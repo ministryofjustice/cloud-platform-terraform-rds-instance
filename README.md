@@ -80,6 +80,6 @@ https://ministryofjustice.github.io/technical-guidance/standards/documenting-inf
 
 ## Reading Material
 
-https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_MySQL.html
-https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_PostgreSQL.html
-https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_MariaDB.html
+- https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_MySQL.html
+- https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_PostgreSQL.html
+- https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_MariaDB.html
