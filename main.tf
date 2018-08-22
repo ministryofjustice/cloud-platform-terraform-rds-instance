@@ -19,7 +19,7 @@ resource "random_string" "username" {
 
 resource "random_string" "password" {
     length = 16
-    special = true
+    special = false
 }
 
 resource "aws_iam_user" "user" {
@@ -30,9 +30,40 @@ resource "aws_iam_user" "user" {
 resource "aws_iam_access_key" "user" {
   user = "${aws_iam_user.user.name}"
 }
+resource "aws_kms_key" "kms" {
+  description = "${var.application}-${var.environment-name}-kms-key"
+
+  tags {
+        business-unit           = "${var.business-unit}"
+        application             = "${var.application}"
+        is-production           = "${var.is-production}"
+        environment-name        = "${var.environment-name}"
+        owner                   = "${var.team_name}"
+        infrastructure-support  = "${var.infrastructure-support}"
+    }
+}
+
+resource "aws_kms_alias" "alias" {
+    name = "alias/${var.application}-${var.environment-name}-kms-key"
+    target_key_id = "${aws_kms_key.kms.key_id}"
+}
+
+resource "aws_db_subnet_group" "db_subnet" {
+  name       = "${var.application}-${var.environment-name}-db-subnet-group"
+  subnet_ids = ["subnet-7293103a", "subnet-7bf10c21", "subnet-de00b3b8"]
+
+  tags {
+        business-unit           = "${var.business-unit}"
+        application             = "${var.application}"
+        is-production           = "${var.is-production}"
+        environment-name        = "${var.environment-name}"
+        owner                   = "${var.team_name}"
+        infrastructure-support  = "${var.infrastructure-support}"
+    }
+}
 
 resource "aws_db_instance" "rds" {
-    identifier                  = "cloud-platform-${random_string.identifier.result}"
+    identifier                  = "cloud-platform-${var.application}-${var.environment-name}-${random_string.identifier.result}"
     final_snapshot_identifier   = "${var.application}-${var.environment-name}-finalsnapshot"
     allocated_storage           = "${var.db_allocated_storage}"
     engine                      = "${var.db_engine}"
@@ -43,14 +74,14 @@ resource "aws_db_instance" "rds" {
     username                    = "${random_string.username.result}"
     password                    = "${random_string.password.result}"
     backup_retention_period     = "${var.db_backup_retention_period}"
-    storage_encrypted           = "${var.db_storage_encryption}"
+    storage_type                = "${var.db_storage_type}"
+    iops                        = "${var.db_iops}"
+    storage_encrypted           = true
+    db_subnet_group_name        = "${aws_db_subnet_group.db_subnet.name}"
+    vpc_security_group_ids      = ["sg-7e8cf203", "sg-7e8cf203"]
+    kms_key_id                  = "${aws_kms_key.kms.arn}"
     multi_az                    = true
     copy_tags_to_snapshot       = true
-
-
-
-
-
 
     tags {
         business-unit           = "${var.business-unit}"
@@ -61,5 +92,3 @@ resource "aws_db_instance" "rds" {
         infrastructure-support  = "${var.infrastructure-support}"
     }
 }
-
-

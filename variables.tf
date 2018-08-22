@@ -11,7 +11,7 @@ variable "db_engine" {
 }
 variable "db_engine_version" {
     description = "The engine version to use e.g. 10.4"
-    default = "10.4"
+    default = 10.4
 }
 variable "db_instance_class" {
     description = "The instance type of the RDS instance"
@@ -24,13 +24,18 @@ variable "db_backup_retention_period" {
 
 variable "db_port" {
     description = "The port on which the DB accepts connections"
-    default = 5432
 }
 
-variable "db_storage_encryption" {
-    description = "Specifies whether the DB instance is encrypted"
-    default     = true
-} 
+variable "db_storage_type" {
+    description = "One of standard (magnetic), gp2 (general purpose SSD), or io1 (provisioned IOPS SSD)."
+    default = "gp2"
+}
+
+variable "db_iops" {
+    description = "The amount of provisioned IOPS. Setting this implies a storage_type of io1"
+    default = 0
+}
+ 
 
 variable "business-unit" {
   description = " Area of the MOJ responsible for the service"
