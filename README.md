@@ -37,14 +37,14 @@ module "example_team_rds" {
 
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
-| db_allocated_storage | The allocated storage in gibibytes | integer | 10 | no |
-| db_engine | Database engine used | string | postgresql | no |
-| db_engine_version | The engine version to use | integer | 10.4 | no |
-| db_instance_class | The instance type of the RDS instance | string | db.t2.small | no |
+| db_allocated_storage | The allocated storage in gibibytes | integer | `10` | no |
+| db_engine | Database engine used | string | `postgresql` | no |
+| db_engine_version | The engine version to use | integer | `10.4` | no |
+| db_instance_class | The instance type of the RDS instance | string | `db.t2.small` | no |
 | db_backup_retention_period | The days to retain backups. Must be 1 or greater to be a source for a Read Replica | integer | - | yes
 | db_port | The port on which the DB accepts connections | integer | - | no |
-| db_storage_type | One of standard (magnetic), gp2 (general purpose SSD), or io1 (provisioned IOPS SSD). | string | gp2 | no |
-| db_iops | The amount of provisioned IOPS. Setting this implies a storage_type of io1 | integer | 0 | Required if 'db_storage_type' is set to io1 |
+| db_storage_type | One of standard (magnetic), gp2 (general purpose SSD), or io1 (provisioned IOPS SSD). | string | `gp2` | no |
+| db_iops | The amount of provisioned IOPS. Setting this implies a storage_type of io1 | integer | 0 | `Required if 'db_storage_type' is set to io1` |
 
 
 ### Tags
