@@ -44,7 +44,7 @@ module "example_team_rds" {
 | db_backup_retention_period | The days to retain backups. Must be 1 or greater to be a source for a Read Replica | integer | - | yes
 | db_port | The port on which the DB accepts connections | integer | - | no |
 | db_storage_type | One of standard (magnetic), gp2 (general purpose SSD), or io1 (provisioned IOPS SSD). | string | `gp2` | no |
-| db_iops | The amount of provisioned IOPS. Setting this implies a storage_type of io1 | integer | 0 | `Required if 'db_storage_type' is set to io1` |
+| db_iops | The amount of provisioned IOPS. Setting this implies a storage_type of io1 | integer | `0` | * Required if 'db_storage_type' is set to io1 |
 
 
 ### Tags
