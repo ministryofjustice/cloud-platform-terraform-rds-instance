@@ -12,6 +12,19 @@ resource "random_string" "identifier" {
     upper = false
 }
 
+resource "random_string" "key" {
+    length = 6
+    special = false
+    upper   = false
+}
+
+resource "random_string" "subnet" {
+    length = 6
+    special = false
+    upper   = false
+}
+
+
 resource "random_string" "username" {
     length = 8
     special = false
@@ -44,12 +57,12 @@ resource "aws_kms_key" "kms" {
 }
 
 resource "aws_kms_alias" "alias" {
-    name = "alias/${var.application}-${var.environment-name}-kms-key"
+    name = "alias/${var.application}-${var.environment-name}-kms-key-${random_string.key.result}"
     target_key_id = "${aws_kms_key.kms.key_id}"
 }
 
 resource "aws_db_subnet_group" "db_subnet" {
-  name       = "${var.application}-${var.environment-name}-db-subnet-group"
+  name       = "${var.application}-${var.environment-name}-db-subnet-group-${random_string.subnet.result}"
   subnet_ids = ["subnet-7293103a", "subnet-7bf10c21", "subnet-de00b3b8"]
 
   tags {
