@@ -3,7 +3,7 @@
 }
   
   module "example_team_rds" {
-  source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=rds/module"
+  source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=master"
   
   team_name              = "example-repo"
   db_allocated_storage   = 20
