@@ -15,21 +15,21 @@ The database name uses the format - `"${var.application}${var.environment-name}"
 
 ```hcl
 module "example_team_rds" {
-  source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=master"
+  source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance"
 
   team_name                 = "example-repo"
-  db_allocated_storage      = 20
+  db_allocated_storage      = "20"
   db_engine                 = "mysql"
-  db_engine_version         = 5.7
+  db_engine_version         = "5.7"
   db_instance_class         = "db.t2.small"
   db_retention_period       = 10
   db_port                   = 3306
   db_storage_type           = "io1"
-  db_iops                   = 1000
+  db_iops                   = "1000"
   db_vpc_security_group_ids = ["sg-7e8cf203", "sg-7e8cf203"]
   db_db_subnet_groups       = ["subnet-7293103a", "subnet-7bf10c21", "subnet-de00b3b8"]
   business-unit             = "example-bu"
-  application               = "example-app"
+  application               = "exampleapp"
   is-production             = "false"
   environment-name          = "development"
   infrastructure-support    = "example-team@digtal.justice.gov.uk"
@@ -39,16 +39,16 @@ module "example_team_rds" {
 
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
-| db_allocated_storage | The allocated storage in gibibytes | integer | `10` | no |
+| db_allocated_storage | The allocated storage in gibibytes | string | `10` | no |
 | db_engine | Database engine used | string | `postgresql` | no |
-| db_engine_version | The engine version to use | integer | `10.4` | no |
+| db_engine_version | The engine version to use | string | `10.4` | no |
 | db_instance_class | The instance type of the RDS instance | string | `db.t2.small` | no |
-| db_backup_retention_period | The days to retain backups. Must be 1 or greater to be a source for a Read Replica | integer | - | yes
-| db_port | The port on which the DB accepts connections | integer | - | no |
+| db_backup_retention_period | The days to retain backups. Must be 1 or greater to be a source for a Read Replica | string | - | yes
+| db_port | The port on which the DB accepts connections | string | - | no |
 | db_storage_type | One of standard (magnetic), gp2 (general purpose SSD), or io1 (provisioned IOPS SSD). | string | `gp2` | no |
-| db_iops | The amount of provisioned IOPS. Setting this implies a storage_type of io1 | integer | `0` | * Required if 'db_storage_type' is set to io1 |
-| db_vpc_security_group_ids | List of VPC security groups to associate | string | `["sg-7e8cf203", "sg-7e8cf203"]`| no |
-| db_db_subnet_groups | A list of VPC subnet IDs | string | `["subnet-7293103a", "subnet-7bf10c21", "subnet-de00b3b8"]` | no |
+| db_iops | The amount of provisioned IOPS. Setting this implies a storage_type of io1 | string | `0` | ** Required if 'db_storage_type' is set to io1 ** |
+| db_vpc_security_group_ids | List of VPC security groups to associate | list | `["sg-7e8cf203", "sg-7e8cf203"]`| no |
+| db_db_subnet_groups | A list of VPC subnet IDs | list | `["subnet-7293103a", "subnet-7bf10c21", "subnet-de00b3b8"]` | no |
 
 
 ### Tags

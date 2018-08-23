@@ -23,14 +23,17 @@ variable "db_backup_retention_period" {
 variable "db_port" {
     description = "The port on which the DB accepts connections"
 }
+
 variable "db_storage_type" {
-    description = "One of standard (magnetic), gp2 (general purpose SSD), or io1 (provisioned IOPS SSD)."
+    description = "One of standard magnetic gp2 general purpose SSD or io1 provisioned IOPS SSD."
     default = "gp2"
 }
+
 variable "db_iops" {
     description = "The amount of provisioned IOPS. Setting this implies a storage_type of io1"
     default = 0
 }
+
 variable "db_vpc_security_group_ids" {
     description = "List of VPC security groups to associate"
     default = ["sg-7e8cf203", "sg-7e8cf203"]
