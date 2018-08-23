@@ -63,7 +63,7 @@ resource "aws_kms_alias" "alias" {
 
 resource "aws_db_subnet_group" "db_subnet" {
   name       = "${var.application}-${var.environment-name}-db-subnet-group-${random_string.subnet.result}"
-  subnet_ids = ["subnet-7293103a", "subnet-7bf10c21", "subnet-de00b3b8"]
+  subnet_ids = "${var.db_db_subnet_groups}"
 
   tags {
         business-unit           = "${var.business-unit}"
@@ -91,7 +91,7 @@ resource "aws_db_instance" "rds" {
     iops                        = "${var.db_iops}"
     storage_encrypted           = true
     db_subnet_group_name        = "${aws_db_subnet_group.db_subnet.name}"
-    vpc_security_group_ids      = ["sg-7e8cf203", "sg-7e8cf203"]
+    vpc_security_group_ids      = "${var.db_vpc_security_group_ids}"
     kms_key_id                  = "${aws_kms_key.kms.arn}"
     multi_az                    = true
     copy_tags_to_snapshot       = true
