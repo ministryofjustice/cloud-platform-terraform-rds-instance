@@ -82,7 +82,6 @@ resource "aws_db_instance" "rds" {
     engine                      = "${var.db_engine}"
     engine_version              = "${var.db_engine_version}"
     instance_class              = "${var.db_instance_class}"
-    port                        = "${var.db_port}"
     name                        = "${var.application}${var.environment-name}"
     username                    = "${random_string.username.result}"
     password                    = "${random_string.password.result}"
