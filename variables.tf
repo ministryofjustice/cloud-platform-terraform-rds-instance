@@ -20,9 +20,6 @@ variable "db_instance_class" {
 variable "db_backup_retention_period" {
     description = "The days to retain backups. Must be 1 or greater to be a source for a Read Replica"
 }
-variable "db_port" {
-    description = "The port on which the DB accepts connections"
-}
 
 variable "db_storage_type" {
     description = "One of standard magnetic gp2 general purpose SSD or io1 provisioned IOPS SSD."
