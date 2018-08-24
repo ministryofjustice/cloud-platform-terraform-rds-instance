@@ -11,7 +11,6 @@
   db_engine_version           = "5.7.17"
   db_instance_class           = "db.t2.small"
   db_backup_retention_period  = 10
-  db_port                     = 3306
   db_storage_type             = "io1"
   db_iops                     = "1000"
   db_vpc_security_group_ids   = ["sg-7e8cf203", "sg-7e8cf203"]
