@@ -1,6 +1,16 @@
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
+data "terraform_remote_state" "cluster" {
+  backend = "s3"
+
+  config {
+    bucket = "${var.cluster_state_bucket}"
+    region = "eu-west-1"
+    key    = "/env:/${var.cluster_name}/terraform.tfstate"
+  }
+}
+
 resource "random_id" "id" {
   byte_length = 16
 }
@@ -33,15 +43,6 @@ resource "random_string" "password" {
   special = false
 }
 
-resource "aws_iam_user" "user" {
-  name = "rds-instance-user-${random_id.id.hex}"
-  path = "/system/rds-instance-user/${var.team_name}/"
-}
-
-resource "aws_iam_access_key" "user" {
-  user = "${aws_iam_user.user.name}"
-}
-
 resource "aws_kms_key" "kms" {
   description = "${var.application}-${var.environment-name}-kms-key"
 
@@ -62,7 +63,7 @@ resource "aws_kms_alias" "alias" {
 
 resource "aws_db_subnet_group" "db_subnet" {
   name       = "${var.application}-${var.environment-name}-db-subnet-group-${random_string.subnet.result}"
-  subnet_ids = "${var.db_db_subnet_groups}"
+  subnet_ids = ["${data.terraform_remote_state.cluster.internal_subnets_ids}"]
 
   tags {
     business-unit          = "${var.business-unit}"
@@ -74,8 +75,28 @@ resource "aws_db_subnet_group" "db_subnet" {
   }
 }
 
+resource "aws_security_group" "rds-sg" {
+  name        = "allow_all"
+  description = "Allow all inbound traffic"
+  vpc_id      = "${data.terraform_remote_state.cluster.vpc_id}"
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["${data.terraform_remote_state.cluster.network_cidr_block}"]
+  }
+
+  egress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks = ["${data.terraform_remote_state.cluster.network_cidr_block}"]
+  }
+}
+
 resource "aws_db_instance" "rds" {
-  identifier                = "cloud-platform-${var.application}-${var.environment-name}-${random_string.identifier.result}"
+  identifier                = "cloud-platform-${random_string.identifier.result}"
   final_snapshot_identifier = "${var.application}-${var.environment-name}-finalsnapshot"
   allocated_storage         = "${var.db_allocated_storage}"
   engine                    = "${var.db_engine}"
@@ -89,7 +110,7 @@ resource "aws_db_instance" "rds" {
   iops                      = "${var.db_iops}"
   storage_encrypted         = true
   db_subnet_group_name      = "${aws_db_subnet_group.db_subnet.name}"
-  vpc_security_group_ids    = "${var.db_vpc_security_group_ids}"
+  vpc_security_group_ids    = ["${aws_security_group.rds-sg.name}"]
   kms_key_id                = "${aws_kms_key.kms.arn}"
   multi_az                  = true
   copy_tags_to_snapshot     = true
