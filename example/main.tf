@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 module "example_team_rds" {
-  source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance"
+  source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=2.0"
 
   /*
    * When using this module through the cloud-platform-environments, the
