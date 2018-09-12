@@ -12,25 +12,11 @@ data "terraform_remote_state" "cluster" {
 }
 
 resource "random_id" "id" {
-  byte_length = 16
+  byte_length = 8
 }
 
-resource "random_string" "identifier" {
-  length  = 8
-  special = false
-  upper   = false
-}
-
-resource "random_string" "key" {
-  length  = 6
-  special = false
-  upper   = false
-}
-
-resource "random_string" "subnet" {
-  length  = 6
-  special = false
-  upper   = false
+locals {
+  identifier = "cloud-platform-${random_id.id.hex}"
 }
 
 resource "random_string" "username" {
@@ -57,12 +43,12 @@ resource "aws_kms_key" "kms" {
 }
 
 resource "aws_kms_alias" "alias" {
-  name          = "alias/${var.application}-${var.environment-name}-kms-key-${random_string.key.result}"
+  name          = "alias/${local.identifier}"
   target_key_id = "${aws_kms_key.kms.key_id}"
 }
 
 resource "aws_db_subnet_group" "db_subnet" {
-  name       = "${var.application}-${var.environment-name}-db-subnet-group-${random_string.subnet.result}"
+  name       = "${local.identifier}"
   subnet_ids = ["${data.terraform_remote_state.cluster.internal_subnets_ids}"]
 
   tags {
@@ -76,7 +62,7 @@ resource "aws_db_subnet_group" "db_subnet" {
 }
 
 resource "aws_security_group" "rds-sg" {
-  name        = "allow_all"
+  name        = "${local.identifier}"
   description = "Allow all inbound traffic"
   vpc_id      = "${data.terraform_remote_state.cluster.vpc_id}"
 
@@ -96,8 +82,8 @@ resource "aws_security_group" "rds-sg" {
 }
 
 resource "aws_db_instance" "rds" {
-  identifier                = "cloud-platform-${random_string.identifier.result}"
-  final_snapshot_identifier = "${var.application}-${var.environment-name}-finalsnapshot"
+  identifier                = "${local.identifier}"
+  final_snapshot_identifier = "${local.identifier}-finalsnapshot"
   allocated_storage         = "${var.db_allocated_storage}"
   engine                    = "${var.db_engine}"
   engine_version            = "${var.db_engine_version}"

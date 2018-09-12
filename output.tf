@@ -3,11 +3,6 @@ output "rds_instance_endpoint" {
   value       = "${aws_db_instance.rds.endpoint}"
 }
 
-output "rds_instance_id" {
-  description = "The RDS instance ID."
-  value       = "${aws_db_instance.rds.id}"
-}
-
 output "database_name" {
   description = "Name of the database"
   value       = "${aws_db_instance.rds.name}"
