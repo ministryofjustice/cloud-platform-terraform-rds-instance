@@ -31,7 +31,7 @@ resource "random_string" "password" {
 }
 
 resource "aws_kms_key" "kms" {
-  description = "${var.application}-${var.environment-name}-kms-key"
+  description = "${local.identifier}"
 
   tags {
     business-unit          = "${var.business-unit}"
