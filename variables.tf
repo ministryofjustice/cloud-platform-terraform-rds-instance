@@ -34,6 +34,11 @@ variable "db_iops" {
   default     = 0
 }
 
+variable "db_name" {
+  description = "The name of the database to be created on the instance (if empty, it will be ${var.application}${var.environment-name})"
+  default     = ""
+}
+
 variable "business-unit" {
   description = " Area of the MOJ responsible for the service"
   default     = "mojdigital"

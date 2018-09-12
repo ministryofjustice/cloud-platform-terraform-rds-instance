@@ -17,6 +17,7 @@ resource "random_id" "id" {
 
 locals {
   identifier = "cloud-platform-${random_id.id.hex}"
+  db_name    = "${var.db_name != "" ? var.db_name : "${var.application}${var.environment-name}"}"
 }
 
 resource "random_string" "username" {
@@ -92,7 +93,7 @@ resource "aws_db_instance" "rds" {
   engine                    = "${var.db_engine}"
   engine_version            = "${var.db_engine_version}"
   instance_class            = "${var.db_instance_class}"
-  name                      = "${var.application}${var.environment-name}"
+  name                      = "${local.db_name}"
   username                  = "${random_string.username.result}"
   password                  = "${random_string.password.result}"
   backup_retention_period   = "${var.db_backup_retention_period}"
