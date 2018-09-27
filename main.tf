@@ -17,7 +17,7 @@ resource "random_id" "id" {
 
 locals {
   identifier = "cloud-platform-${random_id.id.hex}"
-  db_name    = "${var.db_name != "" ? var.db_name : "${var.application}${var.environment-name}"}"
+  db_name    = "${var.db_name != "" ? var.db_name : "${random_id.id.hex}"}"
 }
 
 resource "random_string" "username" {
