@@ -2,18 +2,21 @@ provider "aws" {
   region = "eu-west-1"
 }
 
+/*
+ * When using this module through the cloud-platform-environments, the following
+ * two variables are automatically supplied by the pipeline.
+ *
+ */
+
+variable "cluster_name" {}
+
+variable "cluster_state_bucket" {}
+
 module "example_team_rds" {
   source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=2.0"
 
-  /*
-   * When using this module through the cloud-platform-environments, the
-   * following two values are automatically supplied by the pipeline as
-   * variables.
-   *
-   */
-  // cluster_name           = "cloud-platform-live-0"
-  // cluster_state_bucket   = "cloud-platform-cluster-state-bucket"
-
+  cluster_name               = "${var.cluster_name}"
+  cluster_state_bucket       = "${var.cluster_state_bucket}"
   team_name                  = "example-repo"
   db_allocated_storage       = "100"
   db_engine                  = "postgres"

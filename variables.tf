@@ -35,7 +35,7 @@ variable "db_iops" {
 }
 
 variable "db_name" {
-  description = "The name of the database to be created on the instance (if empty, it will be ${var.application}${var.environment-name})"
+  description = "The name of the database to be created on the instance (if empty, it will be the generated random identifier)"
   default     = ""
 }
 
