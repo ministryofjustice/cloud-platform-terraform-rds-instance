@@ -34,14 +34,9 @@ variable "db_iops" {
   default     = 0
 }
 
-variable "db_vpc_security_group_ids" {
-  description = "List of VPC security groups to associate"
-  default     = ["sg-7e8cf203", "sg-7e8cf203"]
-}
-
-variable "db_db_subnet_groups" {
-  description = "A list of VPC subnet IDs."
-  default     = ["subnet-7293103a", "subnet-7bf10c21", "subnet-de00b3b8"]
+variable "db_name" {
+  description = "The name of the database to be created on the instance (if empty, it will be the generated random identifier)"
+  default     = ""
 }
 
 variable "business-unit" {
@@ -59,4 +54,12 @@ variable "environment-name" {}
 
 variable "infrastructure-support" {
   description = "The team responsible for managing the infrastructure. Should be of the form <team-name> (<team-email>)"
+}
+
+variable "cluster_name" {
+  description = "The name of the cluster (eg.: cloud-platform-live-0)"
+}
+
+variable "cluster_state_bucket" {
+  description = "The name of the S3 bucket holding the terraform state for the cluster"
 }
