@@ -63,3 +63,8 @@ variable "cluster_name" {
 variable "cluster_state_bucket" {
   description = "The name of the S3 bucket holding the terraform state for the cluster"
 }
+
+variable "snapshot_identifier" {
+  description = "Specifies whether or not to create this database from a snapshot. This correlates to the snapshot ID you'd find in the RDS console."
+  default     = ""
+}

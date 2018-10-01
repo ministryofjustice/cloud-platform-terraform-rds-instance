@@ -17,7 +17,7 @@ resource "random_id" "id" {
 
 locals {
   identifier = "cloud-platform-${random_id.id.hex}"
-  db_name    = "${var.db_name != "" ? var.db_name : "${random_id.id.hex}"}"
+  db_name    = "${var.db_name != "" ? var.db_name : "db${random_id.id.hex}"}"
 }
 
 resource "random_string" "username" {
@@ -101,10 +101,11 @@ resource "aws_db_instance" "rds" {
   iops                      = "${var.db_iops}"
   storage_encrypted         = true
   db_subnet_group_name      = "${aws_db_subnet_group.db_subnet.name}"
-  vpc_security_group_ids    = ["${aws_security_group.rds-sg.name}"]
+  vpc_security_group_ids    = ["${aws_security_group.rds-sg.id }"]
   kms_key_id                = "${aws_kms_key.kms.arn}"
   multi_az                  = true
   copy_tags_to_snapshot     = true
+  snapshot_identifier       = "${var.snapshot_identifier}"
 
   tags {
     business-unit          = "${var.business-unit}"
