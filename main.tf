@@ -105,6 +105,7 @@ resource "aws_db_instance" "rds" {
   kms_key_id                = "${aws_kms_key.kms.arn}"
   multi_az                  = true
   copy_tags_to_snapshot     = true
+  snapshot_identifier       = "${var.snapshot_identifier}"
 
   tags {
     business-unit          = "${var.business-unit}"
