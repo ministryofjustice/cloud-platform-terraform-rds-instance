@@ -97,7 +97,7 @@ resource "aws_db_instance" "rds" {
   username                  = "${random_string.username.result}"
   password                  = "${random_string.password.result}"
   backup_retention_period   = "${var.db_backup_retention_period}"
-  storage_type              = "${var.db_storage_type}"
+  storage_type              = "${var.db_iops == 0 ? "gp2" : "io1" }"
   iops                      = "${var.db_iops}"
   storage_encrypted         = true
   db_subnet_group_name      = "${aws_db_subnet_group.db_subnet.name}"

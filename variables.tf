@@ -24,13 +24,8 @@ variable "db_backup_retention_period" {
   description = "The days to retain backups. Must be 1 or greater to be a source for a Read Replica"
 }
 
-variable "db_storage_type" {
-  description = "One of standard magnetic gp2 general purpose SSD or io1 provisioned IOPS SSD."
-  default     = "gp2"
-}
-
 variable "db_iops" {
-  description = "The amount of provisioned IOPS. Setting this implies a storage_type of io1"
+  description = "The amount of provisioned IOPS. Setting this to a value other than 0 implies a storage_type of io1"
   default     = 0
 }
 

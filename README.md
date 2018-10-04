@@ -21,8 +21,7 @@ module "example_team_rds" {
   db_engine              = "mysql"
   db_engine_version      = "5.7"
   db_instance_class      = "db.t2.small"
-  db_retention_period    = 10
-  db_storage_type        = "io1"
+  db_retention_period    = "10"
   db_iops                = "1000"
   team_name              = "example-repo"
   business-unit          = "example-bu"
@@ -48,7 +47,6 @@ cluster_state_bucket
 | db_engine_version | The engine version to use | string | `10.4` | no |
 | db_instance_class | The instance type of the RDS instance | string | `db.t2.small` | no |
 | db_backup_retention_period | The days to retain backups. Must be 1 or greater to be a source for a Read Replica | string | - | yes
-| db_storage_type | One of standard (magnetic), gp2 (general purpose SSD), or io1 (provisioned IOPS SSD). | string | `gp2` | no |
 | db_iops | The amount of provisioned IOPS. Setting this implies a storage_type of io1 | string | `0` | ** Required if 'db_storage_type' is set to io1 ** |
 | db_name | The name of the database to be created on the instance (if empty, it will be the generated random identifier) | string |  | no |
 | snapshot_identifier | Specifies whether or not to create this database from a snapshot. This correlates to the snapshot ID you'd find in the RDS console. | string | "" | no |
