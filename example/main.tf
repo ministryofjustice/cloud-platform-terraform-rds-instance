@@ -1,3 +1,7 @@
+terraform {
+  backend "s3" {}
+}
+
 provider "aws" {
   region = "eu-west-1"
 }
@@ -12,22 +16,35 @@ variable "cluster_name" {}
 
 variable "cluster_state_bucket" {}
 
+/*
+ * Make sure that you use the latest version of the module by changing the
+ * `ref=` value in the `source` attribute to the latest version listed on the
+ * releases page of this repository.
+ *
+ */
 module "example_team_rds" {
-  source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=2.0"
+  source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=2.2"
 
-  cluster_name               = "${var.cluster_name}"
-  cluster_state_bucket       = "${var.cluster_state_bucket}"
-  team_name                  = "example-repo"
-  db_allocated_storage       = "100"
-  db_engine                  = "postgres"
-  db_engine_version          = "10.4"
-  db_instance_class          = "db.t2.small"
-  db_backup_retention_period = 10
-  db_storage_type            = "io1"
-  db_iops                    = "1000"
-  business-unit              = "example-bu"
-  application                = "exampleapp"
-  is-production              = "false"
-  environment-name           = "development"
-  infrastructure-support     = "example-team@digtal.justice.gov.uk"
+  cluster_name           = "${var.cluster_name}"
+  cluster_state_bucket   = "${var.cluster_state_bucket}"
+  team_name              = "example-repo"
+  business-unit          = "example-bu"
+  application            = "exampleapp"
+  is-production          = "false"
+  environment-name       = "development"
+  infrastructure-support = "example-team@digtal.justice.gov.uk"
+}
+
+resource "kubernetes_secret" "example_team_rds" {
+  metadata {
+    name      = "example-team-rds-instance-output"
+    namespace = "my-namespace"
+  }
+
+  data {
+    rds_instance_endpoint = "${module.example_team_rds.rds_instance_endpoint}"
+    database_name         = "${module.example_team_rds.database_name}"
+    database_username     = "${module.example_team_rds.database_username}"
+    database_password     = "${module.example_team_rds.database_password}"
+  }
 }
