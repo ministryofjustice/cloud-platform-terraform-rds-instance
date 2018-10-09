@@ -18,10 +18,7 @@ module "example_team_rds" {
   cluster_name           = "cloud-platform-live-0"
   cluster_state_bucket   = "live-0-state-bucket"
   db_allocated_storage   = "20"
-  db_engine              = "mysql"
-  db_engine_version      = "5.7"
   db_instance_class      = "db.t2.small"
-  db_retention_period    = "10"
   db_iops                = "1000"
   team_name              = "example-repo"
   business-unit          = "example-bu"
@@ -39,7 +36,7 @@ module "example_team_rds" {
 | cluster_name | The name of the cluster (eg.: cloud-platform-live-0) | string |  | yes |
 | cluster_state_bucket | The name of the S3 bucket holding the terraform state for the cluster | string | | yes |
 | db_allocated_storage | The allocated storage in gibibytes | string | `10` | no |
-| db_engine | Database engine used | string | `postgresql` | no |
+| db_engine | Database engine used | string | `postgres` | no |
 | db_engine_version | The engine version to use | string | `10.4` | no |
 | db_instance_class | The instance type of the RDS instance | string | `db.t2.small` | no |
 | db_backup_retention_period | The days to retain backups. Must be 1 or greater to be a source for a Read Replica | string | `7` | yes
