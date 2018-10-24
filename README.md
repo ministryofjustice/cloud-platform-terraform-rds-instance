@@ -64,6 +64,8 @@ Some of the inputs are tags. All infrastructure resources need to be tagged acco
 | Name | Description |
 |------|-------------|
 | rds_instance_endpoint | The connection endpoint in address:port format |
+| rds_instance_address | The hostname of the RDS instance |
+| rds_instance_port | The database port |
 | database_name | Name of the database |
 | database_username | Database Username |
 | database_password | Database Password |
