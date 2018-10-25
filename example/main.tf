@@ -46,5 +46,6 @@ resource "kubernetes_secret" "example_team_rds" {
     database_name         = "${module.example_team_rds.database_name}"
     database_username     = "${module.example_team_rds.database_username}"
     database_password     = "${module.example_team_rds.database_password}"
+    rds_instance_address	= "${module.example_team_rds.rds_instance_address}"
   }
 }
