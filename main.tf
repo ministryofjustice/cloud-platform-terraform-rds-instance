@@ -94,7 +94,7 @@ resource "aws_db_instance" "rds" {
   engine_version            = "${var.db_engine_version}"
   instance_class            = "${var.db_instance_class}"
   name                      = "${local.db_name}"
-  username                  = "${random_string.username.result}"
+  username                  = "cp${random_string.username.result}"
   password                  = "${random_string.password.result}"
   backup_retention_period   = "${var.db_backup_retention_period}"
   storage_type              = "${var.db_iops == 0 ? "gp2" : "io1" }"
