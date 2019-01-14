@@ -70,6 +70,22 @@ Some of the inputs are tags. All infrastructure resources need to be tagged acco
 | database_username | Database Username |
 | database_password | Database Password |
 
+## Access outside the cluster
+
+The databases are configured with a VPC endoint, reachable only from the cluster pods; for tasks like bulk data import `kubectl forward` can create an authenticated tunnel, with a 2-step process:
+
+1. Create a forwarding pod, any small image that does TCP will do:
+```
+kubectl --context live-0 -n my-namespace run port-forward --generator=run-pod/v1 --image=djfaze/port-forward --port=5432 --env="REMOTE_HOST=cloud-platform-db-name-here.eu-west-1.rds.amazonaws.com" --env="REMOTE_PORT=5432"
+```
+2. Forward the DB port
+```
+kubectl --context live-0 -n my-namespace port-forward port-forward 5432:80
+```
+With this, client tools can access via localhost
+```
+psql -h localhost -U db-username db-name
+```
 
 ## Reading Material
 
