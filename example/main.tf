@@ -24,8 +24,8 @@ variable "cluster_state_bucket" {}
  */
 module "example_team_rds" {
   source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=4.0"
-  cluster_name           = "live-1"
-  cluster_state_bucket   = "cloud-platform-terraform-state"
+  cluster_name           = "example-cluster-0"
+  cluster_state_bucket   = "example-state"
   team_name              = "example-repo"
   business-unit          = "example-bu"
   application            = "exampleapp"

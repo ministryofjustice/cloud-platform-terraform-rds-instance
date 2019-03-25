@@ -1,11 +1,9 @@
 variable "cluster_name" {
   description = "The name of the cluster (eg.: cloud-platform-live-0)"
-  default = "live-1"
 }
 
 variable "cluster_state_bucket" {
   description = "The name of the S3 bucket holding the terraform state for the cluster"
-  default = "cloud-platform-terraform-state"
 }
 
 variable "team_name" {}
