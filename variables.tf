@@ -64,3 +64,8 @@ variable "db_name" {
   description = "The name of the database to be created on the instance (if empty, it will be the generated random identifier)"
   default     = ""
 }
+
+variable "aws_region" {
+  description = "Region into which the resource will be created."
+  default     = "eu-west-2"
+}
