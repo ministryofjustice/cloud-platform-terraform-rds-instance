@@ -23,16 +23,16 @@ variable "cluster_state_bucket" {}
  *
  */
 module "example_team_rds" {
-  source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=3.1"
-
-  cluster_name           = "${var.cluster_name}"
-  cluster_state_bucket   = "${var.cluster_state_bucket}"
+  source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=4.0"
+  cluster_name           = "live-1"
+  cluster_state_bucket   = "cloud-platform-terraform-state"
   team_name              = "example-repo"
   business-unit          = "example-bu"
   application            = "exampleapp"
   is-production          = "false"
   environment-name       = "development"
   infrastructure-support = "example-team@digtal.justice.gov.uk"
+  aws_region             = "eu-west-2"
 }
 
 resource "kubernetes_secret" "example_team_rds" {
@@ -46,6 +46,6 @@ resource "kubernetes_secret" "example_team_rds" {
     database_name         = "${module.example_team_rds.database_name}"
     database_username     = "${module.example_team_rds.database_username}"
     database_password     = "${module.example_team_rds.database_password}"
-    rds_instance_address	= "${module.example_team_rds.rds_instance_address}"
+    rds_instance_address  = "${module.example_team_rds.rds_instance_address}"
   }
 }
