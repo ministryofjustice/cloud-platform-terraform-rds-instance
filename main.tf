@@ -2,7 +2,7 @@ data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
 provider "aws" {
-  alias = "destination"
+  alias = "london"
   region = "eu-west-2"
 }
 data "terraform_remote_state" "cluster" {
@@ -35,7 +35,7 @@ resource "random_string" "password" {
 }
 
 resource "aws_kms_key" "kms" {
-  provider = "aws.destination"
+  provider = "aws.london"
   description = "${local.identifier}"
 
   tags {
@@ -49,13 +49,13 @@ resource "aws_kms_key" "kms" {
 }
 
 resource "aws_kms_alias" "alias" {
-  provider = "aws.destination"
+  provider = "aws.london"
   name          = "alias/${local.identifier}"
   target_key_id = "${aws_kms_key.kms.key_id}"
 }
 
 resource "aws_db_subnet_group" "db_subnet" {
-    provider = "aws.destination"
+    provider = "aws.london"
 
   name       = "${local.identifier}"
   subnet_ids = ["${data.terraform_remote_state.cluster.internal_subnets_ids}"]
@@ -71,7 +71,7 @@ resource "aws_db_subnet_group" "db_subnet" {
 }
 
 resource "aws_security_group" "rds-sg" {
-    provider = "aws.destination"
+    provider = "aws.london"
 
   name        = "${local.identifier}"
   description = "Allow all inbound traffic"
@@ -97,7 +97,7 @@ resource "aws_security_group" "rds-sg" {
 }
 
 resource "aws_db_instance" "rds" {
-    provider = "aws.destination"
+    provider = "aws.london"
 
   identifier                = "${local.identifier}"
   final_snapshot_identifier = "${local.identifier}-finalsnapshot"
