@@ -102,6 +102,7 @@ resource "aws_db_instance" "rds" {
   identifier                = "${local.identifier}"
   final_snapshot_identifier = "${local.identifier}-finalsnapshot"
   allocated_storage         = "${var.db_allocated_storage}"
+  apply_immediately         = true
   engine                    = "${var.db_engine}"
   engine_version            = "${var.db_engine_version}"
   instance_class            = "${var.db_instance_class}"
