@@ -54,7 +54,7 @@ module "example_team_rds" {
 
 ### Tags
 
-Some of the inputs are tags. All infrastructure resources need to be tagged according to the [MOJ techincal guidence](https://ministryofjustice.github.io/technical-guidance/standards/documenting-infrastructure-owners/#documenting-owners-of-infrastructure). The tags are stored as variables that you will need to fill out as part of your module.
+Some of the inputs are tags. All infrastructure resources need to be tagged according to the [MOJ techincal guidance](https://ministryofjustice.github.io/technical-guidance/standards/documenting-infrastructure-owners/#documenting-owners-of-infrastructure). The tags are stored as variables that you will need to fill out as part of your module.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
@@ -75,6 +75,36 @@ Some of the inputs are tags. All infrastructure resources need to be tagged acco
 | database_name | Name of the database |
 | database_username | Database Username |
 | database_password | Database Password |
+
+## Quick test for database access
+
+Connection details exported in the Kubernetes secret can be parsed with
+```
+$ kubectl --context live-1 -n rds-test get secret rds-test-rds-instance-output -o json | jq -r '.data'
+{
+  "database_name": "...",
+  "database_password": "...",
+  "database_username": "...",
+  "rds_instance_address": "...",
+  "rds_instance_endpoint": "..."
+}
+```
+base64decode with eg
+```
+$ kubectl --context live-1 -n rds-test get secret rds-test-rds-instance-output -o json | jq -r '.data[] | @base64d'
+```
+A Docker image containing the `psql` utility is available from [Bitnami](https://github.com/bitnami/bitnami-docker-postgresql)  (preferable to the official one because it doesn't run as root) and can be quickly launched with
+```
+$ kubectl --context live-1 -n rds-test run --generator=run-pod/v1 shell --rm -i --tty --image bitnami/postgresql -- bash
+If you don't see a command prompt, try pressing enter.
+I have no name!@shell:/$ $ psql -h cloud-platform-identifier.eu-west-2.rds.amazonaws.com -U username databasename
+Password for username:
+psql (10.7, server 10.6)
+SSL connection (protocol: TLSv1.2, cipher: ECDHE-RSA-AES256-GCM-SHA384, bits: 256, compression: off)
+db4dc779f4f67a7f18=> \l
+ postgres           | cpQRXIypod | UTF8     | en_US.UTF-8 | en_US.UTF-8 |
+ test_db            | cpQRXIypod | UTF8     | en_US.UTF-8 | en_US.UTF-8 |
+```
 
 ## Access outside the cluster
 
