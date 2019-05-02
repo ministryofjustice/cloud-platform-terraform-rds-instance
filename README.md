@@ -29,7 +29,11 @@ module "example_team_rds" {
   is-production          = "false"
   environment-name       = "development"
   infrastructure-support = "example-team@digtal.justice.gov.uk"
-  aws_region             = "eu-west-2"
+
+  providers = {
+    # This can be either "aws.london" or "aws.ireland:
+    aws = "aws.london"
+  }
 }
 
 ```
@@ -49,8 +53,8 @@ module "example_team_rds" {
 | snapshot_identifier | Specifies whether or not to create this database from a snapshot. This correlates to the snapshot ID you'd find in the RDS console. | string | | no |
 | cluster_name | The name of the cluster (eg.: cloud-platform-live-0) | string | - | yes |
 | cluster_state_bucket | The name of the S3 bucket holding the terraform state for the cluster | string | - | yes |
-| aws_region | region into which the resource will be created | string | eu-west-2 | no 
-
+| providers | provider (and region) creating the resources |  arrays of string | default provider | no
+|
 
 ### Tags
 
