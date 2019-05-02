@@ -65,6 +65,7 @@ variable "db_name" {
   default     = ""
 }
 
+#Deprecated from v3.2
 variable "aws_region" {
   description = "Region into which the resource will be created."
   default     = "eu-west-2"
