@@ -138,6 +138,8 @@ kubectl get secret [secret name] -n [your namespace] -o json \
   | base64 --decode
 ```
 
+If you are exporting the individual database connection parameters separately (i.e. database hostname, database name, database username and database password), you will need to adapt the commands in this section accordingly. In particular, you will need to pass the parameters individually to `psql` via command-line flags.
+
 ### 1. Run a port-forward pod
 
 There are several docker images designed to forward network traffic. We will use [marcnuri/port-forward][port-forward-image] for this example.
