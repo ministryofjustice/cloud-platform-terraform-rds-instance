@@ -113,12 +113,27 @@ db4dc779f4f67a7f18=> \l
 ## Access outside the cluster
 
 When you create an RDS instance using this module, it is created inside a virtual private cloud (VPC), which will only accept network connections from within the kubernetes cluster.
+So, trying to connect to the RDS instance from your local machine will not work.
+
+```
++--------------+                   \ /                        +--------------+
+| Your machine | -------------------X-----------------------> | RDS instance |
++--------------+                   / \                        +--------------+
+```
 
 If you need to access your database from outside the cluster (e.g. from your own development machine, or to perform a bulk data import), you can do so via the following steps:
 
 1. Run a pod inside the cluster to forward network traffic to your RDS instance
 2. Tell kubernetes to forward traffic from your local machine to the new pod
 3. Access the database as if it were running on your local machine
+
+So, the connection from your machine to the RDS instance works like this:
+
+```
++--------------+             +---------------------+          +--------------+
+| Your machine |------------>| Port forwarding pod |--------->| RDS instance |
++--------------+             +---------------------+          +--------------+
+```
 
 The hostname and credentials for accessing your database will be in a kubernetes secret inside your namespace. You can retrieve them as follows:
 
@@ -169,9 +184,35 @@ kubectl \
 
 ### 3. Access the database
 
+Now you can connect to the database as if it were running locally, on your machine.
+
+If you are exporting a database URL from your RDS kubernetes secret, it might have a value like this:
+
 ```
-psql [database URL from your RDS secret]
+postgres://cpDvquXO5B:R1eDN0xEUnaH6Aqr@cloud-platform-df3589e0e7acba37.cdwm328dlye6.eu-west-2.rds.amazonaws.com:5432/dbdf3589e0e7acba37
+
 ```
+
+You can use this URL to connect to your database via the port forward you have set up, but you need to replace the database hostname, (`cloud-platform-df3589e0e7acba37.cdwm328dlye6.eu-west-2.rds.amazonaws.com` in this example), with `localhost`.
+
+So, if you were starting from the database URL above, the database connection command you will run on your local machine would be:
+
+```
+psql postgres://cpDvquXO5B:R1eDN0xEUnaH6Aqr@localhost:5432/dbdf3589e0e7acba37
+```
+
+If you are exporting the database credentials separately, the command would be something like this:
+
+```
+psql \
+  --host localhost \
+  --port 5432 \
+  --dbname [your database name] \
+  --username [your database username] \
+  --password
+```
+
+(You will be prompted to enter the database password, which you should get (and then base64 decode) from your kubernetes secret)
 
 Please remember to delete the port-forwarding pod when you have finished.
 
