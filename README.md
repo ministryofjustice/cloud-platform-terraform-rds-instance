@@ -157,7 +157,7 @@ If you are exporting the individual database connection parameters separately (i
 
 ### 1. Run a port-forward pod
 
-There are several docker images designed to forward network traffic. We will use [marcnuri/port-forward][port-forward-image] for this example.
+There are several docker images designed to forward network traffic, but you need one which does not run as `root`. We will use [ministryofjustice/port-forward][port-forward-image] for this example.
 
 NB: **The cluster pod security policy (PSP) will prevent any images from running a process as the `root` user, so docker images which expect to do this will not work.**
 
@@ -166,7 +166,7 @@ kubectl \
   -n [your namespace] \
   run port-forward-pod \
   --generator=run-pod/v1 \
-  --image=marcnuri/port-forward \
+  --image=ministryofjustice/port-forward \
   --port=5432 \
   --env="REMOTE_HOST=[your database hostname]" \
   --env="LOCAL_PORT=5432" \
@@ -226,4 +226,4 @@ kubectl delete pod port-forward-pod -n [your namespace]
 - https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_PostgreSQL.html
 - https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_MariaDB.html
 
-[port-forward-image]: https://hub.docker.com/r/marcnuri/port-forward
+[port-forward-image]: https://cloud.docker.com/u/ministryofjustice/repository/docker/ministryofjustice/port-forward
