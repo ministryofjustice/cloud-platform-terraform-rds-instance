@@ -112,19 +112,112 @@ db4dc779f4f67a7f18=> \l
 
 ## Access outside the cluster
 
-The databases are configured with a VPC endoint, reachable only from the cluster pods; for tasks like bulk data import `kubectl forward` can create an authenticated tunnel, with a 2-step process:
+When you create an RDS instance using this module, it is created inside a virtual private cloud (VPC), which will only accept network connections from within the kubernetes cluster.
+So, trying to connect to the RDS instance from your local machine will not work.
 
-1. Create a forwarding pod, any small image that does TCP will do:
 ```
-kubectl --context live-0 -n my-namespace run port-forward --generator=run-pod/v1 --image=djfaze/port-forward --port=5432 --env="REMOTE_HOST=cloud-platform-db-name-here.eu-west-1.rds.amazonaws.com" --env="REMOTE_PORT=5432"
++--------------+                   \ /                        +--------------+
+| Your machine | -------------------X-----------------------> | RDS instance |
++--------------+                   / \                        +--------------+
 ```
-2. Forward the DB port
+
+If you need to access your database from outside the cluster (e.g. from your own development machine, or to perform a bulk data import), you can do so via the following steps:
+
+1. Run a pod inside the cluster to forward network traffic to your RDS instance
+2. Tell kubernetes to forward traffic from your local machine to the new pod
+3. Access the database as if it were running on your local machine
+
+So, the connection from your machine to the RDS instance works like this:
+
 ```
-kubectl --context live-0 -n my-namespace port-forward port-forward 5432:80
++--------------+             +---------------------+          +--------------+
+| Your machine |------------>| Port forwarding pod |--------->| RDS instance |
++--------------+             +---------------------+          +--------------+
 ```
-With this, client tools can access via localhost
+
+The hostname and credentials for accessing your database will be in a kubernetes secret inside your namespace. You can retrieve them as follows:
+
 ```
-psql -h localhost -U db-username db-name
+kubectl get secrets -n [your namespace]
+
+kubectl get secret [secret name] -n [your namespace] -o json
+
+```
+
+You will need to base64 decode the values from the secret. Here is an example assuming the secret exports a single `url` value:
+
+```
+kubectl get secret [secret name] -n [your namespace] -o json \
+  | jq '.data.url' \
+  | sed 's/"//g' \
+  | base64 --decode
+```
+
+If you are exporting the individual database connection parameters separately (i.e. database hostname, database name, database username and database password), you will need to adapt the commands in this section accordingly. In particular, you will need to pass the parameters individually to `psql` via command-line flags.
+
+### 1. Run a port-forward pod
+
+There are several docker images designed to forward network traffic. We will use [marcnuri/port-forward][port-forward-image] for this example.
+
+NB: **The cluster pod security policy (PSP) will prevent any images from running a process as the `root` user, so docker images which expect to do this will not work.**
+
+```
+kubectl \
+  -n [your namespace] \
+  run port-forward-pod \
+  --generator=run-pod/v1 \
+  --image=marcnuri/port-forward \
+  --port=5432 \
+  --env="REMOTE_HOST=[your database hostname]" \
+  --env="LOCAL_PORT=5432" \
+  --env="REMOTE_PORT=5432"
+```
+
+### 2. Forward local traffic to the port-forward-pod
+
+```
+kubectl \
+  -n [your namespace] \
+  port-forward \
+  port-forward-pod 5432:5432
+```
+
+### 3. Access the database
+
+Now you can connect to the database as if it were running locally, on your machine.
+
+If you are exporting a database URL from your RDS kubernetes secret, it might have a value like this:
+
+```
+postgres://cpDvquXO5B:R1eDN0xEUnaH6Aqr@cloud-platform-df3589e0e7acba37.cdwm328dlye6.eu-west-2.rds.amazonaws.com:5432/dbdf3589e0e7acba37
+
+```
+
+You can use this URL to connect to your database via the port forward you have set up, but you need to replace the database hostname, (`cloud-platform-df3589e0e7acba37.cdwm328dlye6.eu-west-2.rds.amazonaws.com` in this example), with `localhost`.
+
+So, if you were starting from the database URL above, the database connection command you will run on your local machine would be:
+
+```
+psql postgres://cpDvquXO5B:R1eDN0xEUnaH6Aqr@localhost:5432/dbdf3589e0e7acba37
+```
+
+If you are exporting the database credentials separately, the command would be something like this:
+
+```
+psql \
+  --host localhost \
+  --port 5432 \
+  --dbname [your database name] \
+  --username [your database username] \
+  --password
+```
+
+(You will be prompted to enter the database password, which you should get (and then base64 decode) from your kubernetes secret)
+
+Please remember to delete the port-forwarding pod when you have finished.
+
+```
+kubectl delete pod port-forward-pod -n [your namespace]
 ```
 
 ## Reading Material
@@ -132,3 +225,5 @@ psql -h localhost -U db-username db-name
 - https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_MySQL.html
 - https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_PostgreSQL.html
 - https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_MariaDB.html
+
+[port-forward-image]: https://hub.docker.com/r/marcnuri/port-forward
