@@ -135,6 +135,8 @@ So, the connection from your machine to the RDS instance works like this:
 +--------------+             +---------------------+          +--------------+
 ```
 
+### Database Hostname/Credentials
+
 The hostname and credentials for accessing your database will be in a kubernetes secret inside your namespace. You can retrieve them as follows:
 
 ```
@@ -144,16 +146,22 @@ kubectl get secret [secret name] -n [your namespace] -o json
 
 ```
 
-You will need to base64 decode the values from the secret. Here is an example assuming the secret exports a single `url` value:
+You will need to base64 decode the values from the secret. In general:
+
+    echo [secret value] | base64 --decode
+
+If you are exporting a database URL from your RDS kubernetes secret, it might have a value like this:
 
 ```
-kubectl get secret [secret name] -n [your namespace] -o json \
-  | jq '.data.url' \
-  | sed 's/"//g' \
-  | base64 --decode
+postgres://cpDvquXO5B:R1eDN0xEUnaH6Aqr@cloud-platform-df3589e0e7acba37.cdwm328dlye6.eu-west-2.rds.amazonaws.com:5432/dbdf3589e0e7acba37
+
 ```
 
-If you are exporting the individual database connection parameters separately (i.e. database hostname, database name, database username and database password), you will need to adapt the commands in this section accordingly. In particular, you will need to pass the parameters individually to `psql` via command-line flags.
+The database hostname is part between `@` and `:` In the example above, the database hostname is:
+
+**cloud-platform-df3589e0e7acba37.cdwm328dlye6.eu-west-2.rds.amazonaws.com**
+
+You will need this value to tell the port-forward pod where it should send network traffic.
 
 ### 1. Run a port-forward pod
 
@@ -175,12 +183,16 @@ kubectl \
 
 ### 2. Forward local traffic to the port-forward-pod
 
+Now you need to forward network traffic from a port on your local machine to the port-forward pod inside the cluster.
+
 ```
 kubectl \
   -n [your namespace] \
   port-forward \
   port-forward-pod 5432:5432
 ```
+
+You need to leave this running as long as you are accessing the database.
 
 ### 3. Access the database
 
