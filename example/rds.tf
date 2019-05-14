@@ -26,7 +26,7 @@ module "example_team_rds" {
   infrastructure-support = "example-team@digtal.justice.gov.uk" 
 
   providers = {
-    # Can be either "aws.london" or "aws.london"
+    # Can be either "aws.london" or "aws.ireland"
     aws = "aws.london"
   }
 }
