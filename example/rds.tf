@@ -15,7 +15,7 @@ variable "cluster_state_bucket" {}
  *
  */
 module "example_team_rds" {
-  source                 = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=4.2"
+  source                 = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=4.3"
   cluster_name           = "${var.cluster_name}"
   cluster_state_bucket   = "${var.cluster_state_bucket}"
   team_name              = "example-repo"
@@ -24,6 +24,7 @@ module "example_team_rds" {
   is-production          = "false"
   environment-name       = "development"
   infrastructure-support = "example-team@digtal.justice.gov.uk" 
+  allow_major_version_upgrade = "true" # use this when upgrading the major version of an engine
 
   providers = {
     # Can be either "aws.london" or "aws.ireland"

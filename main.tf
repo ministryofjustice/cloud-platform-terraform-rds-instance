@@ -107,6 +107,7 @@ resource "aws_db_instance" "rds" {
   multi_az                  = true
   copy_tags_to_snapshot     = true
   snapshot_identifier       = "${var.snapshot_identifier}"
+  allow_major_version_upgrade = "${var.allow_major_version_upgrade}"
 
   tags {
     business-unit          = "${var.business-unit}"

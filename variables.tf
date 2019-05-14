@@ -65,6 +65,11 @@ variable "db_name" {
   default     = ""
 }
 
+variable "allow_major_version_upgrade" {
+  description = "Indicates that major version upgrades are allowed."
+  default     = "false"
+}
+
 #Deprecated from v3.2
 variable "aws_region" {
   description = "Region into which the resource will be created."
