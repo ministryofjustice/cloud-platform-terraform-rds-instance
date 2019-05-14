@@ -23,13 +23,10 @@ module "example_team_rds" {
   application            = "exampleapp"
   is-production          = "false"
   environment-name       = "development"
-  infrastructure-support = "example-team@digtal.justice.gov.uk"
-
-  # Deprecated from the version 4.2 of this module
-  #aws_region             = "eu-west-2"  
+  infrastructure-support = "example-team@digtal.justice.gov.uk" 
 
   providers = {
-    # Can be either "aws.london" or "aws.london"
+    # Can be either "aws.london" or "aws.ireland"
     aws = "aws.london"
   }
 }
