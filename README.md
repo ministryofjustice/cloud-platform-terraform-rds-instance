@@ -8,7 +8,7 @@ The module also deploys the instance in Multi-AZ.
 The outputs of this module should allow a user to connect to the database instance.
 
 
-**IMPORTANT NOTE: The latest module (4.0) does not support Live-0 deployment. Be sure to use the previous one (3.1) is you need to deploy to Live-0.**
+**IMPORTANT NOTE: From version 4.0, this module does not support Live-0 deployment. Be sure to use the previous one (3.1) is you need to deploy to Live-0.**
 
 ## Usage
 
@@ -37,6 +37,10 @@ module "example_team_rds" {
 }
 
 ```
+
+For more details, be sure to read [this example](example/rds.tf)
+
+
 ## Inputs
 
 | Name | Description | Type | Default | Required |
