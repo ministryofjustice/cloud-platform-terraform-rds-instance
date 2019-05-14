@@ -23,8 +23,10 @@ module "example_team_rds" {
   application            = "exampleapp"
   is-production          = "false"
   environment-name       = "development"
-  infrastructure-support = "example-team@digtal.justice.gov.uk" 
-  allow_major_version_upgrade = "true" # use this when upgrading the major version of an engine
+  infrastructure-support = "example-team@digtal.justice.gov.uk"
+
+  # use "allow_major_version_upgrade" when upgrading the major version of an engine
+  allow_major_version_upgrade = "true"
 
   providers = {
     # Can be either "aws.london" or "aws.ireland"
