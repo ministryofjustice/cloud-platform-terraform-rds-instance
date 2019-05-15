@@ -1,4 +1,7 @@
 # cloud-platform-terraform-rds-instance
+
+![version](https://img.shields.io/badge/version-4.2-green.svg?cacheSeconds=2592000)
+
 This terraform module will create an RDS instance and all required AWS resources. A KMS key is also created in order to enable encryption.
 
 The RDS instance that is created uses a randomly generated name to avoid any conflicts. The default database created in the instance uses the same random identifier but can be overriden by the user.
