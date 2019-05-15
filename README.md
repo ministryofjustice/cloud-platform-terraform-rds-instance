@@ -7,6 +7,7 @@ The module also deploys the instance in Multi-AZ.
 
 The outputs of this module should allow a user to connect to the database instance.
 
+When upgrading the major version of an engine, `allow_major_version_upgrade` must be set to `true`, as default is set to false.
 
 **IMPORTANT NOTE: From version 4.0, this module does not support Live-0 deployment. Be sure to use the previous one (3.1) is you need to deploy to Live-0.**
 
@@ -57,8 +58,8 @@ For more details, be sure to read [this example](example/rds.tf)
 | snapshot_identifier | Specifies whether or not to create this database from a snapshot. This correlates to the snapshot ID you'd find in the RDS console. | string | | no |
 | cluster_name | The name of the cluster (eg.: cloud-platform-live-0) | string | - | yes |
 | cluster_state_bucket | The name of the S3 bucket holding the terraform state for the cluster | string | - | yes |
-| providers | provider (and region) creating the resources |  arrays of string | default provider | no
-|
+| providers | provider (and region) creating the resources |  arrays of string | default provider | no |
+| allow_major_version_upgrade | Indicates that major version upgrades are allowed |  string | false | no |
 
 ### Tags
 
