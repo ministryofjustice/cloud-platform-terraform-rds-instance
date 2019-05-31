@@ -108,6 +108,7 @@ resource "aws_db_instance" "rds" {
   copy_tags_to_snapshot       = true
   snapshot_identifier         = "${var.snapshot_identifier}"
   allow_major_version_upgrade = "${var.allow_major_version_upgrade}"
+  parameter_group_name        = "${aws_db_parameter_group.custom_parameters.name}"
 
   tags {
     business-unit          = "${var.business-unit}"
@@ -116,5 +117,15 @@ resource "aws_db_instance" "rds" {
     environment-name       = "${var.environment-name}"
     owner                  = "${var.team_name}"
     infrastructure-support = "${var.infrastructure-support}"
+  }
+}
+
+resource "aws_db_parameter_group" "custom_parameters" {
+  name   = "${local.db_name}"
+  family = "postgres10"
+
+  parameter {
+    name  = "rds.force_ssl"
+    value = "${var.force_ssl ? 1 : 0}"
   }
 }
