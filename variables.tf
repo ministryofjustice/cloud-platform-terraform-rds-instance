@@ -71,7 +71,7 @@ variable "allow_major_version_upgrade" {
 }
 
 variable "force_ssl" {
-  description = "Enforce SSL connections, set to 1 to enable"
+  description = "Enforce SSL connections, set to true to enable"
   default     = "false"
 }
 

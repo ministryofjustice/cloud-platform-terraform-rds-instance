@@ -121,7 +121,7 @@ resource "aws_db_instance" "rds" {
 }
 
 resource "aws_db_parameter_group" "custom_parameters" {
-  name   = "${local.db_name}"
+  name   = "${local.identifier}"
   family = "postgres10"
 
   parameter {
