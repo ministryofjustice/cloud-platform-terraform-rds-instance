@@ -70,6 +70,11 @@ variable "allow_major_version_upgrade" {
   default     = "false"
 }
 
+variable "force_ssl" {
+  description = "Enforce SSL connections, set to true to enable"
+  default     = "false"
+}
+
 #Deprecated from v3.2
 variable "aws_region" {
   description = "Region into which the resource will be created."
