@@ -42,7 +42,7 @@ variable "db_engine" {
 
 variable "db_engine_version" {
   description = "The engine version to use e.g. 10"
-  default     = "10"
+  default     = "9.6"
 }
 
 variable "db_instance_class" {
@@ -73,10 +73,4 @@ variable "allow_major_version_upgrade" {
 variable "force_ssl" {
   description = "Enforce SSL connections, set to true to enable"
   default     = "false"
-}
-
-#Deprecated from v3.2
-variable "aws_region" {
-  description = "Region into which the resource will be created."
-  default     = "eu-west-2"
 }
