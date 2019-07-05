@@ -15,13 +15,14 @@ variable "cluster_state_bucket" {}
  *
  */
 module "example_team_rds" {
-  source                 = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=4.3"
+  source                 = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=4.5"
   cluster_name           = "${var.cluster_name}"
   cluster_state_bucket   = "${var.cluster_state_bucket}"
   team_name              = "example-repo"
   business-unit          = "example-bu"
   application            = "exampleapp"
   is-production          = "false"
+  db_engine_version      = "9.6"                                                                        # change this postgres version as you see fit.
   environment-name       = "development"
   infrastructure-support = "example-team@digtal.justice.gov.uk"
   force_ssl              = "true"
