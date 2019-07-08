@@ -74,3 +74,9 @@ variable "force_ssl" {
   description = "Enforce SSL connections, set to true to enable"
   default     = "false"
 }
+
+variable "rds_family" {
+  description = "Maps the postgres version with the rds family, a family often covers several versions"
+  default = "postgres10"
+}
+
