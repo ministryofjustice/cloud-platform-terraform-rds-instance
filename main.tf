@@ -120,7 +120,6 @@ resource "aws_db_instance" "rds" {
   }
 }
 
-
 resource "aws_db_parameter_group" "custom_parameters" {
   name   = "${local.identifier}"
   family = "${var.rds_family}"

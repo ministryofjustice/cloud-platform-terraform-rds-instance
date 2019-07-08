@@ -77,6 +77,5 @@ variable "force_ssl" {
 
 variable "rds_family" {
   description = "Maps the postgres version with the rds family, a family often covers several versions"
-  default = "postgres10"
+  default     = "postgres10"
 }
-
