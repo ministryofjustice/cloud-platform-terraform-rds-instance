@@ -22,14 +22,14 @@ module "example_team_rds" {
   business-unit          = "example-bu"
   application            = "exampleapp"
   is-production          = "false"
-  db_engine_version      = "9.6"                                                                        # change this postgres version as you see fit.
+  db_engine_version      = "10"                                                                         # change this postgres version as you see fit.
   environment-name       = "development"
   infrastructure-support = "example-team@digtal.justice.gov.uk"
   force_ssl              = "true"
 
   # rds_family should be one of: postgres9.4, postgres9.5, postgres9.6, postgres10, postgres11
   # Pick the one that defines the postgres version the best
-  rds_family = "postgres9.6"
+  rds_family = "postgres10"
 
   # use "allow_major_version_upgrade" when upgrading the major version of an engine
   allow_major_version_upgrade = "true"

@@ -33,8 +33,7 @@ module "example_team_rds" {
   is-production          = "false"
   environment-name       = "development"
   infrastructure-support = "example-team@digtal.justice.gov.uk"
-
-  rds_family             = "9.6"
+  rds_family             = "postgres10"
 
   providers = {
     # This can be either "aws.london" or "aws.ireland:
