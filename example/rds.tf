@@ -22,7 +22,8 @@ module "example_team_rds" {
   business-unit          = "example-bu"
   application            = "exampleapp"
   is-production          = "false"
-  db_engine_version      = "10"                                                                         # change this postgres version as you see fit.
+  # change the postgres version as you see fit.
+  db_engine_version      = "10"                                                                        
   environment-name       = "development"
   infrastructure-support = "example-team@digtal.justice.gov.uk"
   force_ssl              = "true"
