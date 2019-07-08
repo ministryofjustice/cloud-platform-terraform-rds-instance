@@ -122,7 +122,7 @@ resource "aws_db_instance" "rds" {
 
 resource "aws_db_parameter_group" "custom_parameters" {
   name   = "${local.identifier}"
-  family = "postgres10"
+  family = "${var.rds_family}"
 
   parameter {
     name  = "rds.force_ssl"

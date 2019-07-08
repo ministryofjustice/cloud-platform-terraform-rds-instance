@@ -15,16 +15,22 @@ variable "cluster_state_bucket" {}
  *
  */
 module "example_team_rds" {
-  source                 = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=4.3"
+  source                 = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=4.5"
   cluster_name           = "${var.cluster_name}"
   cluster_state_bucket   = "${var.cluster_state_bucket}"
   team_name              = "example-repo"
   business-unit          = "example-bu"
   application            = "exampleapp"
   is-production          = "false"
+  # change the postgres version as you see fit.
+  db_engine_version      = "10"                                                                        
   environment-name       = "development"
   infrastructure-support = "example-team@digtal.justice.gov.uk"
   force_ssl              = "true"
+
+  # rds_family should be one of: postgres9.4, postgres9.5, postgres9.6, postgres10, postgres11
+  # Pick the one that defines the postgres version the best
+  rds_family = "postgres10"
 
   # use "allow_major_version_upgrade" when upgrading the major version of an engine
   allow_major_version_upgrade = "true"

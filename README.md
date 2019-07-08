@@ -33,6 +33,7 @@ module "example_team_rds" {
   is-production          = "false"
   environment-name       = "development"
   infrastructure-support = "example-team@digtal.justice.gov.uk"
+  rds_family             = "postgres10"
 
   providers = {
     # This can be either "aws.london" or "aws.ireland:
@@ -62,6 +63,8 @@ For more details, be sure to read [this example](example/rds.tf)
 | force_ssl | Enforce SSL connections | boolean | `false` | no |
 | snapshot_identifier | Specifies whether or not to create this database from a snapshot. This correlates to the snapshot ID you'd find in the RDS console. | string | | no |
 | providers | provider (and region) creating the resources |  arrays of string | default provider | no |
+| rds_family | rds configuration version | string | `postgres10` | no  |
+
 
 ### Tags
 

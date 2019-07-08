@@ -75,8 +75,7 @@ variable "force_ssl" {
   default     = "false"
 }
 
-#Deprecated from v3.2
-variable "aws_region" {
-  description = "Region into which the resource will be created."
-  default     = "eu-west-2"
+variable "rds_family" {
+  description = "Maps the postgres version with the rds family, a family often covers several versions"
+  default     = "postgres10"
 }
