@@ -120,17 +120,10 @@ resource "aws_db_instance" "rds" {
   }
 }
 
-# Regex matching db_engine_version -> RDS postgres family
-# This transforms db_engine_version 9.x.y to 9.x and 10.x to 10
-locals {
-  familyPattern = "/^((9\\.(\\d+)|1[01])(\\.\\d+)?(\\.\\d+)?)$/"
-}
 
 resource "aws_db_parameter_group" "custom_parameters" {
-  name = "${local.identifier}"
-
-  # family should look like postgres9.4
-  family = "postgres${replace(var.db_engine_version, local.familyPattern, "$2")}"
+  name   = "${local.identifier}"
+  family = "${var.rds_family}"
 
   parameter {
     name  = "rds.force_ssl"
