@@ -125,7 +125,8 @@ resource "aws_db_parameter_group" "custom_parameters" {
   family = "${var.rds_family}"
 
   parameter {
-    name  = "rds.force_ssl"
-    value = "${var.force_ssl ? 1 : 0}"
+    name         = "rds.force_ssl"
+    value        = "${var.force_ssl ? 1 : 0}"
+    apply_method = "${var.apply_method}"
   }
 }
