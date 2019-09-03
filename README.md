@@ -12,6 +12,8 @@ The outputs of this module should allow a user to connect to the database instan
 
 When upgrading the major version of an engine, `allow_major_version_upgrade` must be set to `true`, as default is set to false.
 
+Some engines can't apply some parameters without a reboot(ex postgres9.x cant apply force_ssl immediate), and you will need to specify "pending-reboot" here.
+
 **IMPORTANT NOTE: From version 4.0, this module does not support Live-0 deployment. Be sure to use the previous one (3.1) is you need to deploy to Live-0.**
 
 ## Usage
@@ -60,10 +62,11 @@ For more details, be sure to read [this example](example/rds.tf)
 | db_backup_retention_period | The days to retain backups. Must be 1 or greater to be a source for a Read Replica | string | `7` | yes
 | db_iops | The amount of provisioned IOPS. Setting this implies a storage_type of io1 | string | `0` | ** Required if 'db_storage_type' is set to io1 ** |
 | db_name | The name of the database to be created on the instance (if empty, it will be the generated random identifier) | string |  | no |
-| force_ssl | Enforce SSL connections | boolean | `false` | no |
+| force_ssl | Enforce SSL connections | boolean | `true` | no |
 | snapshot_identifier | Specifies whether or not to create this database from a snapshot. This correlates to the snapshot ID you'd find in the RDS console. | string | | no |
 | providers | provider (and region) creating the resources |  arrays of string | default provider | no |
 | rds_family | rds configuration version | string | `postgres10` | no  |
+| apply_method | Indicates when to apply parameter updates | string | `immediate` | no  |
 
 
 ### Tags
