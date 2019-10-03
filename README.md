@@ -105,7 +105,9 @@ postgres://cpDvquXO5B:R1eDN0xEUnaH6Aqr@cloud-platform-df3589e0e7acba37.cdwm328dl
 
 The database hostname is part between `@` and `:` In the example above, the database hostname is:
 
-**cloud-platform-df3589e0e7acba37.cdwm328dlye6.eu-west-2.rds.amazonaws.com**
+```
+cloud-platform-df3589e0e7acba37.cdwm328dlye6.eu-west-2.rds.amazonaws.com
+```
 
 ### Launching psql in the cluster
 
