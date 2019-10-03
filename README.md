@@ -95,81 +95,34 @@ Some of the inputs are tags. All infrastructure resources need to be tagged acco
 
 ## Quick test for database access
 
-Connection details exported in the Kubernetes secret can be parsed with
-```
-
-$ kubectl -n [your namespace] get secret [secret name] -o json | jq -r '.data'
-
-{
-  "database_name": "...",
-  "database_password": "...",
-  "database_username": "...",
-  "rds_instance_address": "...",
-  "rds_instance_endpoint": "..."
-}
-```
-
-base64decode with eg
-
-```
-$ kubectl -n [your namespace] get secret [secret name] -o json | jq -r '.data[] | @base64d'
-```
-
-A Docker image containing the `psql` utility is available from [Bitnami](https://github.com/bitnami/bitnami-docker-postgresql)  (preferable to the official one because it doesn't run as root) and can be quickly launched with
-
-```
-$ kubectl -n [your namespace] run --generator=run-pod/v1 shell --rm -i --tty --image bitnami/postgresql -- bash
-
-If you don't see a command prompt, try pressing enter.
-
-I have no name!@shell:/$ $ psql -h cloud-platform-identifier.eu-west-2.rds.amazonaws.com -U username databasename
-Password for username:
-psql (10.7, server 10.6)
-SSL connection (protocol: TLSv1.2, cipher: ECDHE-RSA-AES256-GCM-SHA384, bits: 256, compression: off)
-db4dc779f4f67a7f18=> \l
- postgres           | cpQRXIypod | UTF8     | en_US.UTF-8 | en_US.UTF-8 |
- test_db            | cpQRXIypod | UTF8     | en_US.UTF-8 | en_US.UTF-8 |
-```
-
-## Access outside the cluster
-
-When you create an RDS instance using this module, it is created inside a virtual private cloud (VPC), which will only accept network connections from within the kubernetes cluster.
-So, trying to connect to the RDS instance from your local machine will not work.
-
-```
-+--------------+                   \ /                        +--------------+
-| Your machine | -------------------X-----------------------> | RDS instance |
-+--------------+                   / \                        +--------------+
-```
-
-If you need to access your database from outside the cluster (e.g. from your own development machine, or to perform a bulk data import), you can do so via the following steps:
-
-1. Run a pod inside the cluster to forward network traffic to your RDS instance
-2. Tell kubernetes to forward traffic from your local machine to the new pod
-3. Access the database as if it were running on your local machine
-
-So, the connection from your machine to the RDS instance works like this:
-
-```
-+--------------+             +---------------------+          +--------------+
-| Your machine |------------>| Port forwarding pod |--------->| RDS instance |
-+--------------+             +---------------------+          +--------------+
-```
-
 ### Database Hostname/Credentials
 
-The hostname and credentials for accessing your database will be in a kubernetes secret inside your namespace. You can retrieve them as follows:
+The hostname and credentials for accessing your database will be in a
+kubernetes secret inside your namespace. You can retrieve them as follows (the
+`decode.rb` script is available [here][decode]):
 
 ```
-kubectl get secrets -n [your namespace]
+$ kubectl -n [your namespace] get secret [secret name] -o yaml | ./decode.rb
 
-kubectl get secret [secret name] -n [your namespace] -o json
-
+---
+apiVersion: v1
+data:
+  database_name: ...
+  database_password: ...
+  database_username: ...
+  rds_instance_address: cloud-platform-xxxxx.yyyyy.eu-west-2.rds.amazonaws.com
+  rds_instance_endpoint: cloud-platform-xxxxx.yyyyy.eu-west-2.rds.amazonaws.com:5432
+  rds_instance_port: '5432'
+kind: Secret
+metadata:
+  creationTimestamp: '2019-05-08T16:14:23Z'
+  name: secret-name
+  namespace: your-namespace
+  resourceVersion: '11111111'
+  selfLink: "/api/v1/namespaces/your-namespace/secrets/secret-name"
+  uid: 11111111-1111-1111-1111-111111111111
+type: Opaque
 ```
-
-You will need to base64 decode the values from the secret. In general:
-
-    echo [secret value] | base64 --decode
 
 If you are exporting a database URL from your RDS kubernetes secret, it might have a value like this:
 
@@ -182,7 +135,57 @@ The database hostname is part between `@` and `:` In the example above, the data
 
 **cloud-platform-df3589e0e7acba37.cdwm328dlye6.eu-west-2.rds.amazonaws.com**
 
-You will need this value to tell the port-forward pod where it should send network traffic.
+### Launching psql in the cluster
+
+A Docker image containing the `psql` utility is available from [Bitnami] (you
+cannot use the official postgres image, because it runs as root) and can be
+launched like this:
+
+```
+$ kubectl -n [your namespace] run --generator=run-pod/v1 shell --rm -i --tty --image bitnami/postgresql -- bash
+
+If you don't see a command prompt, try pressing enter.
+postgres@shell:/$
+```
+
+You can then connect to your database like this
+
+```
+postgres@shell:/$ psql -h [rds_instance_address] -U [database_username] [database_name]
+Password for username: [...enter database_password here...]
+psql (10.7, server 10.6)
+SSL connection (protocol: TLSv1.2, cipher: ECDHE-RSA-AES256-GCM-SHA384, bits: 256, compression: off)
+[database_name]=>
+```
+
+## Access from outside the cluster
+
+When you create an RDS instance using this module, it is created inside a
+virtual private cloud (VPC), which will only accept network connections from
+within the kubernetes cluster.  So, trying to connect to the RDS instance from
+your local machine will not work.
+
+```
++--------------+                   \ /                        +--------------+
+| Your machine | -------------------X-----------------------> | RDS instance |
++--------------+                   / \                        +--------------+
+```
+
+If you need to access your database from outside the cluster (e.g. from your
+own development machine, or to perform a bulk data import), you can do so via
+the following steps:
+
+1. Run a pod inside the cluster to forward network traffic to your RDS instance
+2. Tell kubernetes to forward traffic from your local machine to the new pod
+3. Access the database as if it were running on your local machine
+
+So, the connection from your machine to the RDS instance works like this:
+
+```
++--------------+             +---------------------+          +--------------+
+| Your machine |------------>| Port forwarding pod |--------->| RDS instance |
++--------------+             +---------------------+          +--------------+
+```
 
 ### 1. Run a port-forward pod
 
@@ -260,3 +263,5 @@ kubectl delete pod port-forward-pod -n [your namespace]
 - https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_MariaDB.html
 
 [port-forward-image]: https://cloud.docker.com/u/ministryofjustice/repository/docker/ministryofjustice/port-forward
+[decode]: https://github.com/ministryofjustice/cloud-platform-environments/blob/master/bin/decode.rb
+[Bitnami]: https://github.com/bitnami/bitnami-docker-postgresql
