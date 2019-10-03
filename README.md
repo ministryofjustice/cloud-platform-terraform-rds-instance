@@ -98,7 +98,7 @@ Some of the inputs are tags. All infrastructure resources need to be tagged acco
 Connection details exported in the Kubernetes secret can be parsed with
 ```
 
-$ kubectl -n [your namespace] get secret rds-test-rds-instance-output -o json | jq -r '.data'
+$ kubectl -n [your namespace] get secret [secret name] -o json | jq -r '.data'
 
 {
   "database_name": "...",
@@ -112,7 +112,7 @@ $ kubectl -n [your namespace] get secret rds-test-rds-instance-output -o json | 
 base64decode with eg
 
 ```
-$ kubectl -n [your namespace] get secret rds-test-rds-instance-output -o json | jq -r '.data[] | @base64d'
+$ kubectl -n [your namespace] get secret [secret name] -o json | jq -r '.data[] | @base64d'
 ```
 
 A Docker image containing the `psql` utility is available from [Bitnami](https://github.com/bitnami/bitnami-docker-postgresql)  (preferable to the official one because it doesn't run as root) and can be quickly launched with
