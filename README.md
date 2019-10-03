@@ -18,35 +18,7 @@ Some engines can't apply some parameters without a reboot(ex postgres9.x cant ap
 
 ## Usage
 
-```hcl
-module "example_team_rds" {
-  source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance"
-
-  // The first two inputs are provided by the pipeline for cloud-platform. See the example for more detail.
-
-  cluster_name           = "cloud-platform-live-0"
-  cluster_state_bucket   = "live-0-state-bucket"
-  db_allocated_storage   = "20"
-  db_instance_class      = "db.t2.small"
-  db_iops                = "1000"
-  team_name              = "example-repo"
-  business-unit          = "example-bu"
-  application            = "exampleapp"
-  is-production          = "false"
-  environment-name       = "development"
-  infrastructure-support = "example-team@digtal.justice.gov.uk"
-  rds_family             = "postgres10"
-
-  providers = {
-    # This can be either "aws.london" or "aws.ireland:
-    aws = "aws.london"
-  }
-}
-
-```
-
-For more details, be sure to read [this example](example/rds.tf)
-
+See [this example](example/rds.tf)
 
 ## Inputs
 
