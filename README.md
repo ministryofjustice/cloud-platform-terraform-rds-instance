@@ -65,7 +65,7 @@ Some of the inputs are tags. All infrastructure resources need to be tagged acco
 | database_username | Database Username |
 | database_password | Database Password |
 
-## Quick test for database access
+## Accessing the database
 
 ### Database Hostname/Credentials
 
