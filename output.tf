@@ -27,3 +27,13 @@ output "database_password" {
   description = "Database Password"
   value       = "${aws_db_instance.rds.password}"
 }
+
+output "access_key_id" {
+  description = "Access key id for s3 account"
+  value       = "${aws_iam_access_key.user.id}"
+}
+
+output "secret_access_key" {
+  description = "Secret key for s3 account"
+  value       = "${aws_iam_access_key.user.secret}"
+}

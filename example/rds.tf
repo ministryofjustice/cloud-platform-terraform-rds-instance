@@ -15,13 +15,14 @@ variable "cluster_state_bucket" {}
  *
  */
 module "example_team_rds" {
-  source                 = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=4.6"
-  cluster_name           = "${var.cluster_name}"
-  cluster_state_bucket   = "${var.cluster_state_bucket}"
-  team_name              = "example-repo"
-  business-unit          = "example-bu"
-  application            = "exampleapp"
-  is-production          = "false"
+  source               = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=4.6"
+  cluster_name         = "${var.cluster_name}"
+  cluster_state_bucket = "${var.cluster_state_bucket}"
+  team_name            = "example-repo"
+  business-unit        = "example-bu"
+  application          = "exampleapp"
+  is-production        = "false"
+
   # change the postgres version as you see fit.
   db_engine_version      = "10"
   environment-name       = "development"
@@ -56,6 +57,8 @@ resource "kubernetes_secret" "example_team_rds" {
     database_username     = "${module.example_team_rds.database_username}"
     database_password     = "${module.example_team_rds.database_password}"
     rds_instance_address  = "${module.example_team_rds.rds_instance_address}"
+    access_key_id         = "${module.example_team_rds.access_key_id}"
+    secret_access_key     = "${module.example_team_rds.secret_access_key}"
 
     /* You can replace all of the above with the following, if you prefer to
      * use a single database URL value in your application code:
