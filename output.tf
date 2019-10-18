@@ -29,11 +29,11 @@ output "database_password" {
 }
 
 output "access_key_id" {
-  description = "Access key id for s3 account"
+  description = "Access key id for RDS IAM user"
   value       = "${aws_iam_access_key.user.id}"
 }
 
 output "secret_access_key" {
-  description = "Secret key for s3 account"
+  description = "Secret key for RDS IAM user"
   value       = "${aws_iam_access_key.user.secret}"
 }
