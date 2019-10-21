@@ -64,6 +64,8 @@ Some of the inputs are tags. All infrastructure resources need to be tagged acco
 | database_name | Name of the database |
 | database_username | Database Username |
 | database_password | Database Password |
+| access_key_id | Access key id for RDS snapshot management |
+| secret_access_key | Secret key for RDS snapshot management |
 
 ## Accessing the database
 
@@ -82,6 +84,8 @@ data:
   database_name: ...
   database_password: ...
   database_username: ...
+  access_key_id: ...
+  secret_access_key: ...
   rds_instance_address: cloud-platform-xxxxx.yyyyy.eu-west-2.rds.amazonaws.com
   rds_instance_endpoint: cloud-platform-xxxxx.yyyyy.eu-west-2.rds.amazonaws.com:5432
   rds_instance_port: '5432'
@@ -229,6 +233,23 @@ Please remember to delete the port-forwarding pod when you have finished.
 ```
 kubectl delete pod port-forward-pod -n [your namespace]
 ```
+
+### 4. Managing RDS snapshots - backups and restores
+
+An IAM user account is created which allows management of RDS snapshots - allowing snapshot create, delete, copy, restore.
+
+Example usage via AWS CLI:
+
+List snapshots
+```
+aws rds describe-db-snapshots --db-instance-identifier [db-instance-name]
+```
+
+Create snapshot
+```
+aws rds create-db-snapshot --db-instance-identifier [db-instance-name] --db-snapshot-identifier [your-snapshot-name]
+```
+
 
 ## Reading Material
 

@@ -130,3 +130,38 @@ resource "aws_db_parameter_group" "custom_parameters" {
     apply_method = "${var.apply_method}"
   }
 }
+
+resource "aws_iam_user" "user" {
+  name = "rds-snapshots-user-${random_id.id.hex}"
+  path = "/system/rds-snapshots-user/${var.team_name}/"
+}
+
+resource "aws_iam_access_key" "user" {
+  user = "${aws_iam_user.user.name}"
+}
+
+data "aws_iam_policy_document" "policy" {
+  statement {
+    actions = [
+      "rds:DescribeDBSnapshots",
+      "rds:CopyDBSnapshot",
+      "rds:DeleteDBSnapshot",
+      "rds:DescribeDBSnapshotAttributes",
+      "rds:ModifyDBSnapshot",
+      "rds:CreateDBSnapshot",
+      "rds:RestoreDBInstanceFromDBSnapshot",
+      "rds:ModifyDBSnapshotAttribute",
+    ]
+
+    resources = [
+      "${aws_db_instance.rds.arn}",
+      "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:snapshot:*",
+    ]
+  }
+}
+
+resource "aws_iam_user_policy" "policy" {
+  name   = "rds-snapshots-read-write"
+  policy = "${data.aws_iam_policy_document.policy.json}"
+  user   = "${aws_iam_user.user.name}"
+}
