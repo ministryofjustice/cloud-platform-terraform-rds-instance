@@ -26,7 +26,7 @@ module "example_team_rds" {
   # change the postgres version as you see fit.
   db_engine_version      = "10"
   environment-name       = "development"
-  infrastructure-support = "example-team@digtal.justice.gov.uk"
+  infrastructure-support = "example-team@digital.justice.gov.uk"
 
   # rds_family should be one of: postgres9.4, postgres9.5, postgres9.6, postgres10, postgres11
   # Pick the one that defines the postgres version the best
