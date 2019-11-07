@@ -183,6 +183,8 @@ kubectl \
   --env="REMOTE_PORT=5432"
 ```
 
+Note: This creates a pod in your namespace, but without a deployment to manage it. This means that, if the cluster moves your workload to a different node, the port-forward pod will not be moved - it will just disappear. If you need your port-forward pod to persist, please use a [deployment].
+
 ### 2. Forward local traffic to the port-forward-pod
 
 Now you need to forward network traffic from a port on your local machine to the port-forward pod inside the cluster.
@@ -260,3 +262,4 @@ aws rds create-db-snapshot --db-instance-identifier [db-instance-name] --db-snap
 [port-forward-image]: https://cloud.docker.com/u/ministryofjustice/repository/docker/ministryofjustice/port-forward
 [decode]: https://github.com/ministryofjustice/cloud-platform-environments/blob/master/bin/decode.rb
 [Bitnami]: https://github.com/bitnami/bitnami-docker-postgresql
+[deployment]: https://kubernetes.io/docs/tasks/run-application/run-stateless-application-deployment/
