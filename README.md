@@ -14,8 +14,6 @@ When upgrading the major version of an engine, `allow_major_version_upgrade` mus
 
 Some engines can't apply some parameters without a reboot(ex postgres9.x cant apply force_ssl immediate), and you will need to specify "pending-reboot" here.
 
-**IMPORTANT NOTE: From version 4.0, this module does not support Live-0 deployment. Be sure to use the previous one (3.1) is you need to deploy to Live-0.**
-
 ## Usage
 
 See [this example](example/rds.tf)
