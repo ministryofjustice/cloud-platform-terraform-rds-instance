@@ -1,39 +1,39 @@
 output "rds_instance_endpoint" {
   description = "The connection endpoint in address:port format"
-  value       = aws_db_instance.rds.endpoint
+  value       = "${aws_db_instance.rds.endpoint}"
 }
 
 output "rds_instance_address" {
   description = "The hostname of the RDS instance"
-  value       = aws_db_instance.rds.address
+  value       = "${aws_db_instance.rds.address}"
 }
 
 output "rds_instance_port" {
   description = "The database port"
-  value       = aws_db_instance.rds.port
+  value       = "${aws_db_instance.rds.port}"
 }
 
 output "database_name" {
   description = "Name of the database"
-  value       = aws_db_instance.rds.name
+  value       = "${aws_db_instance.rds.name}"
 }
 
 output "database_username" {
   description = "Database Username"
-  value       = aws_db_instance.rds.username
+  value       = "${aws_db_instance.rds.username}"
 }
 
 output "database_password" {
   description = "Database Password"
-  value       = aws_db_instance.rds.password
+  value       = "${aws_db_instance.rds.password}"
 }
 
 output "access_key_id" {
   description = "Access key id for RDS IAM user"
-  value       = aws_iam_access_key.user.id
+  value       = "${aws_iam_access_key.user.id}"
 }
 
 output "secret_access_key" {
   description = "Secret key for RDS IAM user"
-  value       = aws_iam_access_key.user.secret
+  value       = "${aws_iam_access_key.user.secret}"
 }
