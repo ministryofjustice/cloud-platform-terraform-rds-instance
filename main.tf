@@ -133,7 +133,7 @@ resource "aws_db_parameter_group" "custom_parameters" {
 
 resource "aws_iam_user" "user" {
   name = "rds-snapshots-user-${random_id.id.hex}"
-  path = "/system/rds-snapshots-user/${var.team_name}/"
+  path = "/system/rds-snapshots-user/"
 }
 
 resource "aws_iam_access_key" "user" {
