@@ -85,3 +85,8 @@ variable "apply_method" {
   description = "Indicates when to apply parameter updates, some engines can't apply some parameters without a reboot, so set to pending-reboot"
   default     = "immediate"
 }
+
+variable "ca_cert_identifier" {
+  description = "Specifies the identifier of the CA certificate for the DB instance"
+  default     = "rds-ca-2019"
+}
