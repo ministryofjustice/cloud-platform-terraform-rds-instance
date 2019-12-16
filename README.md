@@ -37,6 +37,7 @@ See [this example](example/rds.tf)
 | providers | provider (and region) creating the resources |  arrays of string | default provider | no |
 | rds_family | rds configuration version | string | `postgres10` | no  |
 | apply_method | Indicates when to apply parameter updates | string | `immediate` | no  |
+| ca_cert_identifier | Specifies the identifier of the CA certificate for the DB instance | string | `rds-ca-2019` | no  |
 
 
 ### Tags
