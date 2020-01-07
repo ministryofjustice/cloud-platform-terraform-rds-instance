@@ -90,3 +90,20 @@ variable "ca_cert_identifier" {
   description = "Specifies the identifier of the CA certificate for the DB instance"
   default     = "rds-ca-2019"
 }
+
+variable "db_parameter" {
+  type = list(object({
+    apply_method = string
+    name         = string
+    value        = string
+  }))
+  default = [
+    {
+      name         = "rds.force_ssl"
+      value        = "true"
+      apply_method = "immediate"
+    }
+  ]
+  description = "A list of DB parameters to apply. Note that parameters may differ from a DB family to another"
+}
+
