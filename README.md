@@ -135,6 +135,10 @@ SSL connection (protocol: TLSv1.2, cipher: ECDHE-RSA-AES256-GCM-SHA384, bits: 25
 [database_name]=>
 ```
 
+### Accessing your RDS database from your laptop
+
+Instructions on how to do this are available [here](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/other-topics/rds-external-access.html#accessing-your-rds-database)
+
 ### 4. Managing RDS snapshots - backups and restores
 
 An IAM user account is created which allows management of RDS snapshots - allowing snapshot create, delete, copy, restore.
