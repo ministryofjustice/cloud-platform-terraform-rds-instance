@@ -111,6 +111,7 @@ resource "aws_db_instance" "rds" {
   allow_major_version_upgrade = var.allow_major_version_upgrade
   parameter_group_name        = aws_db_parameter_group.custom_parameters.name
   ca_cert_identifier          = var.ca_cert_identifier
+  deletion_protection         = var.is-production
 
   tags = {
     business-unit          = var.business-unit
