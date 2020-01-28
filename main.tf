@@ -122,9 +122,6 @@ resource "aws_db_instance" "rds" {
     infrastructure-support = var.infrastructure-support
   }
 
-  lifecycle {
-    prevent_destroy = var.is-production
-  }
 }
 
 resource "aws_db_parameter_group" "custom_parameters" {
