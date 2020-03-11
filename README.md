@@ -33,6 +33,7 @@ See [this example](example/rds.tf)
 | db_iops | The amount of provisioned IOPS. Setting this implies a storage_type of io1 | string | `0` | ** Required if 'db_storage_type' is set to io1 ** |
 | db_name | The name of the database to be created on the instance (if empty, it will be the generated random identifier) | string |  | no |
 | force_ssl | Enforce SSL connections | boolean | `true` | no |
+| performance_insights_enabled | Enable performance insights in RDS | boolean | `false` | no |
 | snapshot_identifier | Specifies whether or not to create this database from a snapshot. This correlates to the snapshot ID you'd find in the RDS console. | string | | no |
 | providers | provider (and region) creating the resources |  arrays of string | default provider | no |
 | rds_family | rds configuration version | string | `postgres10` | no  |
