@@ -88,29 +88,30 @@ resource "aws_security_group" "rds-sg" {
 }
 
 resource "aws_db_instance" "rds" {
-  identifier                  = local.identifier
-  final_snapshot_identifier   = "${local.identifier}-finalsnapshot"
-  allocated_storage           = var.db_allocated_storage
-  apply_immediately           = true
-  engine                      = var.db_engine
-  engine_version              = var.db_engine_version
-  instance_class              = var.db_instance_class
-  name                        = local.db_name
-  username                    = "cp${random_string.username.result}"
-  password                    = random_string.password.result
-  backup_retention_period     = var.db_backup_retention_period
-  storage_type                = var.db_iops == 0 ? "gp2" : "io1"
-  iops                        = var.db_iops
-  storage_encrypted           = true
-  db_subnet_group_name        = aws_db_subnet_group.db_subnet.name
-  vpc_security_group_ids      = [aws_security_group.rds-sg.id]
-  kms_key_id                  = aws_kms_key.kms.arn
-  multi_az                    = true
-  copy_tags_to_snapshot       = true
-  snapshot_identifier         = var.snapshot_identifier
-  allow_major_version_upgrade = var.allow_major_version_upgrade
-  parameter_group_name        = aws_db_parameter_group.custom_parameters.name
-  ca_cert_identifier          = var.ca_cert_identifier
+  identifier                   = local.identifier
+  final_snapshot_identifier    = "${local.identifier}-finalsnapshot"
+  allocated_storage            = var.db_allocated_storage
+  apply_immediately            = true
+  engine                       = var.db_engine
+  engine_version               = var.db_engine_version
+  instance_class               = var.db_instance_class
+  name                         = local.db_name
+  username                     = "cp${random_string.username.result}"
+  password                     = random_string.password.result
+  backup_retention_period      = var.db_backup_retention_period
+  storage_type                 = var.db_iops == 0 ? "gp2" : "io1"
+  iops                         = var.db_iops
+  storage_encrypted            = true
+  db_subnet_group_name         = aws_db_subnet_group.db_subnet.name
+  vpc_security_group_ids       = [aws_security_group.rds-sg.id]
+  kms_key_id                   = aws_kms_key.kms.arn
+  multi_az                     = true
+  copy_tags_to_snapshot        = true
+  snapshot_identifier          = var.snapshot_identifier
+  allow_major_version_upgrade  = var.allow_major_version_upgrade
+  parameter_group_name         = aws_db_parameter_group.custom_parameters.name
+  ca_cert_identifier           = var.ca_cert_identifier
+  performance_insights_enabled = var.performance_insights_enabled
 
   tags = {
     business-unit          = var.business-unit

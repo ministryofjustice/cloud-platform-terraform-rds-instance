@@ -107,3 +107,9 @@ variable "db_parameter" {
   description = "A list of DB parameters to apply. Note that parameters may differ from a DB family to another"
 }
 
+variable "performance_insights_enabled" {
+  type        = bool
+  description = "Enable performance insights for RDS?"
+  default     = false
+}
+
