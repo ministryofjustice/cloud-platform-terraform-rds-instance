@@ -26,7 +26,7 @@ resource "random_string" "username" {
   special = false
 }
 
-resource "random_string" "password" {
+resource "random_password" "password" {
   length  = 16
   special = false
 }
@@ -97,7 +97,7 @@ resource "aws_db_instance" "rds" {
   instance_class               = var.db_instance_class
   name                         = local.db_name
   username                     = "cp${random_string.username.result}"
-  password                     = random_string.password.result
+  password                     = random_password.password.result
   backup_retention_period      = var.db_backup_retention_period
   storage_type                 = var.db_iops == 0 ? "gp2" : "io1"
   iops                         = var.db_iops
