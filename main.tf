@@ -127,13 +127,10 @@ resource "aws_db_parameter_group" "custom_parameters" {
   name   = local.identifier
   family = var.rds_family
 
-  dynamic "parameter" {
-    for_each = var.db_parameter
-    content {
-      apply_method = lookup(parameter.value, "apply_method", null)
-      name         = parameter.value.name
-      value        = parameter.value.value
-    }
+  parameter {
+    name         = "rds.force_ssl"
+    value        = var.force_ssl ? 1 : 0
+    apply_method = var.apply_method
   }
 }
 
