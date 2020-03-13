@@ -16,8 +16,12 @@ variable "cluster_state_bucket" {
  * releases page of this repository.
  *
  */
+
+# IMP NOTE: Updating to module version 5.3, existing database password will be rotated.
+# Make sure you restart your pods which use this RDS secret to avoid any down time.
+
 module "example_team_rds" {
-  source               = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.2"
+  source               = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.3"
   cluster_name         = var.cluster_name
   cluster_state_bucket = var.cluster_state_bucket
   team_name            = "example-repo"
