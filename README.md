@@ -117,6 +117,8 @@ The database hostname is part between `@` and `:` In the example above, the data
 cloud-platform-df3589e0e7acba37.cdwm328dlye6.eu-west-2.rds.amazonaws.com
 ```
 
+> NB: You should *always* get the database credentials from this kubernetes secret. Do not be tempted to copy the into another location (such as a ConfigMap). This is because the value of the secret can be updated when this module is updated. As long as you always get your database credentials from the kubernetes secret created by terraform, this is fine. But if you copy the value elsewhere, it will not be automatically updated in the new location, and your application will no longer be able to connect to your database.
+
 ### Launching psql in the cluster
 
 A Docker image containing the `psql` utility is available from [Bitnami] (you
