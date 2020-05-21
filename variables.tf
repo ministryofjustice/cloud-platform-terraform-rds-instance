@@ -25,6 +25,11 @@ variable "infrastructure-support" {
   description = "The team responsible for managing the infrastructure. Should be of the form <team-name> (<team-email>)"
 }
 
+
+variable "rds_name"{
+  description = "Optional name of the RDS cluster"
+  default = ""
+}
 variable "snapshot_identifier" {
   description = "Specifies whether or not to create this database from a snapshot. This correlates to the snapshot ID you'd find in the RDS console."
   default     = ""
