@@ -2,9 +2,6 @@
 
 [![Releases](https://img.shields.io/github/release/ministryofjustice/cloud-platform-terraform-rds-instance/all.svg?style=flat-square)](https://github.com/ministryofjustice/cloud-platform-terraform-rds-instance/releases)
 
-# IMP NOTE: Updating to module version 5.3, existing database password will be rotated.
-# Make sure you restart your pods which use this RDS secret to avoid any down time.
-
 This terraform module will create an RDS instance and all required AWS resources. A KMS key is also created in order to enable encryption.
 
 The RDS instance that is created uses a randomly generated name to avoid any conflicts. The default database created in the instance uses the same random identifier but can be overriden by the user.
