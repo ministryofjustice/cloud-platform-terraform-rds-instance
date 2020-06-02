@@ -36,6 +36,7 @@ See [this example](example/rds.tf)
 | db_backup_retention_period | The days to retain backups. Must be 1 or greater to be a source for a Read Replica | string | `7` | yes
 | db_iops | The amount of provisioned IOPS. Setting this implies a storage_type of io1 | string | `0` | ** Required if 'db_storage_type' is set to io1 ** |
 | db_name | The name of the database to be created on the instance (if empty, it will be the generated random identifier) | string |  | no |
+| rds_name | Name of the RDS  | string | if not present a name will be generated | no  |
 | force_ssl | Enforce SSL connections | boolean | `true` | no |
 | performance_insights_enabled | Enable performance insights in RDS | boolean | `false` | no |
 | snapshot_identifier | Specifies whether or not to create this database from a snapshot. This correlates to the snapshot ID you'd find in the RDS console. | string | | no |

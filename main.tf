@@ -88,7 +88,7 @@ resource "aws_security_group" "rds-sg" {
 }
 
 resource "aws_db_instance" "rds" {
-  identifier                   = local.identifier
+  identifier                   = var.rds_name != "" ? var.rds_name : local.identifier
   final_snapshot_identifier    = "${local.identifier}-finalsnapshot"
   allocated_storage            = var.db_allocated_storage
   apply_immediately            = true
