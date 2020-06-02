@@ -21,13 +21,17 @@ variable "cluster_state_bucket" {
 # Make sure you restart your pods which use this RDS secret to avoid any down time.
 
 module "example_team_rds" {
-  source               = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.3"
+  source               = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.4"
   cluster_name         = var.cluster_name
   cluster_state_bucket = var.cluster_state_bucket
   team_name            = "example-repo"
   business-unit        = "example-bu"
   application          = "exampleapp"
-  is-production        = "false"
+  is-production        = "false" 
+
+  # If the rds_name is not specified a random name will be generated ( cp-* )
+  # Changing the RDS name requires the RDS to be re-created (destroy + create)
+  # rds_name             = "my-rds-name" 
 
   # enable performance insights
   performance_insights_enabled = true  
