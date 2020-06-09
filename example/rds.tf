@@ -27,14 +27,14 @@ module "example_team_rds" {
   team_name            = "example-repo"
   business-unit        = "example-bu"
   application          = "exampleapp"
-  is-production        = "false" 
+  is-production        = "false"
 
   # If the rds_name is not specified a random name will be generated ( cp-* )
   # Changing the RDS name requires the RDS to be re-created (destroy + create)
   # rds_name             = "my-rds-name" 
 
   # enable performance insights
-  performance_insights_enabled = true  
+  performance_insights_enabled = true
 
   # change the postgres version as you see fit.
   db_engine_version      = "10"
@@ -47,7 +47,14 @@ module "example_team_rds" {
 
   # Some engines can't apply some parameters without a reboot(ex postgres9.x cant apply force_ssl immediate). 
   # You will need to specify "pending-reboot" here, as default is set to "immediate".
-  apply_method = "pending-reboot"
+  # db_parameter = [
+  #   {
+  #     name         = "rds.force_ssl"
+  #     value        = "true"
+  #     apply_method = "pending-reboot"
+  #   }
+  # ]
+
 
   # use "allow_major_version_upgrade" when upgrading the major version of an engine
   allow_major_version_upgrade = "true"
