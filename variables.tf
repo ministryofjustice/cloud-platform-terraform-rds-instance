@@ -97,3 +97,18 @@ variable "performance_insights_enabled" {
   default     = false
 }
 
+variable "db_parameter" {
+  type = list(object({
+    apply_method = string
+    name         = string
+    value        = string
+  }))
+  default = [
+    {
+      name         = "rds.force_ssl"
+      value        = "true"
+      apply_method = "immediate"
+    }
+  ]
+  description = "A list of DB parameters to apply. Note that parameters may differ from a DB family to another"
+}
