@@ -25,9 +25,9 @@ variable "infrastructure-support" {
   description = "The team responsible for managing the infrastructure. Should be of the form <team-name> (<team-email>)"
 }
 
-variable "rds_name"{
+variable "rds_name" {
   description = "Optional name of the RDS cluster. Changing the name will re-create the RDS"
-  default = ""
+  default     = ""
 }
 
 variable "snapshot_identifier" {
@@ -76,19 +76,9 @@ variable "allow_major_version_upgrade" {
   default     = "false"
 }
 
-variable "force_ssl" {
-  description = "Enforce SSL connections, set to true to enable"
-  default     = "true"
-}
-
 variable "rds_family" {
   description = "Maps the postgres version with the rds family, a family often covers several versions"
   default     = "postgres10"
-}
-
-variable "apply_method" {
-  description = "Indicates when to apply parameter updates, some engines can't apply some parameters without a reboot, so set to pending-reboot"
-  default     = "immediate"
 }
 
 variable "ca_cert_identifier" {
@@ -111,9 +101,21 @@ variable "db_parameter" {
   default = [
     {
       name         = "rds.force_ssl"
-      value        = "true"
+      value        = "1"
       apply_method = "immediate"
     }
   ]
   description = "A list of DB parameters to apply. Note that parameters may differ from a DB family to another"
+}
+
+variable "replicate_source_db" {
+  description = "Specifies that this resource is a Replicate database, and to use this value as the source database. This correlates to the identifier of another Amazon RDS Database to replicate."
+  type        = string
+  default     = ""
+}
+
+variable "skip_final_snapshot" {
+  type        = string
+  description = "If false(default) all DB are taken a final snapshot unless the db instance is created from snapshot itself or a read replica."
+  default     = "false"
 }
