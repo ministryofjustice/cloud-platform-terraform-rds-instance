@@ -76,19 +76,9 @@ variable "allow_major_version_upgrade" {
   default     = "false"
 }
 
-variable "force_ssl" {
-  description = "Enforce SSL connections, set to true to enable"
-  default     = "true"
-}
-
 variable "rds_family" {
   description = "Maps the postgres version with the rds family, a family often covers several versions"
   default     = "postgres10"
-}
-
-variable "apply_method" {
-  description = "Indicates when to apply parameter updates, some engines can't apply some parameters without a reboot, so set to pending-reboot"
-  default     = "immediate"
 }
 
 variable "ca_cert_identifier" {
