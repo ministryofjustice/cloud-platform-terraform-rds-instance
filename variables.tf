@@ -101,7 +101,7 @@ variable "db_parameter" {
   default = [
     {
       name         = "rds.force_ssl"
-      value        = "true"
+      value        = "1"
       apply_method = "immediate"
     }
   ]
