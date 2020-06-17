@@ -32,17 +32,18 @@ See [this example](example/rds.tf)
 | db_engine | Database engine used | string | `postgres` | no |
 | db_engine_version | The engine version to use | string | `10.4` | no |
 | db_instance_class | The instance type of the RDS instance | string | `db.t2.small` | no |
-| db_backup_retention_period | The days to retain backups. Must be 1 or greater to be a source for a Read Replica | string | `7` | yes
+| db_backup_retention_period | The days to retain backups. Must be 1 or greater to be a source for a Read Replica. Must be 0 for read replica db | string | `7` | yes
 | db_iops | The amount of provisioned IOPS. Setting this implies a storage_type of io1 | string | `0` | ** Required if 'db_storage_type' is set to io1 ** |
 | db_name | The name of the database to be created on the instance (if empty, it will be the generated random identifier) | string |  | no |
 | rds_name | Name of the RDS  | string | if not present a name will be generated | no  |
-| force_ssl | Enforce SSL connections | boolean | `true` | no |
 | performance_insights_enabled | Enable performance insights in RDS | boolean | `false` | no |
 | snapshot_identifier | Specifies whether or not to create this database from a snapshot. This correlates to the snapshot ID you'd find in the RDS console. | string | | no |
 | providers | provider (and region) creating the resources |  arrays of string | default provider | no |
 | rds_family | rds configuration version | string | `postgres10` | no  |
-| apply_method | Indicates when to apply parameter updates | string | `immediate` | no  |
 | ca_cert_identifier | Specifies the identifier of the CA certificate for the DB instance | string | `rds-ca-2019` | no  |
+| db_parameter | Parameter block with name, value and apply_method | list | [ { name = "rds.force_ssl", value = "1", apply_method = "immediate" }]  | yes  |
+| replicate_source_db | Specifies that this resource is a Replicate database, and to use this value as the source database. This correlates to the identifier of another Amazon RDS Database to replicate. | string | <source DB db_identifier> | no  
+| skip_final_snapshot | If false(default) all DB are taken a final snapshot unless the db instance is created from snapshot itself or a read replica." | string | `false` | no  
 
 
 ### Tags

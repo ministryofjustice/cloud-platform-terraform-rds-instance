@@ -47,7 +47,7 @@ variable "db_engine" {
 
 variable "db_engine_version" {
   description = "The engine version to use e.g. 10"
-  default     = "10"
+  default     = "10.11"
 }
 
 variable "db_instance_class" {
@@ -116,6 +116,6 @@ variable "replicate_source_db" {
 
 variable "skip_final_snapshot" {
   type        = string
-  description = "If false(default) all DB are taken a final snapshot unless the db instance is created from snapshot itself or a read replica."
+  description = "if false(default), a DB snapshot is created before the DB instance is deleted, using the value from final_snapshot_identifier. If true no DBSnapshot is created"
   default     = "false"
 }
