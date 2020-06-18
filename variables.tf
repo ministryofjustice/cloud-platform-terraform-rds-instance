@@ -25,9 +25,9 @@ variable "infrastructure-support" {
   description = "The team responsible for managing the infrastructure. Should be of the form <team-name> (<team-email>)"
 }
 
-variable "rds_name"{
+variable "rds_name" {
   description = "Optional name of the RDS cluster. Changing the name will re-create the RDS"
-  default = ""
+  default     = ""
 }
 
 variable "snapshot_identifier" {
@@ -47,7 +47,7 @@ variable "db_engine" {
 
 variable "db_engine_version" {
   description = "The engine version to use e.g. 10"
-  default     = "10"
+  default     = "10.11"
 }
 
 variable "db_instance_class" {
@@ -106,4 +106,16 @@ variable "db_parameter" {
     }
   ]
   description = "A list of DB parameters to apply. Note that parameters may differ from a DB family to another"
+}
+
+variable "replicate_source_db" {
+  description = "Specifies that this resource is a Replicate database, and to use this value as the source database. This correlates to the identifier of another Amazon RDS Database to replicate."
+  type        = string
+  default     = ""
+}
+
+variable "skip_final_snapshot" {
+  type        = string
+  description = "if false(default), a DB snapshot is created before the DB instance is deleted, using the value from final_snapshot_identifier. If true no DBSnapshot is created"
+  default     = "false"
 }

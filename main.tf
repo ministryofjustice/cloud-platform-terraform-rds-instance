@@ -32,6 +32,7 @@ resource "random_password" "password" {
 }
 
 resource "aws_kms_key" "kms" {
+  count = var.replicate_source_db != "" ? 0 : 1
   description = local.identifier
 
   tags = {
@@ -45,11 +46,13 @@ resource "aws_kms_key" "kms" {
 }
 
 resource "aws_kms_alias" "alias" {
+  count = var.replicate_source_db != "" ? 0 : 1
   name          = "alias/${local.identifier}"
-  target_key_id = aws_kms_key.kms.key_id
+  target_key_id = aws_kms_key.kms[0].key_id 
 }
 
 resource "aws_db_subnet_group" "db_subnet" {
+  count = var.replicate_source_db != "" ? 0 : 1
   name       = local.identifier
   subnet_ids = data.terraform_remote_state.cluster.outputs.internal_subnets_ids
 
@@ -89,29 +92,31 @@ resource "aws_security_group" "rds-sg" {
 
 resource "aws_db_instance" "rds" {
   identifier                   = var.rds_name != "" ? var.rds_name : local.identifier
-  final_snapshot_identifier    = "${local.identifier}-finalsnapshot"
+  final_snapshot_identifier    = var.replicate_source_db != "" ? null : "${local.identifier}-finalsnapshot"
   allocated_storage            = var.db_allocated_storage
   apply_immediately            = true
   engine                       = var.db_engine
   engine_version               = var.db_engine_version
   instance_class               = var.db_instance_class
   name                         = local.db_name
-  username                     = "cp${random_string.username.result}"
-  password                     = random_password.password.result
+  username                     = var.replicate_source_db != "" ? null : "cp${random_string.username.result}"
+  password                     = var.replicate_source_db != "" ? null : random_password.password.result
   backup_retention_period      = var.db_backup_retention_period
   storage_type                 = var.db_iops == 0 ? "gp2" : "io1"
   iops                         = var.db_iops
   storage_encrypted            = true
-  db_subnet_group_name         = aws_db_subnet_group.db_subnet.name
+  db_subnet_group_name         = var.replicate_source_db != "" ? null : aws_db_subnet_group.db_subnet[0].name
   vpc_security_group_ids       = [aws_security_group.rds-sg.id]
-  kms_key_id                   = aws_kms_key.kms.arn
+  kms_key_id                   = var.replicate_source_db != "" ? null : aws_kms_key.kms[0].arn
   multi_az                     = true
   copy_tags_to_snapshot        = true
   snapshot_identifier          = var.snapshot_identifier
+  replicate_source_db          = var.replicate_source_db
   allow_major_version_upgrade  = var.allow_major_version_upgrade
   parameter_group_name         = aws_db_parameter_group.custom_parameters.name
-  ca_cert_identifier           = var.ca_cert_identifier
+  ca_cert_identifier           = var.replicate_source_db != "" ? null : var.ca_cert_identifier
   performance_insights_enabled = var.performance_insights_enabled
+  skip_final_snapshot          = var.skip_final_snapshot
 
   tags = {
     business-unit          = var.business-unit
@@ -135,16 +140,18 @@ resource "aws_db_parameter_group" "custom_parameters" {
       value        = parameter.value.value
     }
   }
-  
+
 }
 
 resource "aws_iam_user" "user" {
+  count = var.replicate_source_db != "" ? 0 : 1
   name = "rds-snapshots-user-${random_id.id.hex}"
   path = "/system/rds-snapshots-user/"
 }
 
 resource "aws_iam_access_key" "user" {
-  user = aws_iam_user.user.name
+  count = var.replicate_source_db != "" ? 0 : 1
+  user = aws_iam_user.user[0].name
 }
 
 data "aws_iam_policy_document" "policy" {
@@ -168,7 +175,8 @@ data "aws_iam_policy_document" "policy" {
 }
 
 resource "aws_iam_user_policy" "policy" {
+  count = var.replicate_source_db != "" ? 0 : 1
   name   = "rds-snapshots-read-write"
   policy = data.aws_iam_policy_document.policy.json
-  user   = aws_iam_user.user.name
+  user   = aws_iam_user.user[0].name
 }
