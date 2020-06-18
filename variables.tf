@@ -47,7 +47,7 @@ variable "db_engine" {
 
 variable "db_engine_version" {
   description = "The engine version to use e.g. 10"
-  default     = "10.11"
+  default     = "10"
 }
 
 variable "db_instance_class" {
