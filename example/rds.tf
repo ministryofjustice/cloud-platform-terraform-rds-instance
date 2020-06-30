@@ -21,7 +21,7 @@ variable "cluster_state_bucket" {
 # Make sure you restart your pods which use this RDS secret to avoid any down time.
 
 module "example_team_rds" {
-  source               = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.5"
+  source               = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.6"
   cluster_name         = var.cluster_name
   cluster_state_bucket = var.cluster_state_bucket
   team_name            = "example-repo"
@@ -50,22 +50,10 @@ module "example_team_rds" {
   # db_parameter = [
   #   {
   #     name         = "rds.force_ssl"
-  #     value        = "true"
+  #     value        = "0"
   #     apply_method = "pending-reboot"
   #   }
   # ]
-
-  # Set below values if you want to create read replica db instance
-
-  # Set the database_name of the source db
-  # db_name = module.example_team_rds.database_name
-
-  # If specifies, this resource is a Replicate database. Set the db_identifier of the source db 
-  # replicate_source_db         = module.example_team_rds.db_identifier
-
-  # Set to true for replica database. No backups or snapshots are created for read replica
-  # skip_final_snapshot         = "true"
-  # db_backup_retention_period  = 0
 
   # use "allow_major_version_upgrade" when upgrading the major version of an engine
   allow_major_version_upgrade = "true"
@@ -74,6 +62,51 @@ module "example_team_rds" {
     # Can be either "aws.london" or "aws.ireland"
     aws = aws.london
   }
+}
+
+# To create a read replica, use the below code and update the values to reflect your rds instance
+
+module "example-team-read-replica" {
+  source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.6"
+
+  cluster_name         = var.cluster_name
+  cluster_state_bucket = var.cluster_state_bucket
+
+  application            = var.application
+  environment-name       = var.environment-name
+  is-production          = var.is-production
+  infrastructure-support = var.infrastructure-support
+  team_name              = var.team_name
+
+
+
+  # It is mandatory to set the below values to create read replica instance
+
+  # Set the database_name of the source db
+  db_name = module.example_team_rds.database_name
+
+  # Set the db_identifier of the source db 
+  replicate_source_db         = module.example_team_rds.db_identifier
+
+  # Set to true. No backups or snapshots are created for read replica
+  skip_final_snapshot         = "true"
+  db_backup_retention_period  = 0
+
+  providers = {
+    # Can be either "aws.london" or "aws.ireland"
+    aws = aws.london
+  }
+
+  # If db_parameter is specified in source rds instance, use the same values. 
+  # If not specified you dont need to add any. It will use the default values.
+
+  # db_parameter = [
+  #   {
+  #     name         = "rds.force_ssl"
+  #     value        = "0"
+  #     apply_method = "immediate"
+  #   }
+  # ]
 }
 
 resource "kubernetes_secret" "example_team_rds" {
