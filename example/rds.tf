@@ -64,7 +64,9 @@ module "example_team_rds" {
   }
 }
 
-# To create a read replica, use the below code and update the values to reflect your rds instance
+# To create a read replica, use the below code and update the values to specify the RDS instance 
+# from which you are replicating. In this example, we're assuming that example_team_rds is the 
+# source RDS instance,and example-team-read-replica is the replica we are creating.
 
 module "example-team-read-replica" {
   source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.6"
