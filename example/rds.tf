@@ -80,6 +80,8 @@ module "example-team-read-replica" {
   infrastructure-support = var.infrastructure-support
   team_name              = var.team_name
 
+  # If any other inputs of the RDS is passed in the source db which are different from defaults, 
+  # add them to the replica
 
 
   # It is mandatory to set the below values to create read replica instance
