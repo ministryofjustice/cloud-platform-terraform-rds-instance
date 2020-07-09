@@ -68,7 +68,7 @@ module "example_team_rds" {
 # from which you are replicating. In this example, we're assuming that example_team_rds is the 
 # source RDS instance,and example-team-read-replica is the replica we are creating.
 
-module "example-team-read-replica" {
+module "example_team_read_replica" {
   source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.6"
 
   cluster_name         = var.cluster_name
@@ -136,3 +136,25 @@ resource "kubernetes_secret" "example_team_rds" {
      */
 }
 
+
+resource "kubernetes_secret" "example_team_read_replica" {
+  metadata {
+    name      = "example-team-read-replica-instance-output"
+    namespace = "my-namespace"
+  }
+
+  # The database_username, database_password, database_name values are same as the source RDS instance.
+  
+  data = {
+    rds_instance_endpoint = module.example_team_read_replica.rds_instance_endpoint
+    rds_instance_address  = module.example_team_read_replica.rds_instance_address
+    access_key_id         = module.example_team_read_replica.access_key_id
+    secret_access_key     = module.example_team_read_replica.secret_access_key
+  }
+  /* You can replace all of the above with the following, if you prefer to
+     * use a single database URL value in your application code:
+     *
+     * url = "postgres://${module.example_team_rds.database_username}:${module.example_team_rds.database_password}@${module.example_team_read_replica.rds_instance_endpoint}/${module.example_team_rds.database_name}"
+     *
+     */
+}
