@@ -73,6 +73,7 @@ Some of the inputs are tags. All infrastructure resources need to be tagged acco
 | database_password | Database Password |
 | access_key_id | Access key id for RDS snapshot management |
 | secret_access_key | Secret key for RDS snapshot management |
+| db_identifier | DB Identifier of the RDS instance |
 
 ## Accessing the database
 
