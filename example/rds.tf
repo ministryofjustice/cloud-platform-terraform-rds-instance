@@ -158,3 +158,20 @@ resource "kubernetes_secret" "example_team_read_replica" {
      *
      */
 }
+
+
+# Configmap to store non-sensitive data related to the RDS instance
+
+resource "kubernetes_config_map" "example_team_rds" {
+  metadata {
+    name      = "example_team_rds_output"
+    namespace = "my-namespace"
+  }
+
+  data = {
+    database_name = module.example_team_rds.database_name
+    db_identifier = module.example_team_rds.db_identifier
+
+  }
+}
+
