@@ -1,5 +1,5 @@
 
-module "{{ .RdsModuleName }}" {
+module "rds" {
   source               = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.6"
   cluster_name         = var.cluster_name
   cluster_state_bucket = var.cluster_state_bucket
@@ -31,23 +31,23 @@ module "{{ .RdsModuleName }}" {
 
 resource "kubernetes_secret" "rds" {
   metadata {
-    name      = "{{ .RdsModuleName }}-instance-output"
+    name      = "rds-instance-output"
     namespace = var.namespace
   }
 
   data = {
-    rds_instance_endpoint = module.{{ .RdsModuleName }}.rds_instance_endpoint
-    database_name         = module.{{ .RdsModuleName }}.database_name
-    database_username     = module.{{ .RdsModuleName }}.database_username
-    database_password     = module.{{ .RdsModuleName }}.database_password
-    rds_instance_address  = module.{{ .RdsModuleName }}.rds_instance_address
-    access_key_id         = module.{{ .RdsModuleName }}.access_key_id
-    secret_access_key     = module.{{ .RdsModuleName }}.secret_access_key
+    rds_instance_endpoint = module.rds.rds_instance_endpoint
+    database_name         = module.rds.database_name
+    database_username     = module.rds.database_username
+    database_password     = module.rds.database_password
+    rds_instance_address  = module.rds.rds_instance_address
+    access_key_id         = module.rds.access_key_id
+    secret_access_key     = module.rds.secret_access_key
   }
   /* You can replace all of the above with the following, if you prefer to
      * use a single database URL value in your application code:
      *
-     * url = "postgres://${module.{{ .RdsModuleName }}.database_username}:${module.{{ .RdsModuleName }}.database_password}@${module.{{ .RdsModuleName }}.rds_instance_endpoint}/${module.{{ .RdsModuleName }}.database_name}"
+     * url = "postgres://${module.rds.database_username}:${module.rds.database_password}@${module.rds.rds_instance_endpoint}/${module.rds.database_name}"
      *
      */
 }
