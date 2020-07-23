@@ -160,7 +160,7 @@ resource "kubernetes_secret" "example_team_read_replica" {
 }
 
 
-# Optional Configmap to store non-sensitive data related to the RDS instance
+# Configmap to store non-sensitive data related to the RDS instance
 
 resource "kubernetes_config_map" "example_team_rds" {
   metadata {

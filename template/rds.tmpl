@@ -52,3 +52,15 @@ resource "kubernetes_secret" "rds" {
      */
 }
 
+resource "kubernetes_config_map" "rds" {
+  metadata {
+    name      = "rds-instance_output"
+    namespace = var.namespace
+  }
+
+  data = {
+    database_name = module.rds.database_name
+    db_identifier = module.rds.db_identifier
+
+  }
+}
