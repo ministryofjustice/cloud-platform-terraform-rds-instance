@@ -28,10 +28,11 @@ module "example_team_rds" {
   business-unit        = "example-bu"
   application          = "exampleapp"
   is-production        = "false"
+  namespace            = var.namespace
 
   # If the rds_name is not specified a random name will be generated ( cp-* )
   # Changing the RDS name requires the RDS to be re-created (destroy + create)
-  # rds_name             = "my-rds-name" 
+  # rds_name             = "my-rds-name"
 
   # enable performance insights
   performance_insights_enabled = true
@@ -45,7 +46,7 @@ module "example_team_rds" {
   # Pick the one that defines the postgres version the best
   rds_family = "postgres10"
 
-  # Some engines can't apply some parameters without a reboot(ex postgres9.x cant apply force_ssl immediate). 
+  # Some engines can't apply some parameters without a reboot(ex postgres9.x cant apply force_ssl immediate).
   # You will need to specify "pending-reboot" here, as default is set to "immediate".
   # db_parameter = [
   #   {
@@ -64,8 +65,8 @@ module "example_team_rds" {
   }
 }
 
-# To create a read replica, use the below code and update the values to specify the RDS instance 
-# from which you are replicating. In this example, we're assuming that example_team_rds is the 
+# To create a read replica, use the below code and update the values to specify the RDS instance
+# from which you are replicating. In this example, we're assuming that example_team_rds is the
 # source RDS instance,and example-team-read-replica is the replica we are creating.
 
 module "example_team_read_replica" {
@@ -80,7 +81,7 @@ module "example_team_read_replica" {
   infrastructure-support = var.infrastructure-support
   team_name              = var.team_name
 
-  # If any other inputs of the RDS is passed in the source db which are different from defaults, 
+  # If any other inputs of the RDS is passed in the source db which are different from defaults,
   # add them to the replica
 
 
@@ -89,7 +90,7 @@ module "example_team_read_replica" {
   # Set the database_name of the source db
   db_name = module.example_team_rds.database_name
 
-  # Set the db_identifier of the source db 
+  # Set the db_identifier of the source db
   replicate_source_db         = module.example_team_rds.db_identifier
 
   # Set to true. No backups or snapshots are created for read replica
@@ -101,7 +102,7 @@ module "example_team_read_replica" {
     aws = aws.london
   }
 
-  # If db_parameter is specified in source rds instance, use the same values. 
+  # If db_parameter is specified in source rds instance, use the same values.
   # If not specified you dont need to add any. It will use the default values.
 
   # db_parameter = [
@@ -144,7 +145,7 @@ resource "kubernetes_secret" "example_team_read_replica" {
   }
 
   # The database_username, database_password, database_name values are same as the source RDS instance.
-  
+
   data = {
     rds_instance_endpoint = module.example_team_read_replica.rds_instance_endpoint
     rds_instance_address  = module.example_team_read_replica.rds_instance_address

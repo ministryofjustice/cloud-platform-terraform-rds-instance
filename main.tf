@@ -32,7 +32,7 @@ resource "random_password" "password" {
 }
 
 resource "aws_kms_key" "kms" {
-  count = var.replicate_source_db != "" ? 0 : 1
+  count       = var.replicate_source_db != "" ? 0 : 1
   description = local.identifier
 
   tags = {
@@ -42,17 +42,18 @@ resource "aws_kms_key" "kms" {
     environment-name       = var.environment-name
     owner                  = var.team_name
     infrastructure-support = var.infrastructure-support
+    namespace              = var.namespace
   }
 }
 
 resource "aws_kms_alias" "alias" {
-  count = var.replicate_source_db != "" ? 0 : 1
+  count         = var.replicate_source_db != "" ? 0 : 1
   name          = "alias/${local.identifier}"
-  target_key_id = aws_kms_key.kms[0].key_id 
+  target_key_id = aws_kms_key.kms[0].key_id
 }
 
 resource "aws_db_subnet_group" "db_subnet" {
-  count = var.replicate_source_db != "" ? 0 : 1
+  count      = var.replicate_source_db != "" ? 0 : 1
   name       = local.identifier
   subnet_ids = data.terraform_remote_state.cluster.outputs.internal_subnets_ids
 
@@ -63,6 +64,7 @@ resource "aws_db_subnet_group" "db_subnet" {
     environment-name       = var.environment-name
     owner                  = var.team_name
     infrastructure-support = var.infrastructure-support
+    namespace              = var.namespace
   }
 }
 
@@ -125,6 +127,7 @@ resource "aws_db_instance" "rds" {
     environment-name       = var.environment-name
     owner                  = var.team_name
     infrastructure-support = var.infrastructure-support
+    namespace              = var.namespace
   }
 }
 
@@ -145,13 +148,13 @@ resource "aws_db_parameter_group" "custom_parameters" {
 
 resource "aws_iam_user" "user" {
   count = var.replicate_source_db != "" ? 0 : 1
-  name = "rds-snapshots-user-${random_id.id.hex}"
-  path = "/system/rds-snapshots-user/"
+  name  = "rds-snapshots-user-${random_id.id.hex}"
+  path  = "/system/rds-snapshots-user/"
 }
 
 resource "aws_iam_access_key" "user" {
   count = var.replicate_source_db != "" ? 0 : 1
-  user = aws_iam_user.user[0].name
+  user  = aws_iam_user.user[0].name
 }
 
 data "aws_iam_policy_document" "policy" {
@@ -175,7 +178,7 @@ data "aws_iam_policy_document" "policy" {
 }
 
 resource "aws_iam_user_policy" "policy" {
-  count = var.replicate_source_db != "" ? 0 : 1
+  count  = var.replicate_source_db != "" ? 0 : 1
   name   = "rds-snapshots-read-write"
   policy = data.aws_iam_policy_document.policy.json
   user   = aws_iam_user.user[0].name

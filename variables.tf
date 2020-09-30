@@ -16,9 +16,13 @@ variable "is-production" {
   default = "false"
 }
 
+variable "namespace" {
+  default = ""
+}
+
 variable "business-unit" {
   description = "Area of the MOJ responsible for the service"
-  default     = "mojdigital"
+  default     = ""
 }
 
 variable "infrastructure-support" {
