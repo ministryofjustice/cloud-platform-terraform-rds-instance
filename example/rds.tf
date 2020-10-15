@@ -70,7 +70,7 @@ module "example_team_rds" {
 # source RDS instance,and example-team-read-replica is the replica we are creating.
 
 module "example_team_read_replica" {
-  source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.6"
+  source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.8"
 
   cluster_name         = var.cluster_name
   cluster_state_bucket = var.cluster_state_bucket

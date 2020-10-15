@@ -166,6 +166,7 @@ data "aws_iam_policy_document" "policy" {
       "rds:DescribeDBSnapshotAttributes",
       "rds:ModifyDBSnapshot",
       "rds:CreateDBSnapshot",
+      "rds:AmazonRDSReadOnlyAccess",
       "rds:RestoreDBInstanceFromDBSnapshot",
       "rds:ModifyDBSnapshotAttribute",
     ]
@@ -173,6 +174,16 @@ data "aws_iam_policy_document" "policy" {
     resources = [
       aws_db_instance.rds.arn,
       "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:snapshot:*",
+    ]
+  }
+  
+  statement {
+    actions = [
+      "pi:*",
+    ]
+
+    resources = [
+      "arn:aws:pi:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:metrics/rds/*",
     ]
   }
 }
