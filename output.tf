@@ -43,3 +43,8 @@ output "db_identifier" {
   description = "The RDS DB Indentifer"
   value       = aws_db_instance.rds.identifier
 }
+
+output "resource_id" {
+  description = "RDS Resource ID - used for performance insights (metrics)"
+  value       = aws_db_instance.rds.resource_id
+}
