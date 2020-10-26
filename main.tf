@@ -166,7 +166,6 @@ data "aws_iam_policy_document" "policy" {
       "rds:DescribeDBSnapshotAttributes",
       "rds:ModifyDBSnapshot",
       "rds:CreateDBSnapshot",
-      "rds:AmazonRDSReadOnlyAccess",
       "rds:RestoreDBInstanceFromDBSnapshot",
       "rds:ModifyDBSnapshotAttribute",
     ]
