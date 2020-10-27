@@ -168,11 +168,14 @@ data "aws_iam_policy_document" "policy" {
       "rds:CreateDBSnapshot",
       "rds:RestoreDBInstanceFromDBSnapshot",
       "rds:ModifyDBSnapshotAttribute",
+      "rds:ModifyDBInstance",
     ]
 
     resources = [
       aws_db_instance.rds.arn,
       "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:snapshot:*",
+      aws_db_parameter_group.custom_parameters.arn,
+      "arn:aws:rds:${data.aws_region.current.name}:pg:default.*"
     ]
   }
 
