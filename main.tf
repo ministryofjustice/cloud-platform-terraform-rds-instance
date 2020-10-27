@@ -161,6 +161,7 @@ data "aws_iam_policy_document" "policy" {
   statement {
     actions = [
       "rds:DescribeDBSnapshots",
+      "rds:DescribeDBInstances",
       "rds:CopyDBSnapshot",
       "rds:DeleteDBSnapshot",
       "rds:DescribeDBSnapshotAttributes",
