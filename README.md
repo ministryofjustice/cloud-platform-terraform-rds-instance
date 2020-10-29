@@ -173,5 +173,5 @@ aws rds create-db-snapshot --db-instance-identifier [db-instance-name] --db-snap
 - https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_PostgreSQL.html
 - https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_MariaDB.html
 
-[decode]: https://github.com/ministryofjustice/cloud-platform-environments/blob/master/bin/decode.rb
+[decode]: https://github.com/ministryofjustice/cloud-platform-environments/blob/main/bin/decode.rb
 [Bitnami]: https://github.com/bitnami/bitnami-docker-postgresql
