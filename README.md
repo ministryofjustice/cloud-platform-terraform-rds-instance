@@ -46,7 +46,8 @@ See [this example](example/rds.tf)
 | db_parameter | Parameter block with name, value and apply_method | list | [ { name = "rds.force_ssl", value = "1", apply_method = "immediate" }]  | yes  |
 | replicate_source_db | Specifies that this resource is a Replicate database, and to use this value as the source database. This correlates to the identifier of another Amazon RDS Database to replicate. | string | <source DB db_identifier> | no  
 | skip_final_snapshot | If false(default) all DB are taken a final snapshot unless the db instance is created from snapshot itself or a read replica." | string | `false` | no  
-
+| backup_window | time window for automated snapshot to happen (Example: 09:46-10:16)| string | `` | no  
+ deletion_prevention | if true the RDS deletion will fail | string | `false` | no  
 
 ### Tags
 
