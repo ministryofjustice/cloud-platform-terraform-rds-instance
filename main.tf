@@ -119,7 +119,8 @@ resource "aws_db_instance" "rds" {
   ca_cert_identifier           = var.replicate_source_db != "" ? null : var.ca_cert_identifier
   performance_insights_enabled = var.performance_insights_enabled
   skip_final_snapshot          = var.skip_final_snapshot
-
+  deletion_protection          = var.deletion_protection
+  backup_window                = var.backup_window
   tags = {
     business-unit          = var.business-unit
     application            = var.application

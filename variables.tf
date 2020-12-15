@@ -123,3 +123,14 @@ variable "skip_final_snapshot" {
   description = "if false(default), a DB snapshot is created before the DB instance is deleted, using the value from final_snapshot_identifier. If true no DBSnapshot is created"
   default     = "false"
 }
+
+variable "backup_window" {
+  type        = string
+  description = "The daily time range (in UTC) during which automated backups are created if they are enabled. Example: 09:46-10:16"
+  default     = ""
+}
+variable "deletion_protection" {
+  type        = string
+  description = "(Optional) If the DB instance should have deletion protection enabled. The database can't be deleted when this value is set to true. The default is false."
+  default     = "false"
+}
