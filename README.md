@@ -14,7 +14,7 @@ When upgrading the major version of an engine, `allow_major_version_upgrade` mus
 
 Some engines can't apply some parameters without a reboot(ex postgres9.x cant apply force_ssl immediate), and you will need to specify "pending-reboot" here.
 
-By default, a random name will be generated for the RDS. The `rds_name` parameters allows to set this identifier. 
+By default, a random name will be generated for the RDS. The `rds_name` parameters allows to set this identifier.
 Warning: Changing this identifier will recreated the RDS.
 
 When creating Read Replica, make sure to pass the same inputs in the replica instance. If not specified, the module will use default values which will conflict the source RDS instance.
@@ -31,6 +31,7 @@ See [this example](example/rds.tf)
 | cluster_name | The name of the cluster (eg.: cloud-platform-live-0) | string |  | yes |
 | cluster_state_bucket | The name of the S3 bucket holding the terraform state for the cluster | string | | yes |
 | db_allocated_storage | The allocated storage in gibibytes | string | `10` | no |
+| db_max_allocated_storage | Total storage in gibibytes up to which this RDS will autoscale | string | `10000` | no |
 | db_engine | Database engine used | string | `postgres` | no |
 | db_engine_version | The engine version to use | string | `10.4` | no |
 | db_instance_class | The instance type of the RDS instance | string | `db.t2.small` | no |
@@ -44,8 +45,8 @@ See [this example](example/rds.tf)
 | rds_family | rds configuration version | string | `postgres10` | no  |
 | ca_cert_identifier | Specifies the identifier of the CA certificate for the DB instance | string | `rds-ca-2019` | no  |
 | db_parameter | Parameter block with name, value and apply_method | list | [ { name = "rds.force_ssl", value = "1", apply_method = "immediate" }]  | yes  |
-| replicate_source_db | Specifies that this resource is a Replicate database, and to use this value as the source database. This correlates to the identifier of another Amazon RDS Database to replicate. | string | <source DB db_identifier> | no  
-| skip_final_snapshot | If false(default) all DB are taken a final snapshot unless the db instance is created from snapshot itself or a read replica." | string | `false` | no  
+| replicate_source_db | Specifies that this resource is a Replicate database, and to use this value as the source database. This correlates to the identifier of another Amazon RDS Database to replicate. | string | <source DB db_identifier> | no
+| skip_final_snapshot | If false(default) all DB are taken a final snapshot unless the db instance is created from snapshot itself or a read replica." | string | `false` | no
 
 
 ### Tags
