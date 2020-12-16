@@ -31,6 +31,7 @@ See [this example](example/rds.tf)
 | cluster_name | The name of the cluster (eg.: cloud-platform-live-0) | string |  | yes |
 | cluster_state_bucket | The name of the S3 bucket holding the terraform state for the cluster | string | | yes |
 | db_allocated_storage | The allocated storage in gibibytes | string | `10` | no |
+| db_max_allocated_storage | Total storage in gibibytes up to which this RDS will autoscale | string | `10000` | no |
 | db_engine | Database engine used | string | `postgres` | no |
 | db_engine_version | The engine version to use | string | `10.4` | no |
 | db_instance_class | The instance type of the RDS instance | string | `db.t2.small` | no |
