@@ -44,6 +44,11 @@ variable "db_allocated_storage" {
   default     = "10"
 }
 
+variable "db_max_allocated_storage" {
+  description = "Maximum storage limit for storage autoscaling"
+  default     = "10000"
+}
+
 variable "db_engine" {
   description = "Database engine used e.g. postgres, mqsql"
   default     = "postgres"
