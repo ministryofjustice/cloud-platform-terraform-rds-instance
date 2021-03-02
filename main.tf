@@ -115,6 +115,7 @@ resource "aws_db_instance" "rds" {
   copy_tags_to_snapshot        = true
   snapshot_identifier          = var.snapshot_identifier
   replicate_source_db          = var.replicate_source_db
+  auto_minor_version_upgrade   = var.allow_minor_version_upgrade
   allow_major_version_upgrade  = var.allow_major_version_upgrade
   parameter_group_name         = aws_db_parameter_group.custom_parameters.name
   ca_cert_identifier           = var.replicate_source_db != "" ? null : var.ca_cert_identifier
