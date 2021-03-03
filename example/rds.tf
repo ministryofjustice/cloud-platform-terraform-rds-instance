@@ -21,7 +21,7 @@ variable "cluster_state_bucket" {
 # Make sure you restart your pods which use this RDS secret to avoid any down time.
 
 module "example_team_rds" {
-  source               = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.12"
+  source               = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.13.1"
   cluster_name         = var.cluster_name
   cluster_state_bucket = var.cluster_state_bucket
   team_name            = "example-repo"
@@ -38,13 +38,13 @@ module "example_team_rds" {
   performance_insights_enabled = true
 
   # change the postgres version as you see fit.
-  db_engine_version      = "10"
+  db_engine_version      = "12"
   environment-name       = "development"
   infrastructure-support = "example-team@digital.justice.gov.uk"
 
-  # rds_family should be one of: postgres9.4, postgres9.5, postgres9.6, postgres10, postgres11
+  # rds_family should be one of: postgres9.4, postgres9.5, postgres9.6, postgres10, postgres11, postgres12
   # Pick the one that defines the postgres version the best
-  rds_family = "postgres10"
+  rds_family = "postgres12"
 
   # Some engines can't apply some parameters without a reboot(ex postgres9.x cant apply force_ssl immediate).
   # You will need to specify "pending-reboot" here, as default is set to "immediate".
