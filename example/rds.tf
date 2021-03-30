@@ -4,11 +4,7 @@
  *
  */
 
-variable "cluster_name" {
-}
-
-variable "cluster_state_bucket" {
-}
+variable "cluster_name" {}
 
 /*
  * Make sure that you use the latest version of the module by changing the
@@ -21,14 +17,13 @@ variable "cluster_state_bucket" {
 # Make sure you restart your pods which use this RDS secret to avoid any down time.
 
 module "example_team_rds" {
-  source               = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.13.1"
-  cluster_name         = var.cluster_name
-  cluster_state_bucket = var.cluster_state_bucket
-  team_name            = "example-repo"
-  business-unit        = "example-bu"
-  application          = "exampleapp"
-  is-production        = "false"
-  namespace            = var.namespace
+  source        = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.13.1"
+  cluster_name  = var.cluster_name
+  team_name     = "example-repo"
+  business-unit = "example-bu"
+  application   = "exampleapp"
+  is-production = "false"
+  namespace     = var.namespace
 
   # If the rds_name is not specified a random name will be generated ( cp-* )
   # Changing the RDS name requires the RDS to be re-created (destroy + create)
@@ -73,8 +68,6 @@ module "example_team_read_replica" {
   source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.8"
 
   cluster_name         = var.cluster_name
-  cluster_state_bucket = var.cluster_state_bucket
-
   application            = var.application
   environment-name       = var.environment-name
   is-production          = var.is-production
@@ -91,11 +84,11 @@ module "example_team_read_replica" {
   db_name = module.example_team_rds.database_name
 
   # Set the db_identifier of the source db
-  replicate_source_db         = module.example_team_rds.db_identifier
+  replicate_source_db = module.example_team_rds.db_identifier
 
   # Set to true. No backups or snapshots are created for read replica
-  skip_final_snapshot         = "true"
-  db_backup_retention_period  = 0
+  skip_final_snapshot        = "true"
+  db_backup_retention_period = 0
 
   providers = {
     # Can be either "aws.london" or "aws.ireland"
