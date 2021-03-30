@@ -30,7 +30,6 @@ See [this example](example/rds.tf)
 | allow_major_version_upgrade | Indicates that major version upgrades are allowed |  string | false | no |
 | allow_minor_version_upgrade | Indicates that minor upgrades (eg 12.x for Postgres) are allowed |  bool | true | no |
 | cluster_name | The name of the cluster (eg.: cloud-platform-live-0) | string |  | yes |
-| cluster_state_bucket | The name of the S3 bucket holding the terraform state for the cluster | string | | yes |
 | db_allocated_storage | The allocated storage in gibibytes | string | `10` | no |
 | db_max_allocated_storage | Total storage in gibibytes up to which this RDS will autoscale | string | `10000` | no |
 | db_engine | Database engine used | string | `postgres` | no |
