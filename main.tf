@@ -64,7 +64,7 @@ resource "aws_kms_alias" "alias" {
 resource "aws_db_subnet_group" "db_subnet" {
   count      = var.replicate_source_db != "" ? 0 : 1
   name       = local.identifier
-  subnet_ids = data.aws_subnet_ids.private
+  subnet_ids = [data.aws_subnet_ids.private]
 
   tags = {
     business-unit          = var.business-unit
