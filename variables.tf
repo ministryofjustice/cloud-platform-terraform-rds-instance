@@ -78,7 +78,7 @@ variable "db_name" {
 
 variable "allow_minor_version_upgrade" {
   description = "Indicates that minor version upgrades are allowed."
-  default     = "true"
+  default     = "true"d
 }
 
 variable "allow_major_version_upgrade" {
