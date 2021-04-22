@@ -120,7 +120,7 @@ resource "aws_db_instance" "rds" {
   db_subnet_group_name         = var.replicate_source_db != "" ? null : aws_db_subnet_group.db_subnet[0].name
   vpc_security_group_ids       = [aws_security_group.rds-sg.id]
   kms_key_id                   = var.replicate_source_db != "" ? null : aws_kms_key.kms[0].arn
-  multi_az                     = true
+  multi_az                     = can(regex("sqlserver-web|sqlserver-ex", var.db_engine)) ? false : true
   copy_tags_to_snapshot        = true
   snapshot_identifier          = var.snapshot_identifier
   replicate_source_db          = var.replicate_source_db
