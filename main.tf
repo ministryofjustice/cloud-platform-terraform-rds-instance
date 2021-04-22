@@ -110,7 +110,7 @@ resource "aws_db_instance" "rds" {
   engine                       = var.db_engine
   engine_version               = var.db_engine_version
   instance_class               = var.db_instance_class
-  name                         = local.db_name
+  name                         = can(regex("sqlserver", var.db_engine)) ? null : local.db_name
   username                     = var.replicate_source_db != "" ? null : "cp${random_string.username.result}"
   password                     = var.replicate_source_db != "" ? null : random_password.password.result
   backup_retention_period      = var.db_backup_retention_period
