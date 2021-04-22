@@ -132,6 +132,7 @@ resource "aws_db_instance" "rds" {
   skip_final_snapshot          = var.skip_final_snapshot
   deletion_protection          = var.deletion_protection
   backup_window                = var.backup_window
+  license_model                = var.license_model
   tags = {
     business-unit          = var.business-unit
     application            = var.application
