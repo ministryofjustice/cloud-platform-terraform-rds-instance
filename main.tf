@@ -172,6 +172,7 @@ resource "aws_iam_access_key" "user" {
 data "aws_iam_policy_document" "policy" {
   statement {
     actions = [
+      "rds:DescribeDBEngineVersions",
       "rds:DescribeDBSnapshots",
       "rds:DescribeDBInstances",
       "rds:CopyDBSnapshot",
