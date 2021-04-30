@@ -131,8 +131,21 @@ A Docker image containing the `psql` utility is available from [Bitnami] (you
 cannot use the official postgres image, because it runs as root) and can be
 launched like this:
 
+#### Before kubectl 1.18
+
 ```
 $ kubectl -n [your namespace] run --generator=run-pod/v1 shell --rm -i --tty --image bitnami/postgresql -- bash
+
+If you don't see a command prompt, try pressing enter.
+postgres@shell:/$
+```
+
+#### Since kubectl 1.18
+
+The `run` command can now only create pods, so the `--generator` option was removed:
+
+```
+$ kubectl -n [your namespace] run shell --rm -i --tty --image bitnami/postgresql -- bash
 
 If you don't see a command prompt, try pressing enter.
 postgres@shell:/$
