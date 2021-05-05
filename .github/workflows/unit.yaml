@@ -6,16 +6,6 @@ jobs:
   go-tests:
     name: Run Terratest Unit Tests
     runs-on: ubuntu-latest
-    services:
-      localstack:
-        image: localstack/localstack:0.12.10
-        env:
-          SERVICES: iam,sts,rds,s3
-          DEFAULT_REGION: eu-west-2
-          HOSTNAME_EXTERNAL: localstack
-        ports:
-          - 4566:4566
-          - 4571:4571
     steps:
       - name: Checkout
         uses: actions/checkout@v2
