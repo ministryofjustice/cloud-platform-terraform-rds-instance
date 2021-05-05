@@ -11,7 +11,7 @@ jobs:
         image: motoserver/moto:2.0.6
         ports:
           - 5000:5000
-        options: -- -p5000 ec2
+        options: motoserver/moto:2.0.6 -- -p5000 ec2
       moto-iam:
         image: motoserver/moto:2.0.6
         ports:
