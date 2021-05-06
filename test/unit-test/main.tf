@@ -52,7 +52,7 @@ module "vpc" {
   create_egress_only_igw = false
   create_igw             = false
   enable_dns_hostnames   = false
-  enable_ipv6            = false
+  enable_ipv6            = true
 
   public_subnet_tags = merge({
     SubnetType               = "Utility"
