@@ -8,20 +8,13 @@ jobs:
     runs-on: ubuntu-latest
     services:
       moto-ec2:
-        image: motoserver/moto:2.0.6
+        image: localstack/localstack:0.12.10
+        env:
+          SERVICES: ec2,iam,kms,sts,rds
+          DEFAULT_REGION: eu-west-2
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
         ports:
-          - 5000:5000
-        options: motoserver/moto:2.0.6 -- -p5000 ec2
-      moto-iam:
-        image: motoserver/moto:2.0.6
-        ports:
-          - 5001:5001
-        options: motoserver/moto:2.0.6 -- -p5001 iam
-      moto-rds:
-        image: motoserver/moto:2.0.6
-        ports:
-          - 5002:5002
-        options: motoserver/moto:2.0.6 -- -p5002 rds
+          - 4566:4566
     steps:
       - name: Checkout
         uses: actions/checkout@v2

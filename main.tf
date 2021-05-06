@@ -16,6 +16,11 @@ data "aws_subnet_ids" "private" {
   }
 }
 
+data "aws_subnet" "private" {
+  for_each = data.aws_subnet_ids.private.ids
+  id       = each.value
+}
+
 resource "random_id" "id" {
   byte_length = 8
 }
@@ -85,14 +90,14 @@ resource "aws_security_group" "rds-sg" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = [data.aws_vpc.selected.cidr_block]
+    cidr_blocks = [for s in data.aws_subnet.private : s.cidr_block]
   }
 
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = [data.aws_vpc.selected.cidr_block]
+    cidr_blocks = [for s in data.aws_subnet.private : s.cidr_block]
   }
 }
 
@@ -114,7 +119,7 @@ resource "aws_db_instance" "rds" {
   storage_encrypted            = true
   db_subnet_group_name         = var.replicate_source_db != "" ? null : aws_db_subnet_group.db_subnet[0].name
   vpc_security_group_ids       = [aws_security_group.rds-sg.id]
-#  kms_key_id                   = var.replicate_source_db != "" ? null : aws_kms_key.kms[0].arn
+  kms_key_id                   = var.replicate_source_db != "" ? null : aws_kms_key.kms[0].arn
   multi_az                     = true
   copy_tags_to_snapshot        = true
   snapshot_identifier          = var.snapshot_identifier

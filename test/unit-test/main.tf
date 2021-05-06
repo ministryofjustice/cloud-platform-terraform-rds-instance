@@ -8,11 +8,11 @@ provider "aws" {
   skip_requesting_account_id  = true
 
   endpoints {
-    ec2 = "http://localhost:5000"
-    iam = "http://localhost:5001"
-    rds = "http://localhost:5002"
-    sts = "http://localhost:5003"
-    kms = "http://localhost:5004"
+    ec2            = "http://localhost:4566"
+    iam            = "http://localhost:4566"
+    kms            = "http://localhost:4566"
+    rds            = "http://localhost:4566"
+    sts            = "http://localhost:4566"
   }
 }
 
@@ -52,7 +52,7 @@ module "vpc" {
   create_egress_only_igw = false
   create_igw             = false
   enable_dns_hostnames   = false
-  enable_ipv6            = true
+  enable_ipv6            = false
 
   public_subnet_tags = merge({
     SubnetType               = "Utility"
