@@ -11,7 +11,7 @@ func Test(t *testing.T) {
 
 	terraformOptionsVpc := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
 		TerraformDir: "./unit-test",
-		Targets: ["module.vpc"],
+		Targets: []string{"module.vpc"},
 	})
 
 	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
