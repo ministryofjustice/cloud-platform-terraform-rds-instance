@@ -46,13 +46,17 @@ variable "db_max_allocated_storage" {
 }
 
 variable "db_engine" {
-  description = "Database engine used e.g. postgres, mqsql"
+  description = "Database engine used e.g. postgres, mysql, sqlserver-ex"
   default     = "postgres"
+  validation {
+    condition     = contains(["postgres", "mysql", "sqlserver-ee", "sqlserver-ex", "sqlserver-se", "sqlserver-web"], var.db_engine)
+    error_message = "Choose one of Postgresql, MySQL or Microsoft SQL Server. For Aurora, see https://github.com/ministryofjustice/cloud-platform-terraform-rds-aurora."
+  }
 }
 
 variable "db_engine_version" {
-  description = "The engine version to use e.g. 10"
-  default     = "10"
+  description = "The engine version to use e.g. 13.2 for Postgresql, 8.0 for MySQL, 15.00.4073.23.v1 for MS-SQL. Omitting the minor release part allows for automatic updates."
+  default     = "13"
 }
 
 variable "db_instance_class" {
@@ -87,8 +91,8 @@ variable "allow_major_version_upgrade" {
 }
 
 variable "rds_family" {
-  description = "Maps the postgres version with the rds family, a family often covers several versions"
-  default     = "postgres10"
+  description = "Maps the engine version with the parameter group family, a family often covers several versions"
+  default     = "postgres13"
 }
 
 variable "ca_cert_identifier" {
@@ -112,7 +116,7 @@ variable "db_parameter" {
     {
       name         = "rds.force_ssl"
       value        = "1"
-      apply_method = "immediate"
+      apply_method = "pending-reboot"
     }
   ]
   description = "A list of DB parameters to apply. Note that parameters may differ from a DB family to another"
@@ -135,8 +139,25 @@ variable "backup_window" {
   description = "The daily time range (in UTC) during which automated backups are created if they are enabled. Example: 09:46-10:16"
   default     = ""
 }
+
 variable "deletion_protection" {
   type        = string
   description = "(Optional) If the DB instance should have deletion protection enabled. The database can't be deleted when this value is set to true. The default is false."
   default     = "false"
+}
+
+variable "license_model" {
+  type        = string
+  description = "License model information for this DB instance, options are: license-included | bring-your-own-license | general-public-license"
+  default     = "license-included"
+  validation {
+    condition     = contains(["license-included", "bring-your-own-license", "general-public-license"], var.license_model)
+    error_message = "Options are: license-included | bring-your-own-license | general-public-license."
+  }
+}
+
+variable "character_set_name" {
+  type        = string
+  description = "DB char set, used only by MS-SQL"
+  default     = "Latin1_General_CI_AS"
 }
