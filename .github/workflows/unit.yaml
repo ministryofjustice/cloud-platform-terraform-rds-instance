@@ -44,4 +44,5 @@ jobs:
         run: |
           kind get kubeconfig > ./kubeconfig
           export KUBE_CONFIG_PATH="$PWD/kubeconfig"
+          kubectl create ns example-namespace
           go test -v

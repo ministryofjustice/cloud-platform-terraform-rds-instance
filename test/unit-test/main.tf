@@ -8,33 +8,11 @@ provider "aws" {
   skip_requesting_account_id  = true
 
   endpoints {
-    ec2            = "http://localhost:4566"
-    iam            = "http://localhost:4566"
-    kms            = "http://localhost:4566"
-    rds            = "http://localhost:4566"
-    sts            = "http://localhost:4566"
-  }
-}
-
-module "rds" {
-  source     = "../../"
-  depends_on = [module.vpc]
-
-  cluster_name           = "example-cluster"
-  team_name              = "example-repo"
-  business-unit          = "example-bu"
-  application            = "example-app"
-  is-production          = "false"
-  namespace              = "example-ns"
-  environment-name       = "example-env"
-  infrastructure-support = "example-team"
-}
-
-locals {
-  vpc_name             = "example-cluster"
-  vpc_base_domain_name = "${local.vpc_name}.cloud-platform.service.justice.gov.uk"
-  tags = {
-    "kubernetes.io/cluster/${local.vpc_name}" = "shared"
+    ec2 = "http://localhost:4566"
+    iam = "http://localhost:4566"
+    kms = "http://localhost:4566"
+    rds = "http://localhost:4566"
+    sts = "http://localhost:4566"
   }
 }
 
@@ -70,5 +48,47 @@ module "vpc" {
     Terraform = "true"
     Cluster   = local.vpc_name
     Domain    = local.vpc_base_domain_name
+  }
+}
+
+module "rds" {
+  source     = "../../"
+  depends_on = [module.vpc]
+
+  cluster_name           = "example-cluster"
+  team_name              = "example-repo"
+  business-unit          = "example-bu"
+  application            = "example-app"
+  is-production          = "false"
+  namespace              = "example-ns"
+  environment-name       = "example-env"
+  infrastructure-support = "example-team"
+
+  db_engine         = "postgres"
+  db_engine_version = "13"
+}
+
+locals {
+  vpc_name             = "example-cluster"
+  vpc_base_domain_name = "${local.vpc_name}.cloud-platform.service.justice.gov.uk"
+  tags = {
+    "kubernetes.io/cluster/${local.vpc_name}" = "shared"
+  }
+}
+
+resource "kubernetes_secret" "rds" {
+  metadata {
+    name      = "rds-instance-output"
+    namespace = "example-namespace"
+  }
+
+  data = {
+    rds_instance_endpoint = module.rds.rds_instance_endpoint
+    database_name         = module.rds.database_name
+    database_username     = module.rds.database_username
+    database_password     = module.rds.database_password
+    rds_instance_address  = module.rds.rds_instance_address
+    access_key_id         = module.rds.access_key_id
+    secret_access_key     = module.rds.secret_access_key
   }
 }
