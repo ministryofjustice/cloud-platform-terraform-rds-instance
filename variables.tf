@@ -91,8 +91,8 @@ variable "allow_major_version_upgrade" {
 }
 
 variable "rds_family" {
-  description = "Maps the postgres version with the rds family, a family often covers several versions"
-  default     = "postgres10"
+  description = "Maps the engine version with the parameter group family, a family often covers several versions"
+  default     = "postgres13"
 }
 
 variable "ca_cert_identifier" {
@@ -116,7 +116,7 @@ variable "db_parameter" {
     {
       name         = "rds.force_ssl"
       value        = "1"
-      apply_method = "immediate"
+      apply_method = "pending-reboot"
     }
   ]
   description = "A list of DB parameters to apply. Note that parameters may differ from a DB family to another"
