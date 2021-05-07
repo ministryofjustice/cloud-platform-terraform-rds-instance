@@ -1,8 +1,8 @@
 /*
- * When using this module through the cloud-platform-environments, the following
- * two variables are automatically supplied by the pipeline.
+ * When using this module through the cloud-platform-environments,
+ * this variable is automatically supplied by the pipeline.
  *
- */
+*/
 
 variable "cluster_name" {}
 
@@ -12,9 +12,6 @@ variable "cluster_name" {}
  * releases page of this repository.
  *
  */
-
-# IMP NOTE: Updating to module version 5.3, existing database password will be rotated.
-# Make sure you restart your pods which use this RDS secret to avoid any down time.
 
 module "example_team_rds" {
   source        = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.13.1"
@@ -67,7 +64,7 @@ module "example_team_rds" {
 module "example_team_read_replica" {
   source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.8"
 
-  cluster_name         = var.cluster_name
+  cluster_name           = var.cluster_name
   application            = var.application
   environment-name       = var.environment-name
   is-production          = var.is-production

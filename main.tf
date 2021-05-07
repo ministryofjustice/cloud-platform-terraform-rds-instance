@@ -110,17 +110,17 @@ resource "aws_db_instance" "rds" {
   engine                       = var.db_engine
   engine_version               = var.db_engine_version
   instance_class               = var.db_instance_class
-  name                         = local.db_name
+  name                         = can(regex("sqlserver", var.db_engine)) ? null : local.db_name
   username                     = var.replicate_source_db != "" ? null : "cp${random_string.username.result}"
   password                     = var.replicate_source_db != "" ? null : random_password.password.result
   backup_retention_period      = var.db_backup_retention_period
   storage_type                 = var.db_iops == 0 ? "gp2" : "io1"
   iops                         = var.db_iops
-  storage_encrypted            = true
+  storage_encrypted            = can(regex("sqlserver-web|sqlserver-ex", var.db_engine)) ? false : true
   db_subnet_group_name         = var.replicate_source_db != "" ? null : aws_db_subnet_group.db_subnet[0].name
   vpc_security_group_ids       = [aws_security_group.rds-sg.id]
-  kms_key_id                   = var.replicate_source_db != "" ? null : aws_kms_key.kms[0].arn
-  multi_az                     = true
+  kms_key_id                   = (var.replicate_source_db != "") || (can(regex("sqlserver-web|sqlserver-ex", var.db_engine))) ? null : aws_kms_key.kms[0].arn
+  multi_az                     = can(regex("sqlserver-web|sqlserver-ex", var.db_engine)) ? false : true
   copy_tags_to_snapshot        = true
   snapshot_identifier          = var.snapshot_identifier
   replicate_source_db          = var.replicate_source_db
@@ -132,6 +132,9 @@ resource "aws_db_instance" "rds" {
   skip_final_snapshot          = var.skip_final_snapshot
   deletion_protection          = var.deletion_protection
   backup_window                = var.backup_window
+  license_model                = var.license_model
+  character_set_name           = can(regex("sqlserver", var.db_engine)) ? var.character_set_name : null
+
   tags = {
     business-unit          = var.business-unit
     application            = var.application
