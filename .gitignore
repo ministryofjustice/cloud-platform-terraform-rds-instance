@@ -1,9 +1,7 @@
-#  Local .terraform directories
-**/.terraform/*
-
-# .tfstate files
-*.tfstate
-*.tfstate.*
-
-# .tfvars files
-*.tfvars
+.terraform
+*.tfstate*
+.terraform.lock.hcl
+ssh/*id_rsa
+generated/*
+.bundle
+.key

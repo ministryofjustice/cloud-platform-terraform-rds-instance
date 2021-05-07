@@ -116,7 +116,7 @@ resource "aws_db_instance" "rds" {
   backup_retention_period      = var.db_backup_retention_period
   storage_type                 = var.db_iops == 0 ? "gp2" : "io1"
   iops                         = var.db_iops
-  storage_encrypted            = true
+  storage_encrypted            = can(regex("sqlserver-web|sqlserver-ex", var.db_engine)) ? false : true
   db_subnet_group_name         = var.replicate_source_db != "" ? null : aws_db_subnet_group.db_subnet[0].name
   vpc_security_group_ids       = [aws_security_group.rds-sg.id]
   kms_key_id                   = var.replicate_source_db != "" ? null : aws_kms_key.kms[0].arn
