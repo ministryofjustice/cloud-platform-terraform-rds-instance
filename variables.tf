@@ -56,7 +56,7 @@ variable "db_engine" {
 
 variable "db_engine_version" {
   description = "The engine version to use e.g. 13.2 for Postgresql, 8.0 for MySQL, 15.00.4073.23.v1 for MS-SQL. Omitting the minor release part allows for automatic updates."
-  default     = "13"
+  default     = "10"
 }
 
 variable "db_instance_class" {
