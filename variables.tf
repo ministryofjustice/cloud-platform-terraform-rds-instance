@@ -148,12 +148,8 @@ variable "deletion_protection" {
 
 variable "license_model" {
   type        = string
-  description = "License model information for this DB instance, options are: license-included | bring-your-own-license | general-public-license"
-  default     = "license-included"
-  validation {
-    condition     = contains(["license-included", "bring-your-own-license", "general-public-license"], var.license_model)
-    error_message = "Options are: license-included | bring-your-own-license | general-public-license."
-  }
+  description = "License model information for this DB instance, options for MS-SQL are: license-included | bring-your-own-license | general-public-license"
+  default     = null
 }
 
 variable "character_set_name" {
