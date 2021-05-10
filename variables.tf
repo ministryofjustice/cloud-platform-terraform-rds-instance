@@ -49,7 +49,7 @@ variable "db_engine" {
   description = "Database engine used e.g. postgres, mysql, sqlserver-ex"
   default     = "postgres"
   validation {
-    condition     = contains(["postgres", "mysql", "sqlserver-ee", "sqlserver-ex", "sqlserver-se", "sqlserver-web"], var.db_engine)
+    condition     = contains(["postgres", "mysql", "mariadb", "sqlserver-ee", "sqlserver-ex", "sqlserver-se", "sqlserver-web"], var.db_engine)
     error_message = "Choose one of Postgresql, MySQL or Microsoft SQL Server. For Aurora, see https://github.com/ministryofjustice/cloud-platform-terraform-rds-aurora."
   }
 }
@@ -159,5 +159,5 @@ variable "license_model" {
 variable "character_set_name" {
   type        = string
   description = "DB char set, used only by MS-SQL"
-  default     = "Latin1_General_CI_AS"
+  default     = "SQL_Latin1_General_CP1_CI_AS"
 }
