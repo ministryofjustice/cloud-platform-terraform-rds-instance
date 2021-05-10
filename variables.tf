@@ -92,7 +92,7 @@ variable "allow_major_version_upgrade" {
 
 variable "rds_family" {
   description = "Maps the engine version with the parameter group family, a family often covers several versions"
-  default     = "postgres13"
+  default     = "postgres10"
 }
 
 variable "ca_cert_identifier" {
