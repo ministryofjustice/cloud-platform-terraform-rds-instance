@@ -157,3 +157,9 @@ variable "character_set_name" {
   description = "DB char set, used only by MS-SQL"
   default     = "SQL_Latin1_General_CP1_CI_AS"
 }
+
+variable "option_group_name" {
+  type        = string
+  description = "(Optional) The name of an 'aws_db_option_group' to associate to the DB instance"
+  default     = null
+}
