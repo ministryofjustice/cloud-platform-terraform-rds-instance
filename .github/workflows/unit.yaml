@@ -12,7 +12,7 @@ jobs:
         env:
           SERVICES: ec2,iam,kms,sts,rds
           DEFAULT_REGION: eu-west-2
-#          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
           HOSTNAME_EXTERNAL: localstack
         ports:
           - 4566:4566
