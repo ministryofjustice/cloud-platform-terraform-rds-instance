@@ -23,8 +23,8 @@ module "vpc" {
   name                   = local.vpc_name
   cidr                   = "10.0.0.0/8"
   azs                    = ["eu-west-2a", "eu-west-2b", "eu-west-2c"]
-  private_subnets        = ["10.1.1.0/24", "10.1.2.0/24", "10.1.3.0/24"]
-  public_subnets         = ["10.2.1.0/24", "10.2.2.0/24", "10.2.3.0/24"]
+  private_subnets        = ["10.1.0.0/16", "10.2.0.0/16", "10.3.0.0/16"]
+  public_subnets         = ["10.4.0.0/16", "10.5.0.0/16", "10.6.0.0/16"]
   enable_nat_gateway     = false
   enable_vpn_gateway     = false
   create_egress_only_igw = false
