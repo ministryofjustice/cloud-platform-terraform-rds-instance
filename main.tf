@@ -134,6 +134,7 @@ resource "aws_db_instance" "rds" {
   backup_window                = var.backup_window
   license_model                = var.license_model
   character_set_name           = can(regex("sqlserver", var.db_engine)) ? var.character_set_name : null
+  option_group_name            = var.option_group_name
 
   tags = {
     business-unit          = var.business-unit
