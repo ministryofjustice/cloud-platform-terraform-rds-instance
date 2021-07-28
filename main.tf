@@ -132,6 +132,7 @@ resource "aws_db_instance" "rds" {
   skip_final_snapshot          = var.skip_final_snapshot
   deletion_protection          = var.deletion_protection
   backup_window                = var.backup_window
+  maintenance_window           = var.maintenance_window
   license_model                = var.license_model
   character_set_name           = can(regex("sqlserver", var.db_engine)) ? var.character_set_name : null
   option_group_name            = var.option_group_name
