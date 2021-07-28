@@ -6,23 +6,9 @@ jobs:
   go-tests:
     name: Run Terratest Unit Tests
     runs-on: ubuntu-latest
-    services:
-      moto-ec2:
-        image: localstack/localstack:0.12.10
-        env:
-          SERVICES: ec2,iam,kms,sts,rds
-          DEFAULT_REGION: eu-west-2
-          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
-        ports:
-          - 4566:4566
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
-      - name: Set up Go
-        uses: actions/setup-go@v1
-        with:
-          go-version: 1.16
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
@@ -30,19 +16,8 @@ jobs:
           terraform_version: 0.14.x
           terraform_wrapper: false
 
-      - name: Download Go Modules
-        working-directory: test
-        run: go mod download
-
-      - name: Set up Kind
-        uses: engineerd/setup-kind@v0.5.0
-        with:
-          image: "kindest/node:v1.20.2@sha256:15d3b5c4f521a84896ed1ead1b14e4774d02202d5c65ab68f30eeaf310a3b1a7"
-
-      - name: Run Go Tests
+      - name: Run tf Tests
         working-directory: test
         run: |
-          kind get kubeconfig > ./kubeconfig
-          export KUBE_CONFIG_PATH="$PWD/kubeconfig"
-          kubectl create ns example-namespace
-          go test -v
+          terraform init
+          terraform validate
