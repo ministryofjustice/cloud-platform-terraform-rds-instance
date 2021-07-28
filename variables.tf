@@ -140,6 +140,12 @@ variable "backup_window" {
   default     = ""
 }
 
+variable "maintenance_window" {
+  type        = string
+  description = "The window to perform maintenance in. Syntax: \"ddd:hh24:mi-ddd:hh24:mi\". For example: \"Mon:00:00-Mon:03:00\"."
+  default     = ""
+}
+
 variable "deletion_protection" {
   type        = string
   description = "(Optional) If the DB instance should have deletion protection enabled. The database can't be deleted when this value is set to true. The default is false."

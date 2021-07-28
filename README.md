@@ -72,6 +72,7 @@ No modules.
 | <a name="input_allow_minor_version_upgrade"></a> [allow\_minor\_version\_upgrade](#input\_allow\_minor\_version\_upgrade) | Indicates that minor version upgrades are allowed. | `string` | `"true"` | no |
 | <a name="input_application"></a> [application](#input\_application) | n/a | `any` | n/a | yes |
 | <a name="input_backup_window"></a> [backup\_window](#input\_backup\_window) | The daily time range (in UTC) during which automated backups are created if they are enabled. Example: 09:46-10:16 | `string` | `""` | no |
+| <a name="input_maintenance_window"></a> [maintenance\_window](#input\_maintenance\_window) | The window to perform maintenance in. Syntax: "ddd:hh24:mi-ddd:hh24:mi". For example: "Mon:00:00-Mon:03:00". | `string` | `""` | no |
 | <a name="input_business-unit"></a> [business-unit](#input\_business-unit) | Area of the MOJ responsible for the service | `string` | `""` | no |
 | <a name="input_ca_cert_identifier"></a> [ca\_cert\_identifier](#input\_ca\_cert\_identifier) | Specifies the identifier of the CA certificate for the DB instance | `string` | `"rds-ca-2019"` | no |
 | <a name="input_character_set_name"></a> [character\_set\_name](#input\_character\_set\_name) | DB char set, used only by MS-SQL | `string` | `"Latin1_General_CI_AS"` | no |
