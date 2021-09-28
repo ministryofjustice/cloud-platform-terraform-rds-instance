@@ -137,6 +137,12 @@ resource "aws_db_instance" "rds" {
   character_set_name           = can(regex("sqlserver", var.db_engine)) ? var.character_set_name : null
   option_group_name            = var.option_group_name
 
+  timeouts {
+    create = "2h"
+    update = "2h"
+    delete = "2h"
+  }
+
   tags = {
     business-unit          = var.business-unit
     application            = var.application
