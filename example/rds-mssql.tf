@@ -1,29 +1,20 @@
 /*
- * When using this module through the cloud-platform-environments,
- * this variable is automatically supplied by the pipeline.
- *
-*/
-
-variable "cluster_name" {}
-
-/*
  * Make sure that you use the latest version of the module by changing the
  * `ref=` value in the `source` attribute to the latest version listed on the
  * releases page of this repository.
  *
 */
 
-module "rds" {
-  source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.16"
-
+module "rds_mssql" {
+  source                 = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.16.5"
   cluster_name           = var.cluster_name
-  team_name              = "example-repo"
-  business-unit          = "example-bu"
-  application            = "example-app"
-  is-production          = "false"
-  namespace              = "example-ns"
-  environment-name       = "example-env"
-  infrastructure-support = "example-team"
+  team_name              = var.team_name
+  business-unit          = var.business_unit
+  application            = var.application
+  is-production          = var.is_production
+  environment-name       = var.environment_name
+  infrastructure-support = var.infrastructure_support
+  namespace              = var.namespace
 
   # enable performance insights
   performance_insights_enabled = true
@@ -42,18 +33,18 @@ module "rds" {
   }
 }
 
-resource "kubernetes_secret" "rds" {
+resource "kubernetes_secret" "rds_mssql" {
   metadata {
-    name      = "rds-instance-output"
-    namespace = "example-ns"
+    name      = "rds-mssql-instance-output"
+    namespace = var.namespace
   }
 
   data = {
-    rds_instance_endpoint = module.rds.rds_instance_endpoint
-    database_username     = module.rds.database_username
-    database_password     = module.rds.database_password
-    rds_instance_address  = module.rds.rds_instance_address
-    access_key_id         = module.rds.access_key_id
-    secret_access_key     = module.rds.secret_access_key
+    rds_instance_endpoint = module.rds_mssql.rds_instance_endpoint
+    database_username     = module.rds_mssql.database_username
+    database_password     = module.rds_mssql.database_password
+    rds_instance_address  = module.rds_mssql.rds_instance_address
+    access_key_id         = module.rds_mssql.access_key_id
+    secret_access_key     = module.rds_mssql.secret_access_key
   }
 }
