@@ -26,6 +26,7 @@ module "rds_mysql" {
   db_engine         = "mysql"
   db_engine_version = "8.0.25"
   rds_family        = "mysql8.0"
+  db_instance_class = "db.t3.small"
 
   # overwrite db_parameters. 
   db_parameter = [
