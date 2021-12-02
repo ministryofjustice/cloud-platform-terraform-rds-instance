@@ -28,6 +28,8 @@ resource "random_id" "id" {
 locals {
   identifier = "cloud-platform-${random_id.id.hex}"
   db_name    = var.db_name != "" ? var.db_name : "db${random_id.id.hex}"
+  db_arn     = aws_db_instance.rds.arn
+  db_pg_arn  = aws_db_parameter_group.custom_parameters.arn
 }
 
 resource "random_string" "username" {
@@ -199,9 +201,9 @@ data "aws_iam_policy_document" "policy" {
     ]
 
     resources = [
-      aws_db_instance.rds.arn,
+      local.db_arn,
       "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:snapshot:*",
-      aws_db_parameter_group.custom_parameters.arn,
+      local.db_pg_arn,
       "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:pg:default.*"
     ]
   }
