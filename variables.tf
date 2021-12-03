@@ -116,7 +116,7 @@ variable "db_parameter" {
     {
       name         = "rds.force_ssl"
       value        = "1"
-      apply_method = "pending-reboot"
+      apply_method = "immediate"
     }
   ]
   description = "A list of DB parameters to apply. Note that parameters may differ from a DB family to another"
