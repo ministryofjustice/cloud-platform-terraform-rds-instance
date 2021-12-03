@@ -27,6 +27,16 @@ module "rds_mssql" {
   allow_minor_version_upgrade = true
   allow_major_version_upgrade = false
 
+  # Some engines can't apply some parameters without a reboot(ex SQL Server cant apply force_ssl immediate).
+  # You will need to specify "pending-reboot" here, as default is set to "immediate".
+  db_parameter = [
+    {
+      name         = "rds.force_ssl"
+      value        = "1"
+      apply_method = "pending-reboot"
+    }
+  ]
+
   providers = {
     # Can be either "aws.london" or "aws.ireland"
     aws = aws.london
