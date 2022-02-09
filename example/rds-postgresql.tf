@@ -6,13 +6,13 @@
  */
 
 module "rds" {
-  source                 = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.16.5"
+  source                 = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.16.7"
   cluster_name           = var.cluster_name
   team_name              = var.team_name
   business-unit          = var.business_unit
   application            = var.application
   is-production          = var.is_production
-  environment-name       = var.environment_name
+  environment-name       = var.environment
   infrastructure-support = var.infrastructure_support
   namespace              = var.namespace
 
@@ -59,11 +59,11 @@ module "rds" {
 module "read_replica" {
   # default off
   count  = 0
-  source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.16.5"
+  source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.16.7"
 
   cluster_name           = var.cluster_name
   application            = var.application
-  environment-name       = var.environment_name
+  environment-name       = var.environment
   is-production          = var.is_production
   infrastructure-support = var.infrastructure_support
   team_name              = var.team_name
