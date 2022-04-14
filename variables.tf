@@ -169,3 +169,9 @@ variable "option_group_name" {
   description = "(Optional) The name of an 'aws_db_option_group' to associate to the DB instance"
   default     = null
 }
+
+variable "vpc_security_group_ids" {
+  type        = list(string)
+  description = "(Optional) A list of additional VPC security group IDs to associate with the DB instance - in adition to the default VPC security groups granting access from the Cloud Platform"
+  default     = []
+}

@@ -92,6 +92,7 @@ No modules.
 | <a name="input_is-production"></a> [is-production](#input\_is-production) | n/a | `string` | `"false"` | no |
 | <a name="input_license_model"></a> [license\_model](#input\_license\_model) | License model information for this DB instance, options are: license-included \| bring-your-own-license \| general-public-license | `string` | `"license-included"` | no |
 | <a name="input_option_group_name"></a> [option_group_name](#input\_option\_group\_name) | The name of an 'aws_db_option_group' to associate to the DB instance | `string` | null | no |
+| <a name="input_vpc_security_group_ids"></a> [vpc_security_group_ids](#input\_vpc\_security\_group\_ids) | A list of additional VPC security group IDs to associate with the DB instance - in adition to the default VPC security groups granting access from the Cloud Platform | `string` | `[]` | no |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | n/a | `string` | `""` | no |
 | <a name="input_performance_insights_enabled"></a> [performance\_insights\_enabled](#input\_performance\_insights\_enabled) | Enable performance insights for RDS? | `bool` | `false` | no |
 | <a name="input_rds_family"></a> [rds\_family](#input\_rds\_family) | Maps the postgres version with the rds family, a family often covers several versions | `string` | `"postgres10"` | no |

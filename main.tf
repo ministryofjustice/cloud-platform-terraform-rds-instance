@@ -26,10 +26,11 @@ resource "random_id" "id" {
 }
 
 locals {
-  identifier = "cloud-platform-${random_id.id.hex}"
-  db_name    = var.db_name != "" ? var.db_name : "db${random_id.id.hex}"
-  db_arn     = aws_db_instance.rds.arn
-  db_pg_arn  = aws_db_parameter_group.custom_parameters.arn
+  identifier             = "cloud-platform-${random_id.id.hex}"
+  db_name                = var.db_name != "" ? var.db_name : "db${random_id.id.hex}"
+  db_arn                 = aws_db_instance.rds.arn
+  db_pg_arn              = aws_db_parameter_group.custom_parameters.arn
+  vpc_security_group_ids = merge([aws_security_group.rds-sg.id], var.vpc_security_group_ids)
 }
 
 resource "random_string" "username" {
@@ -120,7 +121,7 @@ resource "aws_db_instance" "rds" {
   iops                         = var.db_iops
   storage_encrypted            = can(regex("sqlserver-ex", var.db_engine)) ? false : true
   db_subnet_group_name         = var.replicate_source_db != "" ? null : aws_db_subnet_group.db_subnet[0].name
-  vpc_security_group_ids       = [aws_security_group.rds-sg.id]
+  vpc_security_group_ids       = local.vpc_security_group_ids
   kms_key_id                   = (var.replicate_source_db != "") || (can(regex("sqlserver-ex", var.db_engine))) ? null : aws_kms_key.kms[0].arn
   multi_az                     = can(regex("sqlserver-web|sqlserver-ex", var.db_engine)) ? false : true
   copy_tags_to_snapshot        = true
