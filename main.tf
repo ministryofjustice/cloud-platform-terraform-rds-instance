@@ -30,7 +30,7 @@ locals {
   db_name                = var.db_name != "" ? var.db_name : "db${random_id.id.hex}"
   db_arn                 = aws_db_instance.rds.arn
   db_pg_arn              = aws_db_parameter_group.custom_parameters.arn
-  vpc_security_group_ids = merge([aws_security_group.rds-sg.id], var.vpc_security_group_ids)
+  vpc_security_group_ids = concat([aws_security_group.rds-sg.id], var.vpc_security_group_ids)
 }
 
 resource "random_string" "username" {
