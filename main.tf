@@ -186,17 +186,19 @@ resource "aws_iam_access_key" "user" {
 data "aws_iam_policy_document" "policy" {
   statement {
     actions = [
-      "rds:DescribeDBEngineVersions",
-      "rds:DescribeDBSnapshots",
-      "rds:DescribeDBInstances",
       "rds:CopyDBSnapshot",
-      "rds:DeleteDBSnapshot",
-      "rds:DescribeDBSnapshotAttributes",
-      "rds:ModifyDBSnapshot",
       "rds:CreateDBSnapshot",
-      "rds:RestoreDBInstanceFromDBSnapshot",
-      "rds:ModifyDBSnapshotAttribute",
+      "rds:DeleteDBSnapshot",
+      "rds:DescribeDBEngineVersions",
+      "rds:DescribeDBInstances",
+      "rds:DescribeDBLogFiles",
+      "rds:DescribeDBSnapshotAttributes",
+      "rds:DescribeDBSnapshots",
+      "rds:DownloadDBLogFilePortion",
       "rds:ModifyDBInstance",
+      "rds:ModifyDBSnapshot",
+      "rds:ModifyDBSnapshotAttribute",
+      "rds:RestoreDBInstanceFromDBSnapshot",
       "rds:StartDBInstance",
       "rds:StopDBInstance",
     ]
