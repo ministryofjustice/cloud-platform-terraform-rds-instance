@@ -42,13 +42,7 @@ module "rds_mysql" {
     }
     # Some engines can't apply some parameters without a reboot(ex SQL Server cant apply force_ssl immediate).
     # You will need to specify "pending-reboot" here, as default is set to "immediate".
-    # 
-    # rds.force_ssl unsupported parameter for mysql module:
-    # {
-    #   name         = "rds.force_ssl"
-    #   value        = "1"
-    #   apply_method = "pending-reboot"
-    # }
+ 
   ]
 
   providers = {
