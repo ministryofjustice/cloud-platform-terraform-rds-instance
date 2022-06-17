@@ -40,9 +40,6 @@ module "rds_mysql" {
       value        = "utf8"
       apply_method = "immediate"
     }
-    # Some engines can't apply some parameters without a reboot(ex SQL Server cant apply force_ssl immediate).
-    # You will need to specify "pending-reboot" here, as default is set to "immediate".
- 
   ]
 
   providers = {
