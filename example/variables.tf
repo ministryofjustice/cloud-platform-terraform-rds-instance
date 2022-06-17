@@ -31,7 +31,7 @@ variable "team_name" {
   default     = "example"
 }
 
-variable "environment_name" {
+variable "environment" {
   description = "The type of environment you're deploying to."
   default     = "development"
 }
