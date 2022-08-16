@@ -6,7 +6,7 @@
  */
 
 module "rds" {
-  source                 = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.16.7"
+  source                 = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.16.10"
   cluster_name           = var.cluster_name
   team_name              = var.team_name
   business-unit          = var.business_unit
@@ -24,14 +24,14 @@ module "rds" {
   performance_insights_enabled = true
 
   # change the postgres version as you see fit.
-  db_engine_version = "13"
+  db_engine_version = "14"
 
   # change the instance class as you see fit.
-  db_instance_class = "db.t3.small"
+  db_instance_class = "db.t4g.small"
 
-  # rds_family should be one of: postgres9.4, postgres9.5, postgres9.6, postgres10, postgres11, postgres12, postgres13
+  # rds_family should be one of: postgres10, postgres11, postgres12, postgres13, postgres14
   # Pick the one that defines the postgres version the best
-  rds_family = "postgres13"
+  rds_family = "postgres14"
 
   # Some engines can't apply some parameters without a reboot(ex postgres9.x cant apply force_ssl immediate).
   # You will need to specify "pending-reboot" here, as default is set to "immediate".
@@ -59,7 +59,7 @@ module "rds" {
 module "read_replica" {
   # default off
   count  = 0
-  source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.16.7"
+  source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.16.10"
 
   cluster_name           = var.cluster_name
   application            = var.application
