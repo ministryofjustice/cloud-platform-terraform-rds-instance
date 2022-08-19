@@ -6,7 +6,7 @@
 */
 
 module "rds_mssql" {
-  source                 = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.16.5"
+  source                 = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.16.10"
   cluster_name           = var.cluster_name
   team_name              = var.team_name
   business-unit          = var.business_unit
@@ -20,7 +20,7 @@ module "rds_mssql" {
   performance_insights_enabled = true
 
   db_engine                   = "sqlserver-ex"
-  db_engine_version           = "15.00.4073.23.v1"
+  db_engine_version           = "15.00.4198.2.v1"
   db_instance_class           = "db.t3.medium"
   db_allocated_storage        = 32
   rds_family                  = "sqlserver-ex-15.0"
