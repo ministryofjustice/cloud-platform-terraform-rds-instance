@@ -85,10 +85,10 @@ resource "aws_security_group" "rds-sg" {
   description = "Allow all inbound traffic"
   vpc_id      = data.aws_vpc.selected.id
 
-  // We cannot use `${aws_db_instance.rds.port}` here because it creates a
-  // cyclic dependency. Rather than resorting to `aws_security_group_rule` which
-  // is not ideal for managing rules, we will simply allow traffic to all ports.
-  // This does not compromise security as the instance only listens on one port.
+  # We cannot use `${aws_db_instance.rds.port}` here because it creates a
+  # cyclic dependency. Rather than resorting to `aws_security_group_rule` which
+  # is not ideal for managing rules, we will simply allow traffic to all ports.
+  # This does not compromise security as the instance only listens on one port.
   ingress {
     from_port   = 0
     to_port     = 0
