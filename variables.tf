@@ -136,6 +136,12 @@ variable "performance_insights_enabled" {
   default     = false
 }
 
+variable "enable_auto_start_stop" {
+  type        = bool
+  description = "Enable auto start and stop of the RDS instances for cost saving, https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_StopInstance.html"
+  default     = false
+}
+
 variable "db_parameter" {
   type = list(object({
     apply_method = string

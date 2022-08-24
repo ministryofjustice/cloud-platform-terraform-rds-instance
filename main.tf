@@ -31,6 +31,16 @@ locals {
   db_arn                 = aws_db_instance.rds.arn
   db_pg_arn              = aws_db_parameter_group.custom_parameters.arn
   vpc_security_group_ids = concat([aws_security_group.rds-sg.id], var.vpc_security_group_ids)
+  tag_for_auto_shutdown  = var.enable_auto_start_stop ? {"cloud-platform-auto-shutdown" = "Schedule RDS Stop/Start during non-business hours for cost saving"} : null
+  tags                   = {
+    business-unit          = var.business-unit
+    application            = var.application
+    is-production          = var.is-production
+    environment-name       = var.environment-name
+    owner                  = var.team_name
+    infrastructure-support = var.infrastructure-support
+    namespace              = var.namespace
+  }
 }
 
 resource "random_string" "username" {
@@ -47,15 +57,7 @@ resource "aws_kms_key" "kms" {
   count       = var.replicate_source_db != "" ? 0 : 1
   description = local.identifier
 
-  tags = {
-    business-unit          = var.business-unit
-    application            = var.application
-    is-production          = var.is-production
-    environment-name       = var.environment-name
-    owner                  = var.team_name
-    infrastructure-support = var.infrastructure-support
-    namespace              = var.namespace
-  }
+  tags = local.tags
 }
 
 resource "aws_kms_alias" "alias" {
@@ -69,15 +71,7 @@ resource "aws_db_subnet_group" "db_subnet" {
   name       = local.identifier
   subnet_ids = data.aws_subnet_ids.private.ids
 
-  tags = {
-    business-unit          = var.business-unit
-    application            = var.application
-    is-production          = var.is-production
-    environment-name       = var.environment-name
-    owner                  = var.team_name
-    infrastructure-support = var.infrastructure-support
-    namespace              = var.namespace
-  }
+  tags = local.tags
 }
 
 resource "aws_security_group" "rds-sg" {
@@ -146,15 +140,8 @@ resource "aws_db_instance" "rds" {
     delete = "2h"
   }
 
-  tags = {
-    business-unit          = var.business-unit
-    application            = var.application
-    is-production          = var.is-production
-    environment-name       = var.environment-name
-    owner                  = var.team_name
-    infrastructure-support = var.infrastructure-support
-    namespace              = var.namespace
-  }
+  tags = merge(
+    local.tags, local.tag_for_auto_shutdown)
 }
 
 resource "aws_db_parameter_group" "custom_parameters" {
