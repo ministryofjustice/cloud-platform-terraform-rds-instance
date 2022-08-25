@@ -136,9 +136,9 @@ variable "performance_insights_enabled" {
   default     = false
 }
 
-variable "enable_auto_start_stop" {
+variable "enable_rds_auto_start_stop" {
   type        = bool
-  description = "Enable auto start and stop of the RDS instances for cost saving, https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_StopInstance.html"
+  description = "Enable auto start and stop of the RDS instances during 10:00 PM - 6:00 AM for cost saving"
   default     = false
 }
 

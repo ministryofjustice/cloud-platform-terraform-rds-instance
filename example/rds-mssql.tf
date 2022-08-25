@@ -29,6 +29,10 @@ module "rds_mssql" {
 
   # Some engines can't apply some parameters without a reboot(ex SQL Server cant apply force_ssl immediate).
   # You will need to specify "pending-reboot" here, as default is set to "immediate".
+
+  # Enable auto start and stop of the RDS instances during 10:00 PM - 6:00 AM for cost saving, recommended for non-prod instances
+  # enable_rds_auto_start_stop  = true
+
   db_parameter = [
     {
       name         = "rds.force_ssl"
