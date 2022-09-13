@@ -187,6 +187,7 @@ data "aws_iam_policy_document" "policy" {
       "rds:RestoreDBInstanceFromDBSnapshot",
       "rds:StartDBInstance",
       "rds:StopDBInstance",
+      "pi:GetResourceMetrics",
     ]
 
     resources = [
