@@ -55,7 +55,7 @@ module "rds" {
   source     = "../../"
   depends_on = [module.vpc]
 
-  cluster_name           = "example-cluster"
+  vpc_name               = "example-cluster"
   team_name              = "example-repo"
   business-unit          = "example-bu"
   application            = "example-app"
