@@ -7,7 +7,7 @@
 
 module "rds_mssql" {
   source                 = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.16.10"
-  cluster_name           = var.cluster_name
+  vpc_name               = var.vpc_name
   team_name              = var.team_name
   business-unit          = var.business_unit
   application            = var.application

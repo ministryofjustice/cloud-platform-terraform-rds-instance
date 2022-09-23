@@ -1,5 +1,5 @@
-variable "cluster_name" {
-  description = "The name of the cluster (eg.: cloud-platform-live-0)"
+variable "vpc_name" {
+  description = "The name of the vpc (eg.: cloud-platform-live-0)"
   type        = string
 }
 

@@ -76,7 +76,7 @@ No modules.
 | <a name="input_business-unit"></a> [business-unit](#input\_business-unit) | Area of the MOJ responsible for the service | `string` | `""` | no |
 | <a name="input_ca_cert_identifier"></a> [ca\_cert\_identifier](#input\_ca\_cert\_identifier) | Specifies the identifier of the CA certificate for the DB instance | `string` | `"rds-ca-2019"` | no |
 | <a name="input_character_set_name"></a> [character\_set\_name](#input\_character\_set\_name) | DB char set, used only by MS-SQL | `string` | `"Latin1_General_CI_AS"` | no |
-| <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | The name of the cluster (eg.: cloud-platform-live-0) | `any` | n/a | yes |
+| <a name="input_vpc_name"></a> [cluster\_name](#input\_cluster\_name) | The name of the cluster (eg.: cloud-platform-live-0) | `any` | n/a | yes |
 | <a name="input_db_allocated_storage"></a> [db\_allocated\_storage](#input\_db\_allocated\_storage) | The allocated storage in gibibytes | `string` | `"10"` | no |
 | <a name="input_db_backup_retention_period"></a> [db\_backup\_retention\_period](#input\_db\_backup\_retention\_period) | The days to retain backups. Must be 1 or greater to be a source for a Read Replica | `string` | `"7"` | no |
 | <a name="input_db_engine"></a> [db\_engine](#input\_db\_engine) | Database engine used e.g. postgres, mysql, sqlserver-ex | `string` | `"postgres"` | no |
