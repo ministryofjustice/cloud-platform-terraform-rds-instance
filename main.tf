@@ -180,6 +180,7 @@ data "aws_iam_policy_document" "policy" {
       "rds:DescribeDBLogFiles",
       "rds:DescribeDBSnapshotAttributes",
       "rds:DescribeDBSnapshots",
+      "rds:DescribeOrderableDBInstanceOptions",
       "rds:DownloadDBLogFilePortion",
       "rds:ModifyDBInstance",
       "rds:ModifyDBSnapshot",
