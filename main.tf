@@ -8,16 +8,18 @@ data "aws_vpc" "selected" {
   }
 }
 
-data "aws_subnet_ids" "private" {
-  vpc_id = data.aws_vpc.selected.id
+data "aws_subnets" "private" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.selected.id]
+  }
 
   tags = {
     SubnetType = "Private"
   }
 }
-
 data "aws_subnet" "private" {
-  for_each = data.aws_subnet_ids.private.ids
+  for_each = toset(data.aws_subnets.private.ids)
   id       = each.value
 }
 
@@ -69,7 +71,7 @@ resource "aws_kms_alias" "alias" {
 resource "aws_db_subnet_group" "db_subnet" {
   count      = var.replicate_source_db != null ? 0 : 1
   name       = local.identifier
-  subnet_ids = data.aws_subnet_ids.private.ids
+  subnet_ids = data.aws_subnets.private.ids
 
   tags = local.default_tags
 }
@@ -107,7 +109,7 @@ resource "aws_db_instance" "rds" {
   engine                       = var.replicate_source_db == null ? var.db_engine : null
   engine_version               = var.replicate_source_db == null ? var.db_engine_version : null
   instance_class               = var.db_instance_class
-  name                         = can(regex("sqlserver", var.db_engine)) ? null : local.db_name
+  db_name                      = can(regex("sqlserver", var.db_engine)) ? null : local.db_name
   username                     = var.replicate_source_db != null ? null : "cp${random_string.username.result}"
   password                     = var.replicate_source_db != null ? null : random_password.password.result
   backup_retention_period      = var.db_backup_retention_period
