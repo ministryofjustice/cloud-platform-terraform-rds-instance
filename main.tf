@@ -8,16 +8,18 @@ data "aws_vpc" "selected" {
   }
 }
 
-data "aws_subnet_ids" "private" {
-  vpc_id = data.aws_vpc.selected.id
+data "aws_subnets" "private" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.selected.id]
+  }
 
   tags = {
     SubnetType = "Private"
   }
 }
-
 data "aws_subnet" "private" {
-  for_each = data.aws_subnet_ids.private.ids
+  for_each = toset(data.aws_subnets.private.ids)
   id       = each.value
 }
 
@@ -54,22 +56,22 @@ resource "random_password" "password" {
 }
 
 resource "aws_kms_key" "kms" {
-  count       = var.replicate_source_db != "" ? 0 : 1
+  count       = var.replicate_source_db != null ? 0 : 1
   description = local.identifier
 
   tags = local.default_tags
 }
 
 resource "aws_kms_alias" "alias" {
-  count         = var.replicate_source_db != "" ? 0 : 1
+  count         = var.replicate_source_db != null ? 0 : 1
   name          = "alias/${local.identifier}"
   target_key_id = aws_kms_key.kms[0].key_id
 }
 
 resource "aws_db_subnet_group" "db_subnet" {
-  count      = var.replicate_source_db != "" ? 0 : 1
+  count      = var.replicate_source_db != null ? 0 : 1
   name       = local.identifier
-  subnet_ids = data.aws_subnet_ids.private.ids
+  subnet_ids = data.aws_subnets.private.ids
 
   tags = local.default_tags
 }
@@ -100,23 +102,23 @@ resource "aws_security_group" "rds-sg" {
 
 resource "aws_db_instance" "rds" {
   identifier                   = var.rds_name != "" ? var.rds_name : local.identifier
-  final_snapshot_identifier    = var.replicate_source_db != "" ? null : "${local.identifier}-finalsnapshot"
+  final_snapshot_identifier    = var.replicate_source_db != null ? null : "${local.identifier}-finalsnapshot"
   allocated_storage            = var.db_allocated_storage
   max_allocated_storage        = var.db_max_allocated_storage
   apply_immediately            = true
-  engine                       = var.db_engine
-  engine_version               = var.db_engine_version
+  engine                       = var.replicate_source_db == null ? var.db_engine : null
+  engine_version               = var.replicate_source_db == null ? var.db_engine_version : null
   instance_class               = var.db_instance_class
-  name                         = can(regex("sqlserver", var.db_engine)) ? null : local.db_name
-  username                     = var.replicate_source_db != "" ? null : "cp${random_string.username.result}"
-  password                     = var.replicate_source_db != "" ? null : random_password.password.result
+  db_name                      = can(regex("sqlserver", var.db_engine)) ? null : local.db_name
+  username                     = var.replicate_source_db != null ? null : "cp${random_string.username.result}"
+  password                     = var.replicate_source_db != null ? null : random_password.password.result
   backup_retention_period      = var.db_backup_retention_period
   storage_type                 = var.db_iops == 0 ? "gp2" : "io1"
   iops                         = var.db_iops
   storage_encrypted            = can(regex("sqlserver-ex", var.db_engine)) ? false : true
-  db_subnet_group_name         = var.replicate_source_db != "" ? null : aws_db_subnet_group.db_subnet[0].name
+  db_subnet_group_name         = var.replicate_source_db != null ? null : aws_db_subnet_group.db_subnet[0].name
   vpc_security_group_ids       = local.vpc_security_group_ids
-  kms_key_id                   = (var.replicate_source_db != "") || (can(regex("sqlserver-ex", var.db_engine))) ? null : aws_kms_key.kms[0].arn
+  kms_key_id                   = (var.replicate_source_db != null) || (can(regex("sqlserver-ex", var.db_engine))) ? null : aws_kms_key.kms[0].arn
   multi_az                     = can(regex("sqlserver-web|sqlserver-ex", var.db_engine)) ? false : true
   copy_tags_to_snapshot        = true
   snapshot_identifier          = var.snapshot_identifier
@@ -124,7 +126,7 @@ resource "aws_db_instance" "rds" {
   auto_minor_version_upgrade   = var.allow_minor_version_upgrade
   allow_major_version_upgrade  = var.allow_major_version_upgrade
   parameter_group_name         = aws_db_parameter_group.custom_parameters.name
-  ca_cert_identifier           = var.replicate_source_db != "" ? null : var.ca_cert_identifier
+  ca_cert_identifier           = var.replicate_source_db != null ? null : var.ca_cert_identifier
   performance_insights_enabled = var.performance_insights_enabled
   skip_final_snapshot          = var.skip_final_snapshot
   deletion_protection          = var.deletion_protection
@@ -159,13 +161,13 @@ resource "aws_db_parameter_group" "custom_parameters" {
 }
 
 resource "aws_iam_user" "user" {
-  count = var.replicate_source_db != "" ? 0 : 1
+  count = var.replicate_source_db != null ? 0 : 1
   name  = "rds-snapshots-user-${random_id.id.hex}"
   path  = "/system/rds-snapshots-user/"
 }
 
 resource "aws_iam_access_key" "user" {
-  count = var.replicate_source_db != "" ? 0 : 1
+  count = var.replicate_source_db != null ? 0 : 1
   user  = aws_iam_user.user[0].name
 }
 
@@ -210,7 +212,7 @@ data "aws_iam_policy_document" "policy" {
 }
 
 resource "aws_iam_user_policy" "policy" {
-  count  = var.replicate_source_db != "" ? 0 : 1
+  count  = var.replicate_source_db != null ? 0 : 1
   name   = "rds-snapshots-read-write"
   policy = data.aws_iam_policy_document.policy.json
   user   = aws_iam_user.user[0].name

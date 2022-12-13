@@ -161,7 +161,7 @@ variable "db_parameter" {
 variable "replicate_source_db" {
   description = "Specifies that this resource is a Replicate database, and to use this value as the source database. This correlates to the identifier of another Amazon RDS Database to replicate."
   type        = string
-  default     = ""
+  default     = null
 }
 
 variable "skip_final_snapshot" {
