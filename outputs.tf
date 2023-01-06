@@ -30,13 +30,13 @@ output "database_password" {
 
 output "access_key_id" {
   description = "Access key id for RDS IAM user"
-  value       = join("", aws_iam_access_key.user.*.id)
+  value       = join("", aws_iam_access_key.user_2023[*].id)
 
 }
 
 output "secret_access_key" {
   description = "Secret key for RDS IAM user"
-  value       = join("", aws_iam_access_key.user.*.secret)
+  value       = join("", aws_iam_access_key.user_2023[*].secret)
 }
 
 output "db_identifier" {

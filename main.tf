@@ -166,7 +166,7 @@ resource "aws_iam_user" "user" {
   path  = "/system/rds-snapshots-user/"
 }
 
-resource "aws_iam_access_key" "user" {
+resource "aws_iam_access_key" "user_2023" {
   count = var.replicate_source_db != null ? 0 : 1
   user  = aws_iam_user.user[0].name
 }
