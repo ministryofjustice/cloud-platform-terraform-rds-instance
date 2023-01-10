@@ -6,7 +6,7 @@
 */
 
 module "rds_mysql" {
-  source                 = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.16.14"
+  source                 = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.16.15"
   vpc_name               = var.vpc_name
   team_name              = var.team_name
   business-unit          = var.business_unit
@@ -28,7 +28,7 @@ module "rds_mysql" {
   rds_family        = "mysql8.0"
   db_instance_class = "db.t4g.small"
 
-  # overwrite db_parameters. 
+  # overwrite db_parameters.
   db_parameter = [
     {
       name         = "character_set_client"
