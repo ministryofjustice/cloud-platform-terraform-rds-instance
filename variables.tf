@@ -106,6 +106,18 @@ variable "db_name" {
   type        = string
 }
 
+variable "db_username" {
+  description = "The username of the database to be created on the instance (if empty, it will be the generated random identifier)"
+  default     = ""
+  type        = string
+}
+
+variable "db_password" {
+  description = "The password of the database to be created on the instance (if empty, it will be the generated random identifier)"
+  default     = ""
+  type        = string
+}
+
 variable "allow_minor_version_upgrade" {
   description = "Indicates that minor version upgrades are allowed."
   default     = "true"
@@ -210,4 +222,11 @@ variable "vpc_security_group_ids" {
   type        = list(string)
   description = "(Optional) A list of additional VPC security group IDs to associate with the DB instance - in adition to the default VPC security groups granting access from the Cloud Platform"
   default     = []
+}
+
+
+variable "rotate_db_password" {
+  type        = bool
+  description = "Enable performance insights for RDS?"
+  default     = false
 }

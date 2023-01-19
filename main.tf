@@ -30,6 +30,8 @@ resource "random_id" "id" {
 locals {
   identifier             = "cloud-platform-${random_id.id.hex}"
   db_name                = var.db_name != "" ? var.db_name : "db${random_id.id.hex}"
+  db_username            = var.db_username != "" ? var.db_username : "cp${random_string.username.result}"
+  db_password            = var.db_password != "" ? var.db_password : random_password.password.result
   db_arn                 = aws_db_instance.rds.arn
   db_pg_arn              = aws_db_parameter_group.custom_parameters.arn
   vpc_security_group_ids = concat([aws_security_group.rds-sg.id], var.vpc_security_group_ids)
@@ -110,8 +112,8 @@ resource "aws_db_instance" "rds" {
   engine_version               = var.replicate_source_db == null ? var.db_engine_version : null
   instance_class               = var.db_instance_class
   db_name                      = can(regex("sqlserver", var.db_engine)) ? null : local.db_name
-  username                     = var.replicate_source_db != null ? null : "cp${random_string.username.result}"
-  password                     = var.replicate_source_db != null ? null : random_password.password.result
+  username                     = var.replicate_source_db != null ? null : local.db_username
+  password                     = var.replicate_source_db != null ? null : local.db_password
   backup_retention_period      = var.db_backup_retention_period
   storage_type                 = var.db_iops == 0 ? "gp2" : "io1"
   iops                         = var.db_iops
@@ -169,6 +171,9 @@ resource "aws_iam_user" "user" {
 resource "aws_iam_access_key" "user" {
   count = var.replicate_source_db != null ? 0 : 1
   user  = aws_iam_user.user[0].name
+  lifecycle {
+    prevent_destroy = false
+  }
 }
 
 data "aws_iam_policy_document" "policy" {
