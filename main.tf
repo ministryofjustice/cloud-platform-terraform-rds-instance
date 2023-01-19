@@ -171,9 +171,6 @@ resource "aws_iam_user" "user" {
 resource "aws_iam_access_key" "user" {
   count = var.replicate_source_db != null ? 0 : 1
   user  = aws_iam_user.user[0].name
-  lifecycle {
-    prevent_destroy = false
-  }
 }
 
 data "aws_iam_policy_document" "policy" {
