@@ -30,6 +30,7 @@ resource "random_id" "id" {
 locals {
   identifier             = "cloud-platform-${random_id.id.hex}"
   db_name                = var.db_name != "" ? var.db_name : "db${random_id.id.hex}"
+  db_password            = var.db_password_spin == "switch_to_succession" ? random_password.password_switch.result : random_password.password.result
   db_arn                 = aws_db_instance.rds.arn
   db_pg_arn              = aws_db_parameter_group.custom_parameters.arn
   vpc_security_group_ids = concat([aws_security_group.rds-sg.id], var.vpc_security_group_ids)
@@ -51,6 +52,11 @@ resource "random_string" "username" {
 }
 
 resource "random_password" "password" {
+  length  = 16
+  special = false
+}
+
+resource "random_password" "password_switch" {
   length  = 16
   special = false
 }
@@ -111,7 +117,7 @@ resource "aws_db_instance" "rds" {
   instance_class               = var.db_instance_class
   db_name                      = can(regex("sqlserver", var.db_engine)) ? null : local.db_name
   username                     = var.replicate_source_db != null ? null : "cp${random_string.username.result}"
-  password                     = var.replicate_source_db != null ? null : random_password.password.result
+  password                     = var.replicate_source_db != null ? null : local.db_password
   backup_retention_period      = var.db_backup_retention_period
   storage_type                 = var.db_iops == 0 ? "gp2" : "io1"
   iops                         = var.db_iops
