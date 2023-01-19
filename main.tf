@@ -30,7 +30,7 @@ resource "random_id" "id" {
 locals {
   identifier             = "cloud-platform-${random_id.id.hex}"
   db_name                = var.db_name != "" ? var.db_name : "db${random_id.id.hex}"
-  db_password            = var.db_password_spin == "switch_to_succession" ? random_password.password_switch.result : random_password.password.result
+  db_password            = var.db_password_spin == "switch_to_succession" ? random_password.password_switch[0].result : random_password.password[0].result
   db_arn                 = aws_db_instance.rds.arn
   db_pg_arn              = aws_db_parameter_group.custom_parameters.arn
   vpc_security_group_ids = concat([aws_security_group.rds-sg.id], var.vpc_security_group_ids)
@@ -52,11 +52,13 @@ resource "random_string" "username" {
 }
 
 resource "random_password" "password" {
+  count   = var.db_password_spin != "" ? 0 : 1
   length  = 16
   special = false
 }
 
 resource "random_password" "password_switch" {
+  count   = var.db_password_spin != "switch_to_succession" ? 0 : 1
   length  = 16
   special = false
 }
