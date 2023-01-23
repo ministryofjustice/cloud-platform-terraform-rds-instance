@@ -211,3 +211,9 @@ variable "vpc_security_group_ids" {
   description = "(Optional) A list of additional VPC security group IDs to associate with the DB instance - in adition to the default VPC security groups granting access from the Cloud Platform"
   default     = []
 }
+
+
+variable "db_password_date" {
+  default    = ""
+  description = "Process to spin new db password giving date"
+}
