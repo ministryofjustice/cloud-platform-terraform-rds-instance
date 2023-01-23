@@ -214,6 +214,7 @@ variable "vpc_security_group_ids" {
 
 
 variable "db_password_date" {
-  default    = ""
+  type        = string
+  default     = ""
   description = "Process to spin new db password giving date"
 }
