@@ -43,7 +43,7 @@ locals {
     infrastructure-support = var.infrastructure-support
     namespace              = var.namespace
   }
-  db_password_spin = var.db_password_date == "" ? {} : { "password-rotated-date" = var.db_password_date }
+  db_password_rotation_seed = var.db_password_rotated_date == "" ? {} : { "db-password-rotated-date" = var.db_password_rotated_date }
 }
 
 resource "random_string" "username" {
@@ -54,8 +54,7 @@ resource "random_string" "username" {
 resource "random_password" "password" {
   length  = 16
   special = false
-  keepers = local.db_password_spin
-
+  keepers = local.db_password_rotation_seed
 }
 
 resource "aws_kms_key" "kms" {
