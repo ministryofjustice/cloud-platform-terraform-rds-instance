@@ -6,7 +6,7 @@
 */
 
 module "rds_mssql" {
-  source                 = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.16.15"
+  source                 = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.16.16"
   vpc_name               = var.vpc_name
   team_name              = var.team_name
   business-unit          = var.business_unit
@@ -32,6 +32,9 @@ module "rds_mssql" {
 
   # Enable auto start and stop of the RDS instances during 10:00 PM - 6:00 AM for cost saving, recommended for non-prod instances
   # enable_rds_auto_start_stop  = true
+
+  # This will rotate the db password. Update the value to the current date.
+  # db_password_rotated_date  = "dd-mm-yyyy"
 
   db_parameter = [
     {
