@@ -213,8 +213,8 @@ variable "vpc_security_group_ids" {
 }
 
 
-variable "db_password_date" {
+variable "db_password_rotated_date" {
   type        = string
   default     = ""
-  description = "Process to spin new db password giving date"
+  description = "Using this variable will spin new db password by providing date as value"
 }
