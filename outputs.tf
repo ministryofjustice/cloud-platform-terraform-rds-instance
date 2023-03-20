@@ -26,6 +26,7 @@ output "database_username" {
 output "database_password" {
   description = "Database Password"
   value       = aws_db_instance.rds.password
+  sensitive   = true
 }
 
 output "access_key_id" {
@@ -37,6 +38,7 @@ output "access_key_id" {
 output "secret_access_key" {
   description = "Secret key for RDS IAM user"
   value       = join("", aws_iam_access_key.user.*.secret)
+  sensitive   = true
 }
 
 output "db_identifier" {
