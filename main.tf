@@ -112,7 +112,7 @@ resource "aws_db_instance" "rds" {
   engine_version               = var.replicate_source_db == null ? var.db_engine_version : null
   instance_class               = var.db_instance_class
   db_name                      = can(regex("sqlserver", var.db_engine)) ? null : local.db_name
-  username                     = var.replicate_source_db != null ? null : "cp${random_string.username.result}"
+  username                     = var.replicate_source_db != null ? null : sensitive("cp${random_string.username.result}")
   password                     = var.replicate_source_db != null ? null : random_password.password.result
   backup_retention_period      = var.db_backup_retention_period
   storage_type                 = var.db_iops == 0 ? "gp2" : "io1"
