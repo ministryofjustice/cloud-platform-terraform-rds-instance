@@ -21,7 +21,7 @@ When creating Read Replica, make sure to pass the same inputs in the replica ins
 
 ## Usage
 
-See these examples for [MS SQL Server](example/rds-mssql.tf), [MySQL](example/rds-mysql.tf) and [PostGreSQL](example/rds-postgresql.tf).
+See these examples for [MS SQL Server](example/rds-mssql.tf), [MySQL](example/rds-mysql.tf) and [PostgreSQL](example/rds-postgresql.tf).
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
