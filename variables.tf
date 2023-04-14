@@ -212,9 +212,14 @@ variable "vpc_security_group_ids" {
   default     = []
 }
 
-
 variable "db_password_rotated_date" {
   type        = string
   default     = ""
   description = "Using this variable will spin new db password by providing date as value"
+}
+
+variable "prepare_for_major_upgrade" {
+  type        = bool
+  default     = false
+  description = "Set this to true to change your parameter group to the default version, and to turn on the ability to upgrade major versions"
 }
