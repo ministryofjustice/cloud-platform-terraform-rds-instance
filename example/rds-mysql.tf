@@ -6,51 +6,32 @@
 */
 
 module "rds_mysql" {
-  source                 = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.16.16"
-  vpc_name               = var.vpc_name
-  team_name              = var.team_name
-  business-unit          = var.business_unit
+  source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.17.1"
+
+  # VPC configuration
+  vpc_name = var.vpc_name
+
+  # RDS configuration
+  allow_minor_version_upgrade  = true
+  allow_major_version_upgrade  = false
+  performance_insights_enabled = false
+  # enable_rds_auto_start_stop   = true # Uncomment to turn off your database overnight between 10PM and 6AM UTC / 11PM and 7AM BST.
+  # db_password_rotated_date     = "2023-04-17" # Uncomment to rotate your database password.
+
+  # MySQL specifics
+  db_engine         = "mysql"
+  db_engine_version = "8.0.32"
+  rds_family        = "mysql8.0"
+  db_instance_class = "db.t4g.micro"
+
+  # Tags
   application            = var.application
-  is-production          = var.is_production
+  business-unit          = var.business_unit
   environment-name       = var.environment
   infrastructure-support = var.infrastructure_support
+  is-production          = var.is_production
   namespace              = var.namespace
-
-  # turn off performance insights
-  performance_insights_enabled = false
-
-  # general options
-  allow_major_version_upgrade = "false"
-
-  # using mysql
-  db_engine         = "mysql"
-  db_engine_version = "8.0.28"
-  rds_family        = "mysql8.0"
-  db_instance_class = "db.t4g.small"
-
-  # overwrite db_parameters.
-  db_parameter = [
-    {
-      name         = "character_set_client"
-      value        = "utf8"
-      apply_method = "immediate"
-    },
-    {
-      name         = "character_set_server"
-      value        = "utf8"
-      apply_method = "immediate"
-    }
-  ]
-
-  # Enable auto start and stop of the RDS instances during 10:00 PM - 6:00 AM for cost saving, recommended for non-prod instances
-  # enable_rds_auto_start_stop  = true
-
-  # This will rotate the db password. Update the value to the current date.
-  # db_password_rotated_date  = "dd-mm-yyyy"
-
-  providers = {
-    aws = aws.london
-  }
+  team_name              = var.team_name
 }
 
 resource "kubernetes_secret" "rds_mysql" {
