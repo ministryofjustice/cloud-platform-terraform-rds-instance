@@ -6,36 +6,28 @@
 */
 
 module "rds_mssql" {
-  source                 = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.16.16"
-  vpc_name               = var.vpc_name
-  team_name              = var.team_name
-  business-unit          = var.business_unit
-  application            = var.application
-  is-production          = var.is_production
-  environment-name       = var.environment
-  infrastructure-support = var.infrastructure_support
-  namespace              = var.namespace
+  source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.17.1"
 
-  # enable performance insights
-  performance_insights_enabled = true
+  # VPC configuration
+  vpc_name = var.vpc_name
 
-  db_engine                   = "sqlserver-ex"
-  db_engine_version           = "15.00.4198.2.v1"
-  db_instance_class           = "db.t3.medium"
-  db_allocated_storage        = 32
-  rds_family                  = "sqlserver-ex-15.0"
-  allow_minor_version_upgrade = true
-  allow_major_version_upgrade = false
+  # RDS configuration
+  allow_minor_version_upgrade  = true
+  allow_major_version_upgrade  = false
+  performance_insights_enabled = false
+  db_max_allocated_storage     = "500"
+  # enable_rds_auto_start_stop   = true # Uncomment to turn off your database overnight between 10PM and 6AM UTC / 11PM and 7AM BST.
+  # db_password_rotated_date     = "2023-04-17" # Uncomment to rotate your database password.
+
+  # SQL Server specifics
+  db_engine            = "sqlserver-ex"
+  db_engine_version    = "15.00.4236.7.v1"
+  rds_family           = "sqlserver-ex-15.0"
+  db_instance_class    = "db.t3.small"
+  db_allocated_storage = 32 # minimum of 20GiB for SQL Server
 
   # Some engines can't apply some parameters without a reboot(ex SQL Server cant apply force_ssl immediate).
   # You will need to specify "pending-reboot" here, as default is set to "immediate".
-
-  # Enable auto start and stop of the RDS instances during 10:00 PM - 6:00 AM for cost saving, recommended for non-prod instances
-  # enable_rds_auto_start_stop  = true
-
-  # This will rotate the db password. Update the value to the current date.
-  # db_password_rotated_date  = "dd-mm-yyyy"
-
   db_parameter = [
     {
       name         = "rds.force_ssl"
@@ -44,10 +36,14 @@ module "rds_mssql" {
     }
   ]
 
-  providers = {
-    # Can be either "aws.london" or "aws.ireland"
-    aws = aws.london
-  }
+  # Tags
+  application            = var.application
+  business-unit          = var.business_unit
+  environment-name       = var.environment
+  infrastructure-support = var.infrastructure_support
+  is-production          = var.is_production
+  namespace              = var.namespace
+  team_name              = var.team_name
 }
 
 resource "kubernetes_secret" "rds_mssql" {
