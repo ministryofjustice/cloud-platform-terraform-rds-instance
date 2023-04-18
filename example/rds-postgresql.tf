@@ -4,7 +4,6 @@
  * releases page of this repository.
  *
  */
-
 module "rds" {
   source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.17.1"
 
@@ -142,6 +141,5 @@ resource "kubernetes_config_map" "rds" {
   data = {
     database_name = module.rds.database_name
     db_identifier = module.rds.db_identifier
-
   }
 }
