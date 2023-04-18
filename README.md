@@ -97,6 +97,7 @@ No modules.
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | Namespace name | `string` | `""` | no |
 | <a name="input_option_group_name"></a> [option\_group\_name](#input\_option\_group\_name) | (Optional) The name of an 'aws\_db\_option\_group' to associate to the DB instance | `string` | `null` | no |
 | <a name="input_performance_insights_enabled"></a> [performance\_insights\_enabled](#input\_performance\_insights\_enabled) | Enable performance insights for RDS? | `bool` | `false` | no |
+| <a name="input_prepare_for_major_upgrade"></a> [prepare\_for\_major\_upgrade](#input\_prepare\_for\_major\_upgrade) | Set this to true to change your parameter group to the default version, and to turn on the ability to upgrade major versions | `bool` | `false` | no |
 | <a name="input_rds_family"></a> [rds\_family](#input\_rds\_family) | Maps the engine version with the parameter group family, a family often covers several versions | `string` | `"postgres10"` | no |
 | <a name="input_rds_name"></a> [rds\_name](#input\_rds\_name) | Optional name of the RDS cluster. Changing the name will re-create the RDS | `string` | `""` | no |
 | <a name="input_replicate_source_db"></a> [replicate\_source\_db](#input\_replicate\_source\_db) | Specifies that this resource is a Replicate database, and to use this value as the source database. This correlates to the identifier of another Amazon RDS Database to replicate. | `string` | `null` | no |
