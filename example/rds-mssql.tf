@@ -4,7 +4,6 @@
  * releases page of this repository.
  *
 */
-
 module "rds_mssql" {
   source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.17.1"
 
