@@ -52,3 +52,7 @@ output "resource_id" {
   description = "RDS Resource ID - used for performance insights (metrics)"
   value       = aws_db_instance.rds.resource_id
 }
+
+output "irsa_policy_arn" {
+  value = aws_iam_policy.irsa.arn
+}
