@@ -14,7 +14,7 @@ When upgrading the major version of an engine, `allow_major_version_upgrade` mus
 
 Some engines can't apply some parameters without a reboot(ex postgres9.x cant apply force_ssl immediate), and you will need to specify "pending-reboot" here.
 
-By default, a random name will be generated for the RDS. The `rds_name` parameters allows to set this identifier. 
+By default, a random name will be generated for the RDS. The `rds_name` parameters allows to set this identifier.
 Warning: Changing this identifier will recreated the RDS.
 
 When creating Read Replica, make sure to pass the same inputs in the replica instance. If not specified, the module will use default values which will conflict the source RDS instance.
