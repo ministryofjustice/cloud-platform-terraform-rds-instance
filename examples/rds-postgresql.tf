@@ -53,11 +53,15 @@ module "read_replica" {
   # If any other inputs of the RDS is passed in the source db which are different from defaults,
   # add them to the replica
 
-
+  # PostgreSQL specifics
+  db_engine         = "postgres"
+  db_engine_version = "14.7"
+  rds_family        = "postgres14"
+  db_instance_class = "db.t4g.micro"
   # It is mandatory to set the below values to create read replica instance
 
-  # Set the database_name of the source db
-  db_name = module.rds.database_name
+ # Set the database_name of the source db
+  db_name = null # "db_name": conflicts with replicate_source_db
 
   # Set the db_identifier of the source db
   replicate_source_db = module.rds.db_identifier
