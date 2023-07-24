@@ -60,7 +60,7 @@ module "read_replica" {
   db_instance_class = "db.t4g.micro"
   # It is mandatory to set the below values to create read replica instance
 
- # Set the database_name of the source db
+  # Set the database_name of the source db
   db_name = null # "db_name": conflicts with replicate_source_db
 
   # Set the db_identifier of the source db
@@ -94,8 +94,6 @@ resource "kubernetes_secret" "rds" {
     database_username     = module.rds.database_username
     database_password     = module.rds.database_password
     rds_instance_address  = module.rds.rds_instance_address
-    access_key_id         = module.rds.access_key_id
-    secret_access_key     = module.rds.secret_access_key
   }
   /* You can replace all of the above with the following, if you prefer to
      * use a single database URL value in your application code:

@@ -1,62 +1,92 @@
-data "aws_caller_identity" "current" {}
+locals {
+  # Generic configuration
+  identifier                = "cloud-platform-${random_id.id.hex}"
+  db_name                   = var.db_name != "" ? var.db_name : "db${random_id.id.hex}"
+  db_arn                    = aws_db_instance.rds.arn
+  db_pg_arn                 = aws_db_parameter_group.custom_parameters.arn
+  vpc_security_group_ids    = concat([aws_security_group.rds-sg.id], var.vpc_security_group_ids)
+  tag_for_auto_shutdown     = var.enable_rds_auto_start_stop ? { "cloud-platform-rds-auto-shutdown" = "Schedule RDS Stop/Start during non-business hours for cost saving" } : null
+  db_password_rotation_seed = var.db_password_rotated_date == "" ? {} : { "db-password-rotated-date" = var.db_password_rotated_date }
+  vpc_name                  = (var.vpc_name == "live") ? "live-1" : var.vpc_name
+
+  # Tags
+  default_tags = {
+    # Mandatory
+    business-unit = var.business_unit
+    application   = var.application
+    is-production = var.is_production
+    owner         = var.team_name
+    namespace     = var.namespace # for billing and identification purposes
+
+    # Optional
+    environment-name       = var.environment_name
+    infrastructure-support = var.infrastructure_support
+  }
+}
+
+##################
+# Get AWS region #
+##################
 data "aws_region" "current" {}
 
-data "aws_vpc" "selected" {
+###########################
+# Get account information #
+###########################
+data "aws_caller_identity" "current" {}
+
+#######################
+# Get VPC information #
+#######################
+data "aws_vpc" "this" {
   filter {
     name   = "tag:Name"
-    values = [var.vpc_name == "live" ? "live-1" : var.vpc_name]
+    values = [local.vpc_name]
   }
 }
 
 data "aws_subnets" "private" {
   filter {
     name   = "vpc-id"
-    values = [data.aws_vpc.selected.id]
+    values = [data.aws_vpc.this.id]
   }
 
   tags = {
     SubnetType = "Private"
   }
 }
+
 data "aws_subnet" "private" {
   for_each = toset(data.aws_subnets.private.ids)
   id       = each.value
 }
 
+########################
+# Generate identifiers #
+########################
 resource "random_id" "id" {
   byte_length = 8
 }
 
-locals {
-  identifier             = "cloud-platform-${random_id.id.hex}"
-  db_name                = var.db_name != "" ? var.db_name : "db${random_id.id.hex}"
-  db_arn                 = aws_db_instance.rds.arn
-  db_pg_arn              = aws_db_parameter_group.custom_parameters.arn
-  vpc_security_group_ids = concat([aws_security_group.rds-sg.id], var.vpc_security_group_ids)
-  tag_for_auto_shutdown  = var.enable_rds_auto_start_stop ? { "cloud-platform-rds-auto-shutdown" = "Schedule RDS Stop/Start during non-business hours for cost saving" } : null
-  default_tags = {
-    business-unit          = var.business-unit
-    application            = var.application
-    is-production          = var.is-production
-    environment-name       = var.environment-name
-    owner                  = var.team_name
-    infrastructure-support = var.infrastructure-support
-    namespace              = var.namespace
-  }
-  db_password_rotation_seed = var.db_password_rotated_date == "" ? {} : { "db-password-rotated-date" = var.db_password_rotated_date }
-}
-
+##############################
+# Generate database username #
+##############################
 resource "random_string" "username" {
   length  = 8
   special = false
 }
 
+##############################
+# Generate database password #
+##############################
 resource "random_password" "password" {
   length  = 16
   special = false
   keepers = local.db_password_rotation_seed
 }
 
+#########################
+# Create encryption key #
+#########################
 resource "aws_kms_key" "kms" {
   count       = var.replicate_source_db != null ? 0 : 1
   description = local.identifier
@@ -70,6 +100,9 @@ resource "aws_kms_alias" "alias" {
   target_key_id = aws_kms_key.kms[0].key_id
 }
 
+########################
+# Create subnet groups #
+########################
 resource "aws_db_subnet_group" "db_subnet" {
   count      = var.replicate_source_db != null ? 0 : 1
   name       = local.identifier
@@ -78,10 +111,13 @@ resource "aws_db_subnet_group" "db_subnet" {
   tags = local.default_tags
 }
 
+##########################
+# Create security groups #
+##########################
 resource "aws_security_group" "rds-sg" {
   name        = local.identifier
   description = "Allow all inbound traffic"
-  vpc_id      = data.aws_vpc.selected.id
+  vpc_id      = data.aws_vpc.this.id
 
   # We cannot use `${aws_db_instance.rds.port}` here because it creates a
   # cyclic dependency. Rather than resorting to `aws_security_group_rule` which
@@ -102,6 +138,9 @@ resource "aws_security_group" "rds-sg" {
   }
 }
 
+###################
+# Create database #
+###################
 resource "aws_db_instance" "rds" {
   identifier                   = var.rds_name != "" ? var.rds_name : local.identifier
   final_snapshot_identifier    = var.replicate_source_db != null ? null : "${local.identifier}-finalsnapshot"
@@ -147,6 +186,9 @@ resource "aws_db_instance" "rds" {
   tags = merge(local.default_tags, local.tag_for_auto_shutdown)
 }
 
+##########################
+# Create parameter group #
+##########################
 resource "aws_db_parameter_group" "custom_parameters" {
   name   = (var.prepare_for_major_upgrade) ? "${local.identifier}-upgrade" : local.identifier
   family = var.rds_family
@@ -165,70 +207,13 @@ resource "aws_db_parameter_group" "custom_parameters" {
   }
 }
 
-# Legacy long-lived credentials
-resource "aws_iam_user" "user" {
-  count = var.replicate_source_db != null ? 0 : 1
-  name  = "rds-snapshots-user-${random_id.id.hex}"
-  path  = "/system/rds-snapshots-user/"
-}
-
-resource "aws_iam_access_key" "user" {
-  count = var.replicate_source_db != null ? 0 : 1
-  user  = aws_iam_user.user[0].name
-}
-
-data "aws_iam_policy_document" "policy" {
-  statement {
-    actions = [
-      "rds:CopyDBSnapshot",
-      "rds:CreateDBSnapshot",
-      "rds:DeleteDBSnapshot",
-      "rds:DescribeDBEngineVersions",
-      "rds:DescribeDBInstances",
-      "rds:DescribeDBLogFiles",
-      "rds:DescribeDBSnapshotAttributes",
-      "rds:DescribeDBSnapshots",
-      "rds:DescribeOrderableDBInstanceOptions",
-      "rds:DownloadDBLogFilePortion",
-      "rds:ModifyDBInstance",
-      "rds:ModifyDBSnapshot",
-      "rds:ModifyDBSnapshotAttribute",
-      "rds:RestoreDBInstanceFromDBSnapshot",
-      "rds:StartDBInstance",
-      "rds:StopDBInstance",
-    ]
-
-    resources = [
-      local.db_arn,
-      "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:snapshot:*",
-      local.db_pg_arn,
-      "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:pg:default.*"
-    ]
-  }
-
-  statement {
-    actions = [
-      "pi:*",
-    ]
-
-    resources = [
-      "arn:aws:pi:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:metrics/rds/*",
-    ]
-  }
-}
-
-resource "aws_iam_user_policy" "policy" {
-  count  = var.replicate_source_db != null ? 0 : 1
-  name   = "rds-snapshots-read-write"
-  policy = data.aws_iam_policy_document.policy.json
-  user   = aws_iam_user.user[0].name
-}
-
 # Short-lived credentials (IRSA)
 data "aws_iam_policy_document" "irsa" {
   version = "2012-10-17"
 
   statement {
+    sid    = "AllowRDSAccessFor${random_id.id.hex}"
+    effect = "Allow"
     actions = [
       "rds:CopyDBSnapshot",
       "rds:CreateDBSnapshot",
@@ -257,6 +242,8 @@ data "aws_iam_policy_document" "irsa" {
   }
 
   statement {
+    sid    = "AllowPIAccessFor${random_id.id.hex}"
+    effect = "Allow"
     actions = [
       "pi:*",
     ]
