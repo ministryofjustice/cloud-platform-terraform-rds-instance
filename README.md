@@ -29,15 +29,15 @@ See these examples for [MS SQL Server](example/rds-mssql.tf), [MySQL](example/rd
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.2.5 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >=4.27.0 |
-| <a name="requirement_random"></a> [random](#requirement\_random) | >=2.0.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.0.0 |
+| <a name="requirement_random"></a> [random](#requirement\_random) | >= 2.0.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >=4.27.0 |
-| <a name="provider_random"></a> [random](#provider\_random) | >=2.0.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.0.0 |
+| <a name="provider_random"></a> [random](#provider\_random) | >= 2.0.0 |
 
 ## Modules
 
@@ -76,7 +76,7 @@ No modules.
 | <a name="input_allow_minor_version_upgrade"></a> [allow\_minor\_version\_upgrade](#input\_allow\_minor\_version\_upgrade) | Indicates that minor version upgrades are allowed. | `string` | `"true"` | no |
 | <a name="input_application"></a> [application](#input\_application) | Application name | `string` | n/a | yes |
 | <a name="input_backup_window"></a> [backup\_window](#input\_backup\_window) | The daily time range (in UTC) during which automated backups are created if they are enabled. Example: 09:46-10:16 | `string` | `""` | no |
-| <a name="input_business-unit"></a> [business-unit](#input\_business-unit) | Area of the MOJ responsible for the service | `string` | `""` | no |
+| <a name="input_business_unit"></a> [business\_unit](#input\_business\_unit) | Area of the MOJ responsible for the service | `string` | n/a | yes |
 | <a name="input_ca_cert_identifier"></a> [ca\_cert\_identifier](#input\_ca\_cert\_identifier) | Specifies the identifier of the CA certificate for the DB instance | `string` | `"rds-ca-2019"` | no |
 | <a name="input_character_set_name"></a> [character\_set\_name](#input\_character\_set\_name) | DB char set, used only by MS-SQL | `string` | `"SQL_Latin1_General_CP1_CI_AS"` | no |
 | <a name="input_db_allocated_storage"></a> [db\_allocated\_storage](#input\_db\_allocated\_storage) | The allocated storage in gibibytes | `string` | `"10"` | no |
@@ -91,12 +91,12 @@ No modules.
 | <a name="input_db_password_rotated_date"></a> [db\_password\_rotated\_date](#input\_db\_password\_rotated\_date) | Using this variable will spin new db password by providing date as value | `string` | `""` | no |
 | <a name="input_deletion_protection"></a> [deletion\_protection](#input\_deletion\_protection) | (Optional) If the DB instance should have deletion protection enabled. The database can't be deleted when this value is set to true. The default is false. | `string` | `"false"` | no |
 | <a name="input_enable_rds_auto_start_stop"></a> [enable\_rds\_auto\_start\_stop](#input\_enable\_rds\_auto\_start\_stop) | Enable auto start and stop of the RDS instances during 10:00 PM - 6:00 AM for cost saving | `bool` | `false` | no |
-| <a name="input_environment-name"></a> [environment-name](#input\_environment-name) | Environment name | `string` | n/a | yes |
-| <a name="input_infrastructure-support"></a> [infrastructure-support](#input\_infrastructure-support) | The team responsible for managing the infrastructure. Should be of the form <team-name> (<team-email>) | `string` | n/a | yes |
-| <a name="input_is-production"></a> [is-production](#input\_is-production) | Whether the environment is production or not | `string` | `"false"` | no |
+| <a name="input_environment_name"></a> [environment\_name](#input\_environment\_name) | Environment name | `string` | n/a | yes |
+| <a name="input_infrastructure_support"></a> [infrastructure\_support](#input\_infrastructure\_support) | The team responsible for managing the infrastructure. Should be of the form <team-name> (<team-email>) | `string` | n/a | yes |
+| <a name="input_is_production"></a> [is\_production](#input\_is\_production) | Whether this is used for production or not | `string` | n/a | yes |
 | <a name="input_license_model"></a> [license\_model](#input\_license\_model) | License model information for this DB instance, options for MS-SQL are: license-included \| bring-your-own-license \| general-public-license | `string` | `null` | no |
 | <a name="input_maintenance_window"></a> [maintenance\_window](#input\_maintenance\_window) | The window to perform maintenance in. Syntax: "ddd:hh24:mi-ddd:hh24:mi". For example: "Mon:00:00-Mon:03:00". | `string` | `""` | no |
-| <a name="input_namespace"></a> [namespace](#input\_namespace) | Namespace name | `string` | `""` | no |
+| <a name="input_namespace"></a> [namespace](#input\_namespace) | Namespace name | `string` | n/a | yes |
 | <a name="input_option_group_name"></a> [option\_group\_name](#input\_option\_group\_name) | (Optional) The name of an 'aws\_db\_option\_group' to associate to the DB instance | `string` | `null` | no |
 | <a name="input_performance_insights_enabled"></a> [performance\_insights\_enabled](#input\_performance\_insights\_enabled) | Enable performance insights for RDS? | `bool` | `false` | no |
 | <a name="input_prepare_for_major_upgrade"></a> [prepare\_for\_major\_upgrade](#input\_prepare\_for\_major\_upgrade) | Set this to true to change your parameter group to the default version, and to turn on the ability to upgrade major versions | `bool` | `false` | no |
