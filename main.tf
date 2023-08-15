@@ -35,12 +35,12 @@ locals {
   vpc_security_group_ids = concat([aws_security_group.rds-sg.id], var.vpc_security_group_ids)
   tag_for_auto_shutdown  = var.enable_rds_auto_start_stop ? { "cloud-platform-rds-auto-shutdown" = "Schedule RDS Stop/Start during non-business hours for cost saving" } : null
   default_tags = {
-    business-unit          = var.business-unit
+    business-unit          = var.business_unit
     application            = var.application
-    is-production          = var.is-production
-    environment-name       = var.environment-name
+    is-production          = var.is_production
+    environment-name       = var.environment_name
     owner                  = var.team_name
-    infrastructure-support = var.infrastructure-support
+    infrastructure-support = var.infrastructure_support
     namespace              = var.namespace
   }
   db_password_rotation_seed = var.db_password_rotated_date == "" ? {} : { "db-password-rotated-date" = var.db_password_rotated_date }
