@@ -2,7 +2,7 @@
 
 [![Releases](https://img.shields.io/github/v/release/ministryofjustice/cloud-platform-terraform-rds-instance.svg)](https://github.com/ministryofjustice/cloud-platform-terraform-rds-instance/releases)
 
-This Terraform module will creates an [Amazon RDS](https://aws.amazon.com/rds/) database for use on the Cloud Platform.
+This Terraform module will create an [Amazon RDS](https://aws.amazon.com/rds/) database for use on the Cloud Platform.
 
 ## Usage
 
