@@ -54,5 +54,6 @@ output "resource_id" {
 }
 
 output "irsa_policy_arn" {
-  value = aws_iam_policy.irsa.arn
+  description = "IAM policy ARN for access to create database snapshots"
+  value       = aws_iam_policy.irsa.arn
 }

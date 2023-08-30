@@ -1,27 +1,128 @@
 # cloud-platform-terraform-rds-instance
 
-[![Releases](https://img.shields.io/github/release/ministryofjustice/cloud-platform-terraform-rds-instance/all.svg?style=flat-square)](https://github.com/ministryofjustice/cloud-platform-terraform-rds-instance/releases)
+[![Releases](https://img.shields.io/github/v/release/ministryofjustice/cloud-platform-terraform-rds-instance.svg)](https://github.com/ministryofjustice/cloud-platform-terraform-rds-instance/releases)
 
-This terraform module will create an RDS instance and all required AWS resources. A KMS key is also created in order to enable encryption.
-
-The RDS instance that is created uses a randomly generated name to avoid any conflicts. The default database created in the instance uses the same random identifier but can be overriden by the user.
-
-The module also deploys the instance in Multi-AZ.
-
-The outputs of this module should allow a user to connect to the database instance.
-
-When upgrading the major version of an engine, `allow_major_version_upgrade` must be set to `true`, as default is set to false.
-
-Some engines can't apply some parameters without a reboot(ex postgres9.x cant apply force_ssl immediate), and you will need to specify "pending-reboot" here.
-
-By default, a random name will be generated for the RDS. The `rds_name` parameters allows to set this identifier.
-Warning: Changing this identifier will recreated the RDS.
-
-When creating Read Replica, make sure to pass the same inputs in the replica instance. If not specified, the module will use default values which will conflict the source RDS instance.
+This Terraform module will creates an [Amazon RDS](https://aws.amazon.com/rds/) database for use on the Cloud Platform.
 
 ## Usage
 
-See these examples for [MS SQL Server](example/rds-mssql.tf), [MySQL](example/rds-mysql.tf) and [PostgreSQL](example/rds-postgresql.tf).
+```hcl
+module "rds_instance" {
+  source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=version" # use the latest release
+
+  # VPC configuration
+  vpc_name = var.vpc_name
+
+  # Database configuration
+  db_engine                = "postgres"
+  db_engine_version        = "15"
+  rds_family               = "postgres15"
+  db_instance_class        = "db.t4g.micro"
+  db_max_allocated_storage = "500"
+
+  # Tags
+  business_unit          = var.business_unit
+  application            = var.application
+  is_production          = var.is_production
+  team_name              = var.team_name
+  namespace              = var.namespace
+  environment_name       = var.environment
+  infrastructure_support = var.infrastructure_support
+}
+```
+
+### Accessing the database
+
+#### Database Hostname/Credentials
+
+The hostname and credentials for accessing your database will be in a
+kubernetes secret inside your namespace. You can retrieve them as follows (the
+`decode.rb` script is available [here][decode]):
+
+```
+$ kubectl -n [your namespace] get secret [secret name] -o yaml | ./decode.rb
+
+---
+apiVersion: v1
+data:
+  database_name: ...
+  database_password: ...
+  database_username: ...
+  access_key_id: ...
+  secret_access_key: ...
+  rds_instance_address: cloud-platform-xxxxx.yyyyy.eu-west-2.rds.amazonaws.com
+  rds_instance_endpoint: cloud-platform-xxxxx.yyyyy.eu-west-2.rds.amazonaws.com:5432
+  rds_instance_port: '5432'
+kind: Secret
+metadata:
+  creationTimestamp: '2019-05-08T16:14:23Z'
+  name: secret-name
+  namespace: your-namespace
+  resourceVersion: '11111111'
+  selfLink: "/api/v1/namespaces/your-namespace/secrets/secret-name"
+  uid: 11111111-1111-1111-1111-111111111111
+type: Opaque
+```
+
+If you are exporting a database URL from your RDS kubernetes secret, it might have a value like this:
+
+```
+postgres://username:password@database_id.random_id.eu-west-2.rds.amazonaws.com:5432/dbdf3589e0e7acba37
+
+```
+
+The database hostname is part between `@` and `:` In the example above, the database hostname is:
+
+```
+database_id.random_id.eu-west-2.rds.amazonaws.com
+```
+
+>NB: You should *always* get the database credentials from this kubernetes secret. Do not be tempted to copy the into another location (such as a ConfigMap). This is because the value of the secret can be updated when this module is updated. As long as you always get your database credentials from the kubernetes secret created by terraform, this is fine. But if you copy the value elsewhere, it will not be automatically updated in the new location, and your application will no longer be able to connect to your database.
+
+### Launching psql in the cluster
+
+A Docker image containing the `psql` utility is available from [Bitnami] (you
+cannot use the official postgres image, because it runs as root) and can be
+launched like this:
+
+```
+$ kubectl -n [your namespace] run --generator=run-pod/v1 shell --rm -i --tty --image bitnami/postgresql -- bash
+
+If you don't see a command prompt, try pressing enter.
+postgres@shell:/$
+```
+
+You can then connect to your database like this
+
+```
+postgres@shell:/$ psql -h [rds_instance_address] -U [database_username] [database_name]
+Password for username: [...enter database_password here...]
+psql (10.7, server 10.6)
+SSL connection (protocol: TLSv1.2, cipher: ECDHE-RSA-AES256-GCM-SHA384, bits: 256, compression: off)
+[database_name]=>
+```
+
+### Accessing your RDS database from your laptop
+
+Instructions on how to do this are available [here](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/other-topics/rds-external-access.html#accessing-your-rds-database)
+
+### Managing RDS snapshots - backups and restores
+
+An IAM user account is created which allows management of RDS snapshots - allowing snapshot create, delete, copy, restore.
+
+Example usage via AWS CLI:
+
+List snapshots
+```
+aws rds describe-db-snapshots --db-instance-identifier [db-instance-name]
+```
+
+Create snapshot
+```
+aws rds create-db-snapshot --db-instance-identifier [db-instance-name] --db-snapshot-identifier [your-snapshot-name]
+```
+
+See the [examples/](examples/) folder for more information.
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
@@ -66,7 +167,7 @@ No modules.
 | [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
 | [aws_subnet.private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnet) | data source |
 | [aws_subnets.private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnets) | data source |
-| [aws_vpc.selected](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/vpc) | data source |
+| [aws_vpc.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/vpc) | data source |
 
 ## Inputs
 
@@ -118,7 +219,7 @@ No modules.
 | <a name="output_database_password"></a> [database\_password](#output\_database\_password) | Database Password |
 | <a name="output_database_username"></a> [database\_username](#output\_database\_username) | Database Username |
 | <a name="output_db_identifier"></a> [db\_identifier](#output\_db\_identifier) | The RDS DB Indentifer |
-| <a name="output_irsa_policy_arn"></a> [irsa\_policy\_arn](#output\_irsa\_policy\_arn) | n/a |
+| <a name="output_irsa_policy_arn"></a> [irsa\_policy\_arn](#output\_irsa\_policy\_arn) | IAM policy ARN for access to create database snapshots |
 | <a name="output_rds_instance_address"></a> [rds\_instance\_address](#output\_rds\_instance\_address) | The hostname of the RDS instance |
 | <a name="output_rds_instance_endpoint"></a> [rds\_instance\_endpoint](#output\_rds\_instance\_endpoint) | The connection endpoint in address:port format |
 | <a name="output_rds_instance_port"></a> [rds\_instance\_port](#output\_rds\_instance\_port) | The database port |
@@ -126,117 +227,18 @@ No modules.
 | <a name="output_secret_access_key"></a> [secret\_access\_key](#output\_secret\_access\_key) | Secret key for RDS IAM user |
 <!-- END_TF_DOCS -->
 
-### Tags
+## Tags
 
-Some of the inputs are tags. All infrastructure resources need to be tagged according to the [MOJ techincal guidance](https://ministryofjustice.github.io/technical-guidance/standards/documenting-infrastructure-owners/#documenting-owners-of-infrastructure). The tags are stored as variables that you will need to fill out as part of your module.
+Some of the inputs for this module are tags. All infrastructure resources must be tagged to meet the MOJ Technical Guidance on [Documenting owners of infrastructure](https://technical-guidance.service.justice.gov.uk/documentation/standards/documenting-infrastructure-owners.html).
 
-| Name | Description | Type | Default | Required |
-|------|-------------|:----:|:-----:|:-----:|
-| application |  | string | - | yes |
-| business-unit | Area of the MOJ responsible for the service | string | `mojdigital` | yes |
-| environment-name |  | string | - | yes |
-| infrastructure-support | The team responsible for managing the infrastructure. Should be of the form team-email | string | - | yes |
-| is-production |  | string | `false` | yes |
-| team_name |  | string | - | yes |
-
-
-## Accessing the database
-
-### Database Hostname/Credentials
-
-The hostname and credentials for accessing your database will be in a
-kubernetes secret inside your namespace. You can retrieve them as follows (the
-`decode.rb` script is available [here][decode]):
-
-```
-$ kubectl -n [your namespace] get secret [secret name] -o yaml | ./decode.rb
-
----
-apiVersion: v1
-data:
-  database_name: ...
-  database_password: ...
-  database_username: ...
-  access_key_id: ...
-  secret_access_key: ...
-  rds_instance_address: cloud-platform-xxxxx.yyyyy.eu-west-2.rds.amazonaws.com
-  rds_instance_endpoint: cloud-platform-xxxxx.yyyyy.eu-west-2.rds.amazonaws.com:5432
-  rds_instance_port: '5432'
-kind: Secret
-metadata:
-  creationTimestamp: '2019-05-08T16:14:23Z'
-  name: secret-name
-  namespace: your-namespace
-  resourceVersion: '11111111'
-  selfLink: "/api/v1/namespaces/your-namespace/secrets/secret-name"
-  uid: 11111111-1111-1111-1111-111111111111
-type: Opaque
-```
-
-If you are exporting a database URL from your RDS kubernetes secret, it might have a value like this:
-
-```
-postgres://cpDvquXO5B:R1eDN0xEUnaH6Aqr@cloud-platform-df3589e0e7acba37.cdwm328dlye6.eu-west-2.rds.amazonaws.com:5432/dbdf3589e0e7acba37
-
-```
-
-The database hostname is part between `@` and `:` In the example above, the database hostname is:
-
-```
-cloud-platform-df3589e0e7acba37.cdwm328dlye6.eu-west-2.rds.amazonaws.com
-```
-
-> NB: You should *always* get the database credentials from this kubernetes secret. Do not be tempted to copy the into another location (such as a ConfigMap). This is because the value of the secret can be updated when this module is updated. As long as you always get your database credentials from the kubernetes secret created by terraform, this is fine. But if you copy the value elsewhere, it will not be automatically updated in the new location, and your application will no longer be able to connect to your database.
-
-### Launching psql in the cluster
-
-A Docker image containing the `psql` utility is available from [Bitnami] (you
-cannot use the official postgres image, because it runs as root) and can be
-launched like this:
-
-```
-$ kubectl -n [your namespace] run --generator=run-pod/v1 shell --rm -i --tty --image bitnami/postgresql -- bash
-
-If you don't see a command prompt, try pressing enter.
-postgres@shell:/$
-```
-
-You can then connect to your database like this
-
-```
-postgres@shell:/$ psql -h [rds_instance_address] -U [database_username] [database_name]
-Password for username: [...enter database_password here...]
-psql (10.7, server 10.6)
-SSL connection (protocol: TLSv1.2, cipher: ECDHE-RSA-AES256-GCM-SHA384, bits: 256, compression: off)
-[database_name]=>
-```
-
-### Accessing your RDS database from your laptop
-
-Instructions on how to do this are available [here](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/other-topics/rds-external-access.html#accessing-your-rds-database)
-
-### 4. Managing RDS snapshots - backups and restores
-
-An IAM user account is created which allows management of RDS snapshots - allowing snapshot create, delete, copy, restore.
-
-Example usage via AWS CLI:
-
-List snapshots
-```
-aws rds describe-db-snapshots --db-instance-identifier [db-instance-name]
-```
-
-Create snapshot
-```
-aws rds create-db-snapshot --db-instance-identifier [db-instance-name] --db-snapshot-identifier [your-snapshot-name]
-```
-
+You should use your namespace variables to populate these. See the [Usage](#usage) section for more information.
 
 ## Reading Material
 
-- https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_MySQL.html
-- https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_PostgreSQL.html
-- https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_MariaDB.html
+- [Cloud Platform user guide](https://user-guide.cloud-platform.service.justice.gov.uk/#cloud-platform-user-guide)
+- [Amazon RDS for MySQL user guide](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_MySQL.html)
+- [Amazon RDS for PostgreSQL user guide](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_PostgreSQL.html)
+- [Amazon RDS for MariaDB user guide](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_MariaDB.html)
 
 [decode]: https://github.com/ministryofjustice/cloud-platform-environments/blob/main/bin/decode.rb
 [Bitnami]: https://github.com/bitnami/bitnami-docker-postgresql
