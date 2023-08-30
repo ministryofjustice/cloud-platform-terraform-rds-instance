@@ -60,7 +60,7 @@ module "read_replica" {
   db_instance_class = "db.t4g.micro"
   # It is mandatory to set the below values to create read replica instance
 
- # Set the database_name of the source db
+  # Set the database_name of the source db
   db_name = null # "db_name": conflicts with replicate_source_db
 
   # Set the db_identifier of the source db
