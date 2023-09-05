@@ -207,65 +207,6 @@ resource "aws_db_parameter_group" "custom_parameters" {
   }
 }
 
-# Legacy long-lived credentials
-resource "aws_iam_user" "user" {
-  count = var.replicate_source_db != null ? 0 : 1
-  name  = "rds-snapshots-user-${random_id.id.hex}"
-  path  = "/system/rds-snapshots-user/"
-}
-
-resource "aws_iam_access_key" "user" {
-  count = var.replicate_source_db != null ? 0 : 1
-  user  = aws_iam_user.user[0].name
-}
-
-data "aws_iam_policy_document" "policy" {
-  statement {
-    actions = [
-      "rds:CopyDBSnapshot",
-      "rds:CreateDBSnapshot",
-      "rds:DeleteDBSnapshot",
-      "rds:DescribeDBEngineVersions",
-      "rds:DescribeDBInstances",
-      "rds:DescribeDBLogFiles",
-      "rds:DescribeDBSnapshotAttributes",
-      "rds:DescribeDBSnapshots",
-      "rds:DescribeOrderableDBInstanceOptions",
-      "rds:DownloadDBLogFilePortion",
-      "rds:ModifyDBInstance",
-      "rds:ModifyDBSnapshot",
-      "rds:ModifyDBSnapshotAttribute",
-      "rds:RestoreDBInstanceFromDBSnapshot",
-      "rds:StartDBInstance",
-      "rds:StopDBInstance",
-    ]
-
-    resources = [
-      local.db_arn,
-      "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:snapshot:*",
-      local.db_pg_arn,
-      "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:pg:default.*"
-    ]
-  }
-
-  statement {
-    actions = [
-      "pi:*",
-    ]
-
-    resources = [
-      "arn:aws:pi:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:metrics/rds/*",
-    ]
-  }
-}
-
-resource "aws_iam_user_policy" "policy" {
-  count  = var.replicate_source_db != null ? 0 : 1
-  name   = "rds-snapshots-read-write"
-  policy = data.aws_iam_policy_document.policy.json
-  user   = aws_iam_user.user[0].name
-}
-
 # Short-lived credentials (IRSA)
 data "aws_iam_policy_document" "irsa" {
   version = "2012-10-17"

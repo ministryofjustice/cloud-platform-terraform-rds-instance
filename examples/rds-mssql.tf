@@ -56,7 +56,5 @@ resource "kubernetes_secret" "rds_mssql" {
     database_username     = module.rds_mssql.database_username
     database_password     = module.rds_mssql.database_password
     rds_instance_address  = module.rds_mssql.rds_instance_address
-    access_key_id         = module.rds_mssql.access_key_id
-    secret_access_key     = module.rds_mssql.secret_access_key
   }
 }

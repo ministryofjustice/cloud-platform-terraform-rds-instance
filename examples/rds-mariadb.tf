@@ -46,7 +46,5 @@ resource "kubernetes_secret" "rds_mariadb" {
     database_username     = module.rds_mariadb.database_username
     database_password     = module.rds_mariadb.database_password
     rds_instance_address  = module.rds_mariadb.rds_instance_address
-    access_key_id         = module.rds_mariadb.access_key_id
-    secret_access_key     = module.rds_mariadb.secret_access_key
   }
 }
