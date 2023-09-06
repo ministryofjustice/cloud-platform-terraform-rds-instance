@@ -5,7 +5,7 @@
  *
 */
 module "rds_mariadb" {
-  source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=5.19.0"
+  source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=6.0.0"
 
   # VPC configuration
   vpc_name = var.vpc_name
@@ -46,7 +46,5 @@ resource "kubernetes_secret" "rds_mariadb" {
     database_username     = module.rds_mariadb.database_username
     database_password     = module.rds_mariadb.database_password
     rds_instance_address  = module.rds_mariadb.rds_instance_address
-    access_key_id         = module.rds_mariadb.access_key_id
-    secret_access_key     = module.rds_mariadb.secret_access_key
   }
 }
