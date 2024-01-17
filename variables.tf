@@ -36,7 +36,7 @@ variable "db_engine" {
   type        = string
 
   validation {
-    condition     = contains(["postgres", "mysql", "mariadb", "sqlserver-ee", "sqlserver-ex", "sqlserver-se", "sqlserver-web"], var.db_engine)
+    condition     = contains(["postgres", "mysql", "mariadb", "sqlserver-ee", "sqlserver-ex", "sqlserver-se", "sqlserver-web", "oracle-se2"], var.db_engine)
     error_message = "Choose one of Postgresql, MySQL or Microsoft SQL Server. For Aurora, see https://github.com/ministryofjustice/cloud-platform-terraform-rds-aurora."
   }
 }
