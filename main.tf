@@ -138,6 +138,11 @@ resource "aws_security_group" "rds-sg" {
   }
 }
 
+locals {
+  iops_led_storage_class = var.db_iops == 0 ? "gp2" : "io1"
+  storage_class          = var.db_storage_class != null ? var.db_storage_class : local.iops_led_storage_class
+}
+
 ###################
 # Create database #
 ###################
@@ -154,7 +159,7 @@ resource "aws_db_instance" "rds" {
   username                     = var.replicate_source_db != null ? null : sensitive("cp${random_string.username.result}")
   password                     = var.replicate_source_db != null ? null : random_password.password.result
   backup_retention_period      = var.db_backup_retention_period
-  storage_type                 = var.db_iops == 0 ? "gp2" : "io1"
+  storage_type                 = local.storage_class
   iops                         = var.db_iops
   storage_encrypted            = can(regex("sqlserver-ex", var.db_engine)) ? false : true
   db_subnet_group_name         = var.replicate_source_db != null ? null : aws_db_subnet_group.db_subnet[0].name

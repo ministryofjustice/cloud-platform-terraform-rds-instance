@@ -181,6 +181,7 @@ No modules.
 | <a name="input_db_engine"></a> [db\_engine](#input\_db\_engine) | Database engine used e.g. postgres, mysql, sqlserver-ex | `string` | `"postgres"` | no |
 | <a name="input_db_engine_version"></a> [db\_engine\_version](#input\_db\_engine\_version) | The engine version to use e.g. 13.2 for Postgresql, 8.0 for MySQL, 15.00.4073.23.v1 for MS-SQL. Omitting the minor release part allows for automatic updates. | `string` | `"10"` | no |
 | <a name="input_db_instance_class"></a> [db\_instance\_class](#input\_db\_instance\_class) | The instance type of the RDS instance | `string` | `"db.t2.small"` | no |
+| <a name="input_db_storage_class"></a> [db\_storage_class](#input\_db\_storage\_class) | The database storage class ; the module will decide between `gp2` and `io1` based on the IOPS setting, but you can override it to e.g. `gp3` here | `string` | `null` | no |
 | <a name="input_db_iops"></a> [db\_iops](#input\_db\_iops) | The amount of provisioned IOPS. Setting this to a value other than 0 implies a storage\_type of io1 | `number` | `0` | no |
 | <a name="input_db_max_allocated_storage"></a> [db\_max\_allocated\_storage](#input\_db\_max\_allocated\_storage) | Maximum storage limit for storage autoscaling | `string` | `"10000"` | no |
 | <a name="input_db_name"></a> [db\_name](#input\_db\_name) | The name of the database to be created on the instance (if empty, it will be the generated random identifier) | `string` | `""` | no |
