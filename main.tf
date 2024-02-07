@@ -6,7 +6,7 @@ locals {
   db_pg_arn                 = aws_db_parameter_group.custom_parameters.arn
   vpc_security_group_ids    = concat([aws_security_group.rds-sg.id], var.vpc_security_group_ids)
   tag_for_auto_shutdown     = var.enable_rds_auto_start_stop ? { "cloud-platform-rds-auto-shutdown" = "Schedule RDS Stop/Start during non-business hours for cost saving" } : null
-  db_password_rotation_seed = var.db_password_rotated_date == "" ? {} : { "db-password-rotated-date" = var.db_password_rotated_date }
+  db_password_rotation_seed = var.db_password_test_rotated_date == "" ? {} : { "db-password-rotated-date" = var.db_password_rotated_date }
   vpc_name                  = (var.vpc_name == "live") ? "live-1" : var.vpc_name
 
   # Tags
