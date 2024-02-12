@@ -231,6 +231,10 @@ data "aws_iam_policy_document" "irsa" {
       "rds:RestoreDBInstanceFromDBSnapshot",
       "rds:StartDBInstance",
       "rds:StopDBInstance",
+      "rds:CreateBlueGreenDeployment",
+      "rds:DeleteBlueGreenDeployment",
+      "rds:DescribeBlueGreenDeployments",
+      "rds:SwitchoverBlueGreenDeployment",
     ]
 
     resources = [
