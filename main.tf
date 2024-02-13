@@ -218,12 +218,10 @@ data "aws_iam_policy_document" "irsa" {
       "rds:CopyDBSnapshot",
       "rds:CreateDBSnapshot",
       "rds:DeleteDBSnapshot",
-      "rds:DescribeDBEngineVersions",
       "rds:DescribeDBInstances",
       "rds:DescribeDBLogFiles",
       "rds:DescribeDBSnapshotAttributes",
       "rds:DescribeDBSnapshots",
-      "rds:DescribeOrderableDBInstanceOptions",
       "rds:DownloadDBLogFilePortion",
       "rds:ModifyDBInstance",
       "rds:ModifyDBSnapshot",
@@ -239,6 +237,17 @@ data "aws_iam_policy_document" "irsa" {
       local.db_pg_arn,
       "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:pg:default.*"
     ]
+  }
+
+  statement {
+    sid    = "AllowRDSDescribeEngineOptions${random_id.id.hex}"
+    effect = "Allow"
+    actions = [
+      "rds:DescribeDBEngineVersions",
+      "rds:DescribeOrderableDBInstanceOptions",
+    ]
+
+    resources = "*"
   }
 
   statement {
