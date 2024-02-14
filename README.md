@@ -124,6 +124,9 @@ aws rds create-db-snapshot --db-instance-identifier [db-instance-name] --db-snap
 
 See the [examples/](examples/) folder for more information.
 
+### Upgrading your RDS or changing the instance type
+Instructions on how to do this are available [here](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/deploying-an-app/relational-databases/upgrade.html#upgrading-a-database-version-or-changing-the-instance-type)
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
