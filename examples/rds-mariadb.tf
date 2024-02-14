@@ -5,7 +5,7 @@
  *
 */
 module "rds_mariadb" {
-  source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=6.0.0"
+  source = "github.com/ministryofjustice/cloud-platform-terraform-rds-instance?ref=6.0.2"
 
   # VPC configuration
   vpc_name = var.vpc_name
