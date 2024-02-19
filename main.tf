@@ -231,11 +231,6 @@ data "aws_iam_policy_document" "irsa" {
       "rds:RestoreDBInstanceFromDBSnapshot",
       "rds:StartDBInstance",
       "rds:StopDBInstance",
-      "rds:CreateBlueGreenDeployment",
-      "rds:DeleteBlueGreenDeployment",
-      "rds:DescribeBlueGreenDeployments",
-      "rds:SwitchoverBlueGreenDeployment",
-      "rds:CreateDBInstanceReadReplica",
     ]
 
     resources = [
@@ -243,7 +238,6 @@ data "aws_iam_policy_document" "irsa" {
       "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:snapshot:*",
       local.db_pg_arn,
       "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:pg:default.*",
-      "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:deployment:bgd-*"
     ]
   }
 
@@ -256,6 +250,23 @@ data "aws_iam_policy_document" "irsa" {
 
     resources = [
       "arn:aws:pi:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:metrics/rds/*",
+    ]
+  }
+
+  statement {
+    sid    = "AllowBlueGreenCreationFor${random_id.id.hex}"
+    effect = "Allow"
+    actions = [
+      "rds:CreateBlueGreenDeployment",
+      "rds:DeleteBlueGreenDeployment",
+      "rds:DescribeBlueGreenDeployments",
+      "rds:SwitchoverBlueGreenDeployment",
+      "rds:CreateDBInstanceReadReplica",
+    ]
+
+    resources = [
+      "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:deployment:bgd-*",
+      "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:db:*"
     ]
   }
 }
