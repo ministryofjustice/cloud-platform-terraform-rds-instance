@@ -235,6 +235,7 @@ data "aws_iam_policy_document" "irsa" {
       "rds:DeleteBlueGreenDeployment",
       "rds:DescribeBlueGreenDeployments",
       "rds:SwitchoverBlueGreenDeployment",
+      "rds:CreateDBInstanceReadReplica",
     ]
 
     resources = [
