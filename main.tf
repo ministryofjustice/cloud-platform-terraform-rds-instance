@@ -259,7 +259,6 @@ data "aws_iam_policy_document" "irsa" {
     actions = [
       "rds:CreateBlueGreenDeployment",
       "rds:DeleteBlueGreenDeployment",
-      "rds:DescribeBlueGreenDeployments",
       "rds:SwitchoverBlueGreenDeployment",
     ]
 
@@ -281,6 +280,17 @@ data "aws_iam_policy_document" "irsa" {
     resources = [
       "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:db:*",
       local.db_pg_arn
+    ]
+  }
+  statement {
+    sid    = "AllowDescribeBGDFor${random_id.id.hex}"
+    effect = "Allow"
+    actions = [
+      "rds:DescribeBlueGreenDeployments",
+    ]
+
+    resources = [
+      "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:deployment:*",
     ]
   }
 }
