@@ -261,7 +261,6 @@ data "aws_iam_policy_document" "irsa" {
       "rds:DeleteBlueGreenDeployment",
       "rds:DescribeBlueGreenDeployments",
       "rds:SwitchoverBlueGreenDeployment",
-      "rds:AddTagsToResource",
     ]
 
     resources = [
@@ -276,6 +275,7 @@ data "aws_iam_policy_document" "irsa" {
     effect = "Allow"
     actions = [
       "rds:CreateDBInstanceReadReplica",
+      "rds:AddTagsToResource",
     ]
 
     resources = [
