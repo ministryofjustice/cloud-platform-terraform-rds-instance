@@ -261,6 +261,7 @@ data "aws_iam_policy_document" "irsa" {
       "rds:DeleteBlueGreenDeployment",
       "rds:DescribeBlueGreenDeployments",
       "rds:SwitchoverBlueGreenDeployment",
+      "rds:AddTagsToResource",
     ]
 
     resources = [
