@@ -275,11 +275,11 @@ data "aws_iam_policy_document" "irsa" {
     effect = "Allow"
     actions = [
       "rds:CreateDBInstanceReadReplica",
-      local.db_pg_arn,
     ]
 
     resources = [
-      "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:db:*"
+      "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:db:*",
+      local.db_pg_arn
     ]
   }
 }
