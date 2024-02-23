@@ -261,13 +261,23 @@ data "aws_iam_policy_document" "irsa" {
       "rds:DeleteBlueGreenDeployment",
       "rds:DescribeBlueGreenDeployments",
       "rds:SwitchoverBlueGreenDeployment",
-      "rds:CreateDBInstanceReadReplica",
     ]
 
     resources = [
       local.db_arn,
       local.db_pg_arn,
-      "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:deployment:bgd-*",
+      "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:deployment:bgd-*"
+    ]
+  }
+
+  statement {
+    sid    = "AllowCreateReadReplicaFor${random_id.id.hex}"
+    effect = "Allow"
+    actions = [
+      "rds:CreateDBInstanceReadReplica",
+    ]
+
+    resources = [
       "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:db:*"
     ]
   }
