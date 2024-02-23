@@ -275,6 +275,7 @@ data "aws_iam_policy_document" "irsa" {
     effect = "Allow"
     actions = [
       "rds:CreateDBInstanceReadReplica",
+      local.db_pg_arn,
     ]
 
     resources = [
