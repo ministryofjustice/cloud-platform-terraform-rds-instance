@@ -172,7 +172,6 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_allow_major_version_upgrade"></a> [allow\_major\_version\_upgrade](#input\_allow\_major\_version\_upgrade) | Indicates that major version upgrades are allowed. | `string` | `"false"` | no |
 | <a name="input_allow_minor_version_upgrade"></a> [allow\_minor\_version\_upgrade](#input\_allow\_minor\_version\_upgrade) | Indicates that minor version upgrades are allowed. | `string` | `"true"` | no |
 | <a name="input_application"></a> [application](#input\_application) | Application name | `string` | n/a | yes |
 | <a name="input_backup_window"></a> [backup\_window](#input\_backup\_window) | The daily time range (in UTC) during which automated backups are created if they are enabled. Example: 09:46-10:16 | `string` | `""` | no |

@@ -165,7 +165,7 @@ resource "aws_db_instance" "rds" {
   snapshot_identifier          = var.snapshot_identifier
   replicate_source_db          = var.replicate_source_db
   auto_minor_version_upgrade   = var.allow_minor_version_upgrade
-  allow_major_version_upgrade  = (var.prepare_for_major_upgrade) ? true : var.allow_major_version_upgrade
+  allow_major_version_upgrade  = (var.prepare_for_major_upgrade) ? true : false
   parameter_group_name         = (var.prepare_for_major_upgrade) ? "default.${var.rds_family}" : aws_db_parameter_group.custom_parameters.name
   ca_cert_identifier           = var.replicate_source_db != null ? null : var.ca_cert_identifier
   performance_insights_enabled = var.performance_insights_enabled

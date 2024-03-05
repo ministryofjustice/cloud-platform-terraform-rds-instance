@@ -77,12 +77,6 @@ variable "allow_minor_version_upgrade" {
   type        = string
 }
 
-variable "allow_major_version_upgrade" {
-  description = "Indicates that major version upgrades are allowed."
-  default     = "false"
-  type        = string
-}
-
 variable "rds_family" {
   description = "Maps the engine version with the parameter group family, a family often covers several versions"
   default     = "postgres10"
