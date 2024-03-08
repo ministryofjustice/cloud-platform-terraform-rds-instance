@@ -282,6 +282,22 @@ data "aws_iam_policy_document" "irsa" {
       local.db_pg_arn
     ]
   }
+
+  statement {
+    sid = "AllowKMSAccessFor${random_id.id.hex}"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:Encrypt",
+      "kms:GenerateDataKey",
+      "kms:ReEncrypt*",
+      "kms:DescribeKey",
+    ]
+
+    resources = [
+      "${aws_kms_key.kms[0].arn}",
+    ]
+  }
   statement {
     sid    = "AllowDescribeBGDFor${random_id.id.hex}"
     effect = "Allow"
