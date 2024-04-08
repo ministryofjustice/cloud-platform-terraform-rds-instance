@@ -97,7 +97,7 @@ variable "ca_cert_identifier" {
 
 variable "performance_insights_enabled" {
   type        = bool
-  description = "Enable performance insights for RDS?"
+  description = "Enable performance insights for RDS? Note: the user should ensure insights are disabled once the desired outcome is achieved."
   default     = false
 }
 
