@@ -164,7 +164,7 @@ resource "aws_db_instance" "rds" {
   copy_tags_to_snapshot        = true
   
   # if is_migration = true, use the migration_snapshop copy of the snapshot_identifier with the module's kms key
-  snapshot_identifier          = var.is_migration ? aws_db_snapshot.rds_migration_snapshot[0].db_snapshot_identifier : var.snapshot_identifier
+  snapshot_identifier          = var.is_migration ? aws_db_snapshot_copy.rds_migration_snapshot : var.snapshot_identifier
 
   replicate_source_db          = var.replicate_source_db
   auto_minor_version_upgrade   = var.allow_minor_version_upgrade
@@ -276,11 +276,10 @@ resource "aws_iam_policy" "irsa" {
 
 # RDS Snapshot - if is_migration = true, create a snapshot of var.snapshot_identifier
 
-resource "aws_db_snapshot" "rds_migration_snapshot" {
-  count                 = var.is_migration ? 1 : 0
-  db_instance_identifier = var.snapshot_identifier
-  db_snapshot_identifier = "${local.identifier}-migration-snapshot"
-  tags = local.default_tags
-  kms_key_id = aws_kms_key.kms[0].arn   # KMS key for snapshot encryption of copied migration snapshot
+resource "aws_db_snapshot_copy" "rds_migration_snapshot" {
+  count               = var.is_migration ? 1 : 0
+  source_db_snapshot_identifier = var.snapshot_identifier
+  target_db_snapshot_identifier = "${local.identifier}-migration-snapshot"
+  kms_key_id          = aws_kms_key.kms[0].arn
+  tags                = local.default_tags
 }
-
