@@ -162,7 +162,10 @@ resource "aws_db_instance" "rds" {
   kms_key_id                   = (var.replicate_source_db != null) || (can(regex("sqlserver-ex", var.db_engine))) ? null : aws_kms_key.kms[0].arn
   multi_az                     = can(regex("sqlserver-web|sqlserver-ex", var.db_engine)) ? false : true
   copy_tags_to_snapshot        = true
-  snapshot_identifier          = var.snapshot_identifier
+  
+  # if is_migration = true, use the migration_snapshop copy of the snapshot_identifier with the module's kms key
+  snapshot_identifier          = var.is_migration ? aws_db_snapshot.rds_migration_snapshot[0].db_snapshot_identifier : var.snapshot_identifier
+
   replicate_source_db          = var.replicate_source_db
   auto_minor_version_upgrade   = var.allow_minor_version_upgrade
   allow_major_version_upgrade  = (var.prepare_for_major_upgrade) ? true : var.allow_major_version_upgrade
@@ -270,3 +273,14 @@ resource "aws_iam_policy" "irsa" {
   policy = data.aws_iam_policy_document.irsa.json
   tags   = local.default_tags
 }
+
+# RDS Snapshot - if is_migration = true, create a snapshot of var.snapshot_identifier
+
+resource "aws_db_snapshot" "rds_migration_snapshot" {
+  count                 = var.is_migration ? 1 : 0
+  db_instance_identifier = var.snapshot_identifier
+  db_snapshot_identifier = "${local.identifier}-migration-snapshot"
+  tags = local.default_tags
+  kms_key_id = aws_kms_key.kms[0].arn   # KMS key for snapshot encryption of copied migration snapshot
+}
+
