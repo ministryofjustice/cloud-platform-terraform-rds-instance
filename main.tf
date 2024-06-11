@@ -164,7 +164,7 @@ resource "aws_db_instance" "rds" {
   copy_tags_to_snapshot        = true
   
   # if is_migration = true, use the migration_snapshop copy of the snapshot_identifier with the module's kms key
-  snapshot_identifier          = var.is_migration ? aws_db_snapshot_copy.rds_migration_snapshot : var.snapshot_identifier
+  snapshot_identifier          = var.is_migration ? aws_db_snapshot_copy.rds_migration_snapshot[0].target_db_snapshot_identifier : var.snapshot_identifier
 
   replicate_source_db          = var.replicate_source_db
   auto_minor_version_upgrade   = var.allow_minor_version_upgrade
