@@ -59,6 +59,12 @@ variable "db_backup_retention_period" {
   type        = string
 }
 
+variable "db_storage_class" {
+  description = "The storage class for the disk. Leave blank if you don't know"
+  default     = null
+  type        = string
+}
+
 variable "db_iops" {
   description = "The amount of provisioned IOPS. Setting this to a value other than 0 implies a storage_type of io1"
   default     = 0
