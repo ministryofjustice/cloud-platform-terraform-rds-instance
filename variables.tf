@@ -60,7 +60,7 @@ variable "db_backup_retention_period" {
 }
 
 variable "db_iops" {
-  description = "The amount of provisioned IOPS. Setting this to a value other than 0 implies a storage_type of io1"
+  description = "The amount of provisioned IOPS. Setting this to a value other than 0 implies a storage_type of io2"
   default     = 0
   type        = number
 }
