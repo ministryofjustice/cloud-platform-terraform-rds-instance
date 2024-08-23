@@ -148,9 +148,9 @@ resource "aws_db_instance" "rds" {
   max_allocated_storage        = var.db_max_allocated_storage
   apply_immediately            = true
   engine                       = var.replicate_source_db == null ? var.db_engine : null
-  engine_version               = var.replicate_source_db == null ? var.db_engine_version : null
+  engine_version               = var.db_engine_version
   instance_class               = var.db_instance_class
-  db_name                      = can(regex("sqlserver", var.db_engine)) ? null : local.db_name
+  db_name                      = var.replicate_source_db != null || can(regex("sqlserver", var.db_engine)) ? null : local.db_name
   username                     = var.replicate_source_db != null ? null : sensitive("cp${random_string.username.result}")
   password                     = var.replicate_source_db != null ? null : random_password.password.result
   backup_retention_period      = var.db_backup_retention_period
