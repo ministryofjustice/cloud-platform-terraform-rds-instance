@@ -168,16 +168,18 @@ resource "aws_db_instance" "rds" {
   final_snapshot_identifier    = var.replicate_source_db != null ? null : "${local.identifier}-finalsnapshot"
   allocated_storage            = var.db_allocated_storage
   max_allocated_storage        = var.db_max_allocated_storage
-  apply_immediately            = true
+  apply_immediately            = var.apply_immediately
   engine                       = var.replicate_source_db == null ? var.db_engine : null
   engine_version               = var.db_engine_version
   instance_class               = var.db_instance_class
   db_name                      = var.replicate_source_db != null || can(regex("sqlserver", var.db_engine)) ? null : local.db_name
   username                     = var.replicate_source_db != null ? null : sensitive("cp${random_string.username.result}")
   password                     = var.replicate_source_db != null ? null : random_password.password.result
-  backup_retention_period      = var.db_backup_retention_period
-  storage_type                 = var.db_iops == 0 ? "gp3" : "io2"
+  backup_retention_period      = var.db_backup_retention_period 
+  storage_type                 = var.storage_type
   iops                         = var.db_iops
+
+
   storage_encrypted            = can(regex("sqlserver-ex", var.db_engine)) ? false : true
   db_subnet_group_name         = var.replicate_source_db != null ? null : aws_db_subnet_group.db_subnet[0].name
   vpc_security_group_ids       = local.vpc_security_group_ids

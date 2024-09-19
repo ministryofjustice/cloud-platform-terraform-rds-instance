@@ -30,6 +30,12 @@ variable "db_max_allocated_storage" {
   type        = string
 }
 
+variable "apply_immediately" {
+  description = "Specifies whether any database modifications are applied immediately, or during the next maintenance window"
+  type        = bool
+  default     = true
+}
+
 variable "db_engine" {
   description = "Database engine used e.g. postgres, mysql, sqlserver-ex"
   default     = "postgres"
@@ -59,10 +65,16 @@ variable "db_backup_retention_period" {
   type        = string
 }
 
+variable "storage_type" {
+  description = "One of 'standard' (magnetic), 'gp2' (general purpose SSD), 'gp3' (new generation of general purpose SSD), or 'io1' (provisioned IOPS SSD). The default is 'io1' if iops is specified, 'gp2' if not. If you specify 'io1' or 'gp3' , you must also include a value for the 'iops' parameter"
+  type        = string
+  default     = null #try null "gp3"
+}
+
 variable "db_iops" {
-  description = "The amount of provisioned IOPS. Setting this to a value other than 0 implies a storage_type of io2"
-  default     = 0
+  description = "The amount of provisioned IOPS. Setting this implies a storage_type of 'io1' or `gp3`. See `notes` for limitations regarding this variable for `gp3`"
   type        = number
+  default     = null
 }
 
 variable "db_name" {
