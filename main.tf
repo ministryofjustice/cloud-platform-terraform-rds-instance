@@ -60,6 +60,22 @@ data "aws_subnet" "private" {
   id       = each.value
 }
 
+data "aws_subnets" "eks_private" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.this.id]
+  }
+
+  tags = {
+    SubnetType = "EKS-Private"
+  }
+}
+
+data "aws_subnet" "eks_private" {
+  for_each = toset(data.aws_subnets.eks_private.ids)
+  id       = each.value
+}
+
 ########################
 # Generate identifiers #
 ########################
@@ -123,18 +139,24 @@ resource "aws_security_group" "rds-sg" {
   # cyclic dependency. Rather than resorting to `aws_security_group_rule` which
   # is not ideal for managing rules, we will simply allow traffic to all ports.
   # This does not compromise security as the instance only listens on one port.
-  ingress {
+ingress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = [for s in data.aws_subnet.private : s.cidr_block]
+    cidr_blocks = concat(
+      [for s in data.aws_subnet.private : s.cidr_block],
+      [for s in data.aws_subnet.eks_private : s.cidr_block]
+    )
   }
 
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = [for s in data.aws_subnet.private : s.cidr_block]
+    cidr_blocks = concat(
+      [for s in data.aws_subnet.private : s.cidr_block],
+      [for s in data.aws_subnet.eks_private : s.cidr_block]
+    )
   }
 }
 
@@ -148,9 +170,9 @@ resource "aws_db_instance" "rds" {
   max_allocated_storage        = var.db_max_allocated_storage
   apply_immediately            = true
   engine                       = var.replicate_source_db == null ? var.db_engine : null
-  engine_version               = var.replicate_source_db == null ? var.db_engine_version : null
+  engine_version               = var.db_engine_version
   instance_class               = var.db_instance_class
-  db_name                      = can(regex("sqlserver", var.db_engine)) ? null : local.db_name
+  db_name                      = var.replicate_source_db != null || can(regex("sqlserver", var.db_engine)) ? null : local.db_name
   username                     = var.replicate_source_db != null ? null : sensitive("cp${random_string.username.result}")
   password                     = var.replicate_source_db != null ? null : random_password.password.result
   backup_retention_period      = var.db_backup_retention_period
