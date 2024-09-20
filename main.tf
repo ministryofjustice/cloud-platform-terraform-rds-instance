@@ -139,10 +139,10 @@ resource "aws_security_group" "rds-sg" {
   # cyclic dependency. Rather than resorting to `aws_security_group_rule` which
   # is not ideal for managing rules, we will simply allow traffic to all ports.
   # This does not compromise security as the instance only listens on one port.
-ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+  ingress {
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
     cidr_blocks = concat(
       [for s in data.aws_subnet.private : s.cidr_block],
       [for s in data.aws_subnet.eks_private : s.cidr_block]
@@ -150,9 +150,9 @@ ingress {
   }
 
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
     cidr_blocks = concat(
       [for s in data.aws_subnet.private : s.cidr_block],
       [for s in data.aws_subnet.eks_private : s.cidr_block]
@@ -164,20 +164,20 @@ ingress {
 # Create database #
 ###################
 resource "aws_db_instance" "rds" {
-  identifier                   = var.rds_name != "" ? var.rds_name : local.identifier
-  final_snapshot_identifier    = var.replicate_source_db != null ? null : "${local.identifier}-finalsnapshot"
-  allocated_storage            = var.db_allocated_storage
-  max_allocated_storage        = var.db_max_allocated_storage
-  apply_immediately            = var.apply_immediately
-  engine                       = var.replicate_source_db == null ? var.db_engine : null
-  engine_version               = var.db_engine_version
-  instance_class               = var.db_instance_class
-  db_name                      = var.replicate_source_db != null || can(regex("sqlserver", var.db_engine)) ? null : local.db_name
-  username                     = var.replicate_source_db != null ? null : sensitive("cp${random_string.username.result}")
-  password                     = var.replicate_source_db != null ? null : random_password.password.result
-  backup_retention_period      = var.db_backup_retention_period 
-  storage_type                 = var.storage_type
-  iops                         = var.db_iops
+  identifier                = var.rds_name != "" ? var.rds_name : local.identifier
+  final_snapshot_identifier = var.replicate_source_db != null ? null : "${local.identifier}-finalsnapshot"
+  allocated_storage         = var.db_allocated_storage
+  max_allocated_storage     = var.db_max_allocated_storage
+  apply_immediately         = var.apply_immediately
+  engine                    = var.replicate_source_db == null ? var.db_engine : null
+  engine_version            = var.db_engine_version
+  instance_class            = var.db_instance_class
+  db_name                   = var.replicate_source_db != null || can(regex("sqlserver", var.db_engine)) ? null : local.db_name
+  username                  = var.replicate_source_db != null ? null : sensitive("cp${random_string.username.result}")
+  password                  = var.replicate_source_db != null ? null : random_password.password.result
+  backup_retention_period   = var.db_backup_retention_period
+  storage_type              = var.storage_type
+  iops                      = var.db_iops
 
 
   storage_encrypted            = can(regex("sqlserver-ex", var.db_engine)) ? false : true
