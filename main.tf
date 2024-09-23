@@ -139,10 +139,10 @@ resource "aws_security_group" "rds-sg" {
   # cyclic dependency. Rather than resorting to `aws_security_group_rule` which
   # is not ideal for managing rules, we will simply allow traffic to all ports.
   # This does not compromise security as the instance only listens on one port.
-ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+  ingress {
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
     cidr_blocks = concat(
       [for s in data.aws_subnet.private : s.cidr_block],
       [for s in data.aws_subnet.eks_private : s.cidr_block]
@@ -150,9 +150,9 @@ ingress {
   }
 
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
     cidr_blocks = concat(
       [for s in data.aws_subnet.private : s.cidr_block],
       [for s in data.aws_subnet.eks_private : s.cidr_block]

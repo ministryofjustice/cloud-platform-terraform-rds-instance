@@ -21,7 +21,7 @@ variable "snapshot_identifier" {
 variable "db_allocated_storage" {
   description = "The allocated storage in gibibytes"
   default     = "20" # 20 GiG is minimum storage size for RDS PostgreSQL gp3 storage type.
-  type        = number   
+  type        = number
 }
 
 variable "db_max_allocated_storage" {
