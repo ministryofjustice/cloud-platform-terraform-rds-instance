@@ -168,7 +168,7 @@ resource "aws_db_instance" "rds" {
   final_snapshot_identifier = var.replicate_source_db != null ? null : "${local.identifier}-finalsnapshot"
   allocated_storage         = var.db_allocated_storage
   max_allocated_storage     = var.db_max_allocated_storage
-  apply_immediately         = var.apply_immediately
+  apply_immediately         = true
   engine                    = var.replicate_source_db == null ? var.db_engine : null
   engine_version            = var.db_engine_version
   instance_class            = var.db_instance_class
