@@ -20,7 +20,7 @@ variable "snapshot_identifier" {
 
 variable "db_allocated_storage" {
   description = "The allocated storage in gibibytes"
-  default     = "20" # 20 GiG is minimum storage size for RDS PostgreSQL gp3 storage type.
+  default     = "20" # Minimum 'gp3' storage size is 20 GiB for Amazon RDS.
   type        = number
 }
 
@@ -60,13 +60,16 @@ variable "db_backup_retention_period" {
 }
 
 variable "storage_type" {
-  description = "One of 'standard' (magnetic), 'gp2' (general purpose SSD), 'gp3' (new generation of general purpose SSD), 'io1' (provisioned IOPS SSD), or 'io2' (new generation of provisioned IOPS SSD). The default is 'io1' if iops is specified, 'gp2' if not. If you specify 'io2' or 'gp3' , you must also include a value for the 'iops' parameter"
+  description = "One of 'standard' (magnetic), 'gp2' (general purpose SSD), 'gp3' (new generation of general purpose SSD), 'io1' (provisioned IOPS SSD), or 'io2' (new generation of provisioned IOPS SSD). If you specify 'io2', you must also include a value for the 'iops' parameter and the `allocated_storage` must be at least 100 GiB (except for SQL Server which the minimum is 20 GiB)."
   type        = string
   default     = "gp3"
 }
 
+# For larger database sizes, you need to adjust the 'iops' value accordingly.
+# The valid ranges for IOPS depend on the DB engine and storage size.
+# Please refer to https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Storage.html for detailed information:
 variable "db_iops" {
-  description = "The amount of provisioned IOPS. Setting this implies a storage_type of 'io1' or `gp3`. See `notes` for limitations regarding this variable for `gp3`"
+  description = "The amount of provisioned IOPS."
   type        = number
   default     = null # Default to null to omit 'iops' unless explicitly specified, preventing unintended changes
 }
