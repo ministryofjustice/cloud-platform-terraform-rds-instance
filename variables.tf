@@ -20,8 +20,8 @@ variable "snapshot_identifier" {
 
 variable "db_allocated_storage" {
   description = "The allocated storage in gibibytes"
-  default     = "10"
-  type        = string
+  default     = "20" # 20 GiG is minimum storage size for RDS PostgreSQL gp3 storage type.
+  type        = number   
 }
 
 variable "db_max_allocated_storage" {
@@ -59,10 +59,16 @@ variable "db_backup_retention_period" {
   type        = string
 }
 
+variable "storage_type" {
+  description = "One of 'standard' (magnetic), 'gp2' (general purpose SSD), 'gp3' (new generation of general purpose SSD), 'io1' (provisioned IOPS SSD), or 'io2' (new generation of provisioned IOPS SSD). The default is 'io1' if iops is specified, 'gp2' if not. If you specify 'io2' or 'gp3' , you must also include a value for the 'iops' parameter"
+  type        = string
+  default     = "gp3"
+}
+
 variable "db_iops" {
-  description = "The amount of provisioned IOPS. Setting this to a value other than 0 implies a storage_type of io1"
-  default     = 0
+  description = "The amount of provisioned IOPS. Setting this implies a storage_type of 'io1' or `gp3`. See `notes` for limitations regarding this variable for `gp3`"
   type        = number
+  default     = null # Default to null to omit 'iops' unless explicitly specified, preventing unintended changes
 }
 
 variable "db_name" {
@@ -142,9 +148,9 @@ variable "backup_window" {
 }
 
 variable "maintenance_window" {
+  description = "The window to perform maintenance in. Syntax: 'ddd:hh24:mi-ddd:hh24:mi'. Eg: 'Mon:00:00-Mon:03:00'"
   type        = string
-  description = "The window to perform maintenance in. Syntax: \"ddd:hh24:mi-ddd:hh24:mi\". For example: \"Mon:00:00-Mon:03:00\"."
-  default     = ""
+  default     = null
 }
 
 variable "deletion_protection" {
