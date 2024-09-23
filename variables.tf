@@ -20,8 +20,8 @@ variable "snapshot_identifier" {
 
 variable "db_allocated_storage" {
   description = "The allocated storage in gibibytes"
-  type        = number
-  default     = null
+  default     = "20" # 20 GiG is minimum storage size for RDS PostgreSQL gp3 storage type.
+  type        = number   
 }
 
 variable "db_max_allocated_storage" {
@@ -66,7 +66,7 @@ variable "db_backup_retention_period" {
 }
 
 variable "storage_type" {
-  description = "One of 'standard' (magnetic), 'gp2' (general purpose SSD), 'gp3' (new generation of general purpose SSD), or 'io1' (provisioned IOPS SSD). The default is 'io1' if iops is specified, 'gp2' if not. If you specify 'io1' or 'gp3' , you must also include a value for the 'iops' parameter"
+  description = "One of 'standard' (magnetic), 'gp2' (general purpose SSD), 'gp3' (new generation of general purpose SSD), 'io1' (provisioned IOPS SSD), or 'io2' (new generation of provisioned IOPS SSD). The default is 'io1' if iops is specified, 'gp2' if not. If you specify 'io2' or 'gp3' , you must also include a value for the 'iops' parameter"
   type        = string
   default     = "gp3"
 }
