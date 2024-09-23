@@ -20,8 +20,8 @@ variable "snapshot_identifier" {
 
 variable "db_allocated_storage" {
   description = "The allocated storage in gibibytes"
-  default     = "20" # 20 is minimum storage size for gp3 
-  type        = string
+  type        = number
+  default     = null
 }
 
 variable "db_max_allocated_storage" {
@@ -74,7 +74,7 @@ variable "storage_type" {
 variable "db_iops" {
   description = "The amount of provisioned IOPS. Setting this implies a storage_type of 'io1' or `gp3`. See `notes` for limitations regarding this variable for `gp3`"
   type        = number
-  default     = null
+  default     = null # Default to null to omit 'iops' unless explicitly specified, preventing unintended changes
 }
 
 variable "db_name" {
