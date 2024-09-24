@@ -63,9 +63,14 @@ variable "storage_type" {
   description = "One of 'standard' (magnetic), 'gp2' (general purpose SSD), 'gp3' (new generation of general purpose SSD), 'io1' (provisioned IOPS SSD), or 'io2' (new generation of provisioned IOPS SSD). If you specify 'io2', you must also include a value for the 'iops' parameter and the `allocated_storage` must be at least 100 GiB (except for SQL Server which the minimum is 20 GiB)."
   type        = string
   default     = "gp3"
+
+  validation {
+    condition     = contains(["standard", "gp2", "gp3", "io1", "io2"], var.storage_type)
+    error_message = "Invalid 'storage_type'. Must be one of 'standard', 'gp2', 'gp3', 'io1', or 'io2'."
+  }
 }
 
-# For larger database sizes, you need to adjust the 'iops' value accordingly.
+# For larger database sizes, you need to adjust the 'db_iops' value accordingly.
 # The valid ranges for IOPS depend on the DB engine and storage size.
 # Please refer to https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Storage.html for detailed information:
 variable "db_iops" {

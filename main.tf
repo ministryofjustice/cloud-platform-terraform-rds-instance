@@ -206,6 +206,40 @@ resource "aws_db_instance" "rds" {
   }
 
   tags = merge(local.default_tags, local.tag_for_auto_shutdown)
+
+  lifecycle {
+    precondition {
+      condition = var.storage_type != "io2" || (
+        contains(["sqlserver-ee", "sqlserver-se", "sqlserver-ex", "sqlserver-web"], var.db_engine) ? var.db_allocated_storage >= 20 : var.db_allocated_storage >= 100
+      )
+      error_message = "When 'storage_type' is 'io2', 'db_allocated_storage' must be at least 100 GiB unless using SQL which must be at least 20 GiB."
+    }
+
+    precondition {
+      condition     = var.storage_type != "io2" || (var.db_iops != null ? var.db_iops >= 1000 : false)
+      error_message = "When 'storage_type' is 'io2', 'db_iops' must be specified and at least 1000."
+    }
+
+    precondition {
+      condition     = var.storage_type != "gp3" || var.db_allocated_storage >= 20
+      error_message = "When 'storage_type' is 'gp3', 'db_allocated_storage' must be at least 20 GiB."
+    }
+
+    precondition {
+      condition = var.storage_type != "gp3" || contains(["sqlserver-ee", "sqlserver-se", "sqlserver-ex", "sqlserver-web"], var.db_engine) || (
+        contains(["oracle-ee", "oracle-se", "oracle-se1", "oracle-se2"], var.db_engine) ? (
+          var.db_allocated_storage < 200 || (var.db_iops != null ? var.db_iops >= 12000 : false)
+          ) : (
+          var.db_allocated_storage < 400 || (var.db_iops != null ? var.db_iops >= 12000 : false)
+        )
+      )
+      error_message = <<EOF
+        When 'storage_type' is 'gp3':
+        - For Oracle engines, if 'db_allocated_storage' is at least 200 GiB, 'db_iops' must be specified and at least 12,000.
+        - For other engines (excluding SQL Server), if 'db_allocated_storage' is at least 400 GiB, 'db_iops' must be specified and at least 12,000.
+      EOF
+    }
+  }
 }
 
 ##########################
