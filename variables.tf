@@ -20,8 +20,8 @@ variable "snapshot_identifier" {
 
 variable "db_allocated_storage" {
   description = "The allocated storage in gibibytes"
-  default     = "10"
-  type        = string
+  default     = "20" # Minimum 'gp3' storage size is 20 GiB for Amazon RDS.
+  type        = number
 }
 
 variable "db_max_allocated_storage" {
@@ -59,10 +59,24 @@ variable "db_backup_retention_period" {
   type        = string
 }
 
+variable "storage_type" {
+  description = "One of 'standard' (magnetic), 'gp2' (general purpose SSD), 'gp3' (new generation of general purpose SSD), 'io1' (provisioned IOPS SSD), or 'io2' (new generation of provisioned IOPS SSD). If you specify 'io2', you must also include a value for the 'iops' parameter and the `allocated_storage` must be at least 100 GiB (except for SQL Server which the minimum is 20 GiB)."
+  type        = string
+  default     = "gp3"
+
+  validation {
+    condition     = contains(["standard", "gp2", "gp3", "io1", "io2"], var.storage_type)
+    error_message = "Invalid 'storage_type'. Must be one of 'standard', 'gp2', 'gp3', 'io1', or 'io2'."
+  }
+}
+
+# For larger database sizes, you need to adjust the 'db_iops' value accordingly.
+# The valid ranges for IOPS depend on the DB engine and storage size.
+# Please refer to https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Storage.html for detailed information:
 variable "db_iops" {
-  description = "The amount of provisioned IOPS. Setting this to a value other than 0 implies a storage_type of io1"
-  default     = 0
+  description = "The amount of provisioned IOPS."
   type        = number
+  default     = null # Default to null to omit 'iops' unless explicitly specified, preventing unintended changes
 }
 
 variable "db_name" {
@@ -142,9 +156,9 @@ variable "backup_window" {
 }
 
 variable "maintenance_window" {
+  description = "The window to perform maintenance in. Syntax: 'ddd:hh24:mi-ddd:hh24:mi'. Eg: 'Mon:00:00-Mon:03:00'"
   type        = string
-  description = "The window to perform maintenance in. Syntax: \"ddd:hh24:mi-ddd:hh24:mi\". For example: \"Mon:00:00-Mon:03:00\"."
-  default     = ""
+  default     = null
 }
 
 variable "deletion_protection" {

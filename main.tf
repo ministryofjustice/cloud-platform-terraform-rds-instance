@@ -139,10 +139,10 @@ resource "aws_security_group" "rds-sg" {
   # cyclic dependency. Rather than resorting to `aws_security_group_rule` which
   # is not ideal for managing rules, we will simply allow traffic to all ports.
   # This does not compromise security as the instance only listens on one port.
-ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+  ingress {
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
     cidr_blocks = concat(
       [for s in data.aws_subnet.private : s.cidr_block],
       [for s in data.aws_subnet.eks_private : s.cidr_block]
@@ -150,9 +150,9 @@ ingress {
   }
 
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
     cidr_blocks = concat(
       [for s in data.aws_subnet.private : s.cidr_block],
       [for s in data.aws_subnet.eks_private : s.cidr_block]
@@ -176,7 +176,7 @@ resource "aws_db_instance" "rds" {
   username                     = var.replicate_source_db != null ? null : sensitive("cp${random_string.username.result}")
   password                     = var.replicate_source_db != null ? null : random_password.password.result
   backup_retention_period      = var.db_backup_retention_period
-  storage_type                 = var.db_iops == 0 ? "gp2" : "io1"
+  storage_type                 = var.storage_type
   iops                         = var.db_iops
   storage_encrypted            = can(regex("sqlserver-ex", var.db_engine)) ? false : true
   db_subnet_group_name         = var.replicate_source_db != null ? null : aws_db_subnet_group.db_subnet[0].name
@@ -206,6 +206,40 @@ resource "aws_db_instance" "rds" {
   }
 
   tags = merge(local.default_tags, local.tag_for_auto_shutdown)
+
+  lifecycle {
+    precondition {
+      condition = var.storage_type != "io2" || (
+        contains(["sqlserver-ee", "sqlserver-se", "sqlserver-ex", "sqlserver-web"], var.db_engine) ? var.db_allocated_storage >= 20 : var.db_allocated_storage >= 100
+      )
+      error_message = "When 'storage_type' is 'io2', 'db_allocated_storage' must be at least 100 GiB unless using SQL which must be at least 20 GiB."
+    }
+
+    precondition {
+      condition     = var.storage_type != "io2" || (var.db_iops != null ? var.db_iops >= 1000 : false)
+      error_message = "When 'storage_type' is 'io2', 'db_iops' must be specified and at least 1000."
+    }
+
+    precondition {
+      condition     = var.storage_type != "gp3" || var.db_allocated_storage >= 20
+      error_message = "When 'storage_type' is 'gp3', 'db_allocated_storage' must be at least 20 GiB."
+    }
+
+    precondition {
+      condition = var.storage_type != "gp3" || contains(["sqlserver-ee", "sqlserver-se", "sqlserver-ex", "sqlserver-web"], var.db_engine) || (
+        contains(["oracle-ee", "oracle-se", "oracle-se1", "oracle-se2"], var.db_engine) ? (
+          var.db_allocated_storage < 200 || (var.db_iops != null ? var.db_iops >= 12000 : false)
+          ) : (
+          var.db_allocated_storage < 400 || (var.db_iops != null ? var.db_iops >= 12000 : false)
+        )
+      )
+      error_message = <<EOF
+        When 'storage_type' is 'gp3':
+        - For Oracle engines, if 'db_allocated_storage' is at least 200 GiB, 'db_iops' must be specified and at least 12,000.
+        - For other engines (excluding SQL Server), if 'db_allocated_storage' is at least 400 GiB, 'db_iops' must be specified and at least 12,000.
+      EOF
+    }
+  }
 }
 
 ##########################
