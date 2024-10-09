@@ -285,6 +285,7 @@ data "aws_iam_policy_document" "irsa" {
       "rds:RestoreDBInstanceFromDBSnapshot",
       "rds:StartDBInstance",
       "rds:StopDBInstance",
+      "rds:RebootDBInstance",
     ]
 
     resources = [
