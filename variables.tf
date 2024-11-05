@@ -7,7 +7,7 @@ variable "vpc_name" {
 }
 
 variable "rds_name" {
-  description = "Optional name of the RDS cluster. Changing the name will re-create the RDS"
+  description = "Optional name of the RDS cluster. Changing the name will re-create the RDS instance"
   default     = ""
   type        = string
 }
