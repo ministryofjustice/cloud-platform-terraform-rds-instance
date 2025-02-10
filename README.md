@@ -86,7 +86,8 @@ cannot use the official postgres image, because it runs as root) and can be
 launched like this:
 
 ```
-$ kubectl -n [your namespace] run --generator=run-pod/v1 shell --rm -i --tty --image bitnami/postgresql -- bash
+$ kubectl -n [your namespace] run shell --rm -i --tty --image bitnami/postgresql -- bash
+
 
 If you don't see a command prompt, try pressing enter.
 postgres@shell:/$
