@@ -109,9 +109,9 @@ Instructions on how to do this are available [here](https://user-guide.cloud-pla
 
 ### Managing RDS snapshots - backups and restores
 
-An IAM user account is created which allows management of RDS snapshots - allowing snapshot create, delete, copy, restore.
+This module utilises IRSA (Iam Role for Service Account) to allow programmatic and AWS CLI access to your RDS instance for [various management tasks](https://github.com/ministryofjustice/cloud-platform-terraform-rds-instance/blob/main/main.tf#L266) (ie snapshot actions, instance state commands).
 
-Example usage via AWS CLI:
+As per all other Cloud Platform supported AWS resources, for AWS CLI command access, you'll need to setup a [Service Pod](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/other-topics/cloud-platform-service-pod.html). Once you've exec'd into your Service Pod, you can for example do the following:
 
 List snapshots
 ```
