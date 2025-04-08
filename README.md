@@ -153,6 +153,7 @@ No modules.
 |------|------|
 | [aws_db_instance.rds](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/db_instance) | resource |
 | [aws_db_parameter_group.custom_parameters](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/db_parameter_group) | resource |
+| [aws_db_snapshot_copy.rds_migration_snapshot](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/db_snapshot_copy) | resource |
 | [aws_db_subnet_group.db_subnet](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/db_subnet_group) | resource |
 | [aws_iam_policy.irsa](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_kms_alias.alias](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias) | resource |
@@ -195,6 +196,7 @@ No modules.
 | <a name="input_enable_rds_auto_start_stop"></a> [enable\_rds\_auto\_start\_stop](#input\_enable\_rds\_auto\_start\_stop) | Enable auto start and stop of the RDS instances during 10:00 PM - 6:00 AM for cost saving | `bool` | `false` | no |
 | <a name="input_environment_name"></a> [environment\_name](#input\_environment\_name) | Environment name | `string` | n/a | yes |
 | <a name="input_infrastructure_support"></a> [infrastructure\_support](#input\_infrastructure\_support) | The team responsible for managing the infrastructure. Should be of the form <team-name> (<team-email>) | `string` | n/a | yes |
+| <a name="input_is_migration"></a> [is\_migration](#input\_is\_migration) | Set this to true if you are creating a new RDS instance using an existing snapshot (via snapshot\_identifier) | `bool` | `false` | no |
 | <a name="input_is_production"></a> [is\_production](#input\_is\_production) | Whether this is used for production or not | `string` | n/a | yes |
 | <a name="input_license_model"></a> [license\_model](#input\_license\_model) | License model information for this DB instance, options for MS-SQL are: license-included \| bring-your-own-license \| general-public-license | `string` | `null` | no |
 | <a name="input_maintenance_window"></a> [maintenance\_window](#input\_maintenance\_window) | The window to perform maintenance in. Syntax: 'ddd:hh24:mi-ddd:hh24:mi'. Eg: 'Mon:00:00-Mon:03:00' | `string` | `null` | no |
