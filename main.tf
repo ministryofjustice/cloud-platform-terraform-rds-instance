@@ -173,7 +173,7 @@ resource "aws_db_instance" "rds" {
   engine_version               = var.db_engine_version
   instance_class               = var.db_instance_class
   db_name                      = var.replicate_source_db != null || can(regex("sqlserver", var.db_engine)) ? null : local.db_name
-  username                     = var.replicate_source_db != null ? null : sensitive("cp${random_string.username.result}")
+  username                     = var.is_migration || var.replicate_source_db != null ? null : sensitive("cp${random_string.username.result}")
   password                     = var.replicate_source_db != null ? null : random_password.password.result
   backup_retention_period      = var.db_backup_retention_period
   storage_type                 = var.storage_type
@@ -184,7 +184,10 @@ resource "aws_db_instance" "rds" {
   kms_key_id                   = (var.replicate_source_db != null) || (can(regex("sqlserver-ex", var.db_engine))) ? null : aws_kms_key.kms[0].arn
   multi_az                     = can(regex("sqlserver-web|sqlserver-ex", var.db_engine)) ? false : true
   copy_tags_to_snapshot        = true
-  snapshot_identifier          = var.snapshot_identifier
+
+  # if is_migration = true, use the migration_snapshop copy of the snapshot_identifier with the module's kms key
+  snapshot_identifier          = var.is_migration ? aws_db_snapshot_copy.rds_migration_snapshot[0].target_db_snapshot_identifier : var.snapshot_identifier
+  
   replicate_source_db          = var.replicate_source_db
   auto_minor_version_upgrade   = var.allow_minor_version_upgrade
   allow_major_version_upgrade  = (var.prepare_for_major_upgrade) ? true : var.allow_major_version_upgrade
@@ -261,6 +264,15 @@ resource "aws_db_parameter_group" "custom_parameters" {
   lifecycle {
     create_before_destroy = true
   }
+}
+
+# RDS Snapshot - if is_migration = true, create a snapshot of var.snapshot_identifier
+resource "aws_db_snapshot_copy" "rds_migration_snapshot" {
+  count               = var.is_migration ? 1 : 0
+  source_db_snapshot_identifier = var.snapshot_identifier
+  target_db_snapshot_identifier = "${local.identifier}-migration-snapshot"
+  kms_key_id          = aws_kms_key.kms[0].arn
+  tags                = local.default_tags
 }
 
 # Short-lived credentials (IRSA)

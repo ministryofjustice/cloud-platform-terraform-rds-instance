@@ -240,3 +240,9 @@ variable "infrastructure_support" {
   description = "The team responsible for managing the infrastructure. Should be of the form <team-name> (<team-email>)"
   type        = string
 }
+
+variable "is_migration" {
+  description = "Set this to true if you are creating a new RDS instance using an existing snapshot (via snapshot_identifier)"
+  type        = bool
+  default     = false
+}
