@@ -277,6 +277,7 @@ resource "aws_db_snapshot_copy" "rds_migration_snapshot" {
 
 # Short-lived credentials (IRSA)
 data "aws_iam_policy_document" "irsa" {
+  count = var.enable_irsa ? 1 : 0
   version = "2012-10-17"
 
   statement {
@@ -334,8 +335,9 @@ data "aws_iam_policy_document" "irsa" {
 }
 
 resource "aws_iam_policy" "irsa" {
+  count = var.enable_irsa ? 1 : 0
   name   = "cloud-platform-rds-instance-${random_id.id.hex}"
   path   = "/cloud-platform/rds-instance/"
-  policy = data.aws_iam_policy_document.irsa.json
+  policy = data.aws_iam_policy_document.irsa[0].json
   tags   = local.default_tags
 }

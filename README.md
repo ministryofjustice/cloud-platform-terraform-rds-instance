@@ -107,6 +107,22 @@ SSL connection (protocol: TLSv1.2, cipher: ECDHE-RSA-AES256-GCM-SHA384, bits: 25
 
 Instructions on how to do this are available [here](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/other-topics/rds-external-access.html#accessing-your-rds-database)
 
+## IMPORTANT - Release 8.2.0 changes:
+
+## IRSA policy
+
+If you want to be able to query the AWS RDS API (ie snapshot actions, instance state commands etc) from your namespace (for example via the [Cloud Platform AWS CLI service pod](https://github.com/ministryofjustice/cloud-platform-terraform-service-pod)), then you'll need to pass in the following argument to your module call:
+
+```
+module "rds" {
+    ...
+    ...
+    enable_irsa = true
+}
+```
+
+This change has been introduced to support Cloud Platform's effort in reducing the count of unused IAM policies
+
 ### Managing RDS snapshots - backups and restores
 
 This module utilises IRSA (Iam Role for Service Account) to allow programmatic and AWS CLI access to your RDS instance for [various management tasks](https://github.com/ministryofjustice/cloud-platform-terraform-rds-instance/blob/main/main.tf#L266) (ie snapshot actions, instance state commands).
@@ -193,6 +209,7 @@ No modules.
 | <a name="input_db_parameter"></a> [db\_parameter](#input\_db\_parameter) | A list of DB parameters to apply. Note that parameters may differ from a DB family to another | <pre>list(object({<br/>    apply_method = string<br/>    name         = string<br/>    value        = string<br/>  }))</pre> | <pre>[<br/>  {<br/>    "apply_method": "immediate",<br/>    "name": "rds.force_ssl",<br/>    "value": "1"<br/>  }<br/>]</pre> | no |
 | <a name="input_db_password_rotated_date"></a> [db\_password\_rotated\_date](#input\_db\_password\_rotated\_date) | Using this variable will spin new db password by providing date as value | `string` | `""` | no |
 | <a name="input_deletion_protection"></a> [deletion\_protection](#input\_deletion\_protection) | (Optional) If the DB instance should have deletion protection enabled. The database can't be deleted when this value is set to true. The default is false. | `string` | `"false"` | no |
+| <a name="input_enable_irsa"></a> [enable\_irsa](#input\_enable\_irsa) | Enable creation of IRSA resources for database snapshot creation (for service pod maintenance etc). Defaults to false | `bool` | `false` | no |
 | <a name="input_enable_rds_auto_start_stop"></a> [enable\_rds\_auto\_start\_stop](#input\_enable\_rds\_auto\_start\_stop) | Enable auto start and stop of the RDS instances during 10:00 PM - 6:00 AM for cost saving | `bool` | `false` | no |
 | <a name="input_environment_name"></a> [environment\_name](#input\_environment\_name) | Environment name | `string` | n/a | yes |
 | <a name="input_infrastructure_support"></a> [infrastructure\_support](#input\_infrastructure\_support) | The team responsible for managing the infrastructure. Should be of the form <team-name> (<team-email>) | `string` | n/a | yes |
@@ -222,7 +239,7 @@ No modules.
 | <a name="output_database_password"></a> [database\_password](#output\_database\_password) | Database Password |
 | <a name="output_database_username"></a> [database\_username](#output\_database\_username) | Database Username |
 | <a name="output_db_identifier"></a> [db\_identifier](#output\_db\_identifier) | The RDS DB Indentifer |
-| <a name="output_irsa_policy_arn"></a> [irsa\_policy\_arn](#output\_irsa\_policy\_arn) | IAM policy ARN for access to create database snapshots |
+| <a name="output_irsa_policy_arn"></a> [irsa\_policy\_arn](#output\_irsa\_policy\_arn) | IAM policy ARN for access to create database snapshots. We're nulling the value if module call doesnt enable irsa. |
 | <a name="output_rds_instance_address"></a> [rds\_instance\_address](#output\_rds\_instance\_address) | The hostname of the RDS instance |
 | <a name="output_rds_instance_endpoint"></a> [rds\_instance\_endpoint](#output\_rds\_instance\_endpoint) | The connection endpoint in address:port format |
 | <a name="output_rds_instance_port"></a> [rds\_instance\_port](#output\_rds\_instance\_port) | The database port |

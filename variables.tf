@@ -204,6 +204,15 @@ variable "prepare_for_major_upgrade" {
 }
 
 ########
+# IRSA #
+########
+variable "enable_irsa" {
+  type        = bool
+  default     = false
+  description = "Enable creation of IRSA resources for database snapshot creation (for service pod maintenance etc). Defaults to false"
+}
+
+########
 # Tags #
 ########
 variable "business_unit" {
