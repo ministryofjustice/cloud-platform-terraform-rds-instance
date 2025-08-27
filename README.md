@@ -209,8 +209,8 @@ No modules.
 | <a name="input_db_parameter"></a> [db\_parameter](#input\_db\_parameter) | A list of DB parameters to apply. Note that parameters may differ from a DB family to another | <pre>list(object({<br/>    apply_method = string<br/>    name         = string<br/>    value        = string<br/>  }))</pre> | <pre>[<br/>  {<br/>    "apply_method": "immediate",<br/>    "name": "rds.force_ssl",<br/>    "value": "1"<br/>  }<br/>]</pre> | no |
 | <a name="input_db_password_rotated_date"></a> [db\_password\_rotated\_date](#input\_db\_password\_rotated\_date) | Using this variable will spin new db password by providing date as value | `string` | `""` | no |
 | <a name="input_deletion_protection"></a> [deletion\_protection](#input\_deletion\_protection) | (Optional) If the DB instance should have deletion protection enabled. The database can't be deleted when this value is set to true. The default is false. | `string` | `"false"` | no |
+| <a name="input_enable_irsa"></a> [enable\_irsa](#input\_enable\_irsa) | Enable creation of IRSA resources for database snapshot creation (for service pod maintenance etc). Defaults to false | `bool` | `false` | no |
 | <a name="input_enable_rds_auto_start_stop"></a> [enable\_rds\_auto\_start\_stop](#input\_enable\_rds\_auto\_start\_stop) | Enable auto start and stop of the RDS instances during 10:00 PM - 6:00 AM for cost saving | `bool` | `false` | no |
-| <a name="input_enable_irsa"></a> [enable\_irsa](#input\_enable\_irsa) | Enable creation of IRSA resources for RDS credentials (for service pod maintenance etc). Defaults to false | `bool` | `false` | no |
 | <a name="input_environment_name"></a> [environment\_name](#input\_environment\_name) | Environment name | `string` | n/a | yes |
 | <a name="input_infrastructure_support"></a> [infrastructure\_support](#input\_infrastructure\_support) | The team responsible for managing the infrastructure. Should be of the form <team-name> (<team-email>) | `string` | n/a | yes |
 | <a name="input_is_migration"></a> [is\_migration](#input\_is\_migration) | Set this to true if you are creating a new RDS instance using an existing snapshot (via snapshot\_identifier) | `bool` | `false` | no |
@@ -239,7 +239,7 @@ No modules.
 | <a name="output_database_password"></a> [database\_password](#output\_database\_password) | Database Password |
 | <a name="output_database_username"></a> [database\_username](#output\_database\_username) | Database Username |
 | <a name="output_db_identifier"></a> [db\_identifier](#output\_db\_identifier) | The RDS DB Indentifer |
-| <a name="output_irsa_policy_arn"></a> [irsa\_policy\_arn](#output\_irsa\_policy\_arn) | IAM policy ARN for access to create database snapshots. This is set as null if IRSA is disabled. |
+| <a name="output_irsa_policy_arn"></a> [irsa\_policy\_arn](#output\_irsa\_policy\_arn) | IAM policy ARN for access to create database snapshots. We're nulling the value if module call doesnt enable irsa. |
 | <a name="output_rds_instance_address"></a> [rds\_instance\_address](#output\_rds\_instance\_address) | The hostname of the RDS instance |
 | <a name="output_rds_instance_endpoint"></a> [rds\_instance\_endpoint](#output\_rds\_instance\_endpoint) | The connection endpoint in address:port format |
 | <a name="output_rds_instance_port"></a> [rds\_instance\_port](#output\_rds\_instance\_port) | The database port |
