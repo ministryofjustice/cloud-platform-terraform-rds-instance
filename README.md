@@ -107,7 +107,7 @@ SSL connection (protocol: TLSv1.2, cipher: ECDHE-RSA-AES256-GCM-SHA384, bits: 25
 
 Instructions on how to do this are available [here](https://user-guide.cloud-platform.service.justice.gov.uk/documentation/other-topics/rds-external-access.html#accessing-your-rds-database)
 
-## IMPORTANT - Release 8.2.0 changes:
+## IMPORTANT - Release 9.0.0 changes:
 
 ## IRSA policy
 
