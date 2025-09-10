@@ -11,9 +11,9 @@ locals {
 
   # engine-to-export log configuration mappings
   db_log_export_mappings = {
-    postgres      = ["postgresql", "upgrade", "iam-db-auth-error"]
-    mysql         = ["audit", "error", "general", "slowquery", "iam-db-auth-error"]
-    mariadb       = ["audit", "error", "general", "slowquery", "iam-db-auth-error"]
+    postgres      = ["postgresql", "upgrade"]
+    mysql         = ["audit", "error", "general", "slowquery"]
+    mariadb       = ["audit", "error", "general", "slowquery"]
     sqlserver-ee  = ["agent", "error"]
     sqlserver-se  = ["agent", "error"]
     sqlserver-ex  = ["agent", "error"]
