@@ -358,11 +358,5 @@ resource "aws_iam_policy" "irsa" {
   tags   = local.default_tags
 }
 
-resource "aws_cloudwatch_log_group" "rds_cloudwatch_logs" {
-  for_each = toset(local.log_exports)
 
-  name              = "/aws/rds/instance/${aws_db_instance.rds.identifier}/${each.key}"
-  retention_in_days = 14
 
-  tags = local.default_tags
-}
