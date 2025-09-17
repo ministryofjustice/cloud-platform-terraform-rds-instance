@@ -24,6 +24,29 @@ locals {
   # Retrieve logs from user-selected engine
   log_exports = lookup(local.db_log_export_mappings, var.db_engine, [])
 
+  required_logging_parameters = contains(["mysql", "mariadb"], var.db_engine) ? [
+    {
+      name         = "general_log"
+      value        = "1"
+      apply_method = "immediate"
+    },
+    {
+      name         = var.db_engine == "mysql" ? "slow_query_log" : "log_slow_query"
+      value        = "1"
+      apply_method = "immediate"
+    },
+    {
+      name         = "log_output"
+      value        = "FILE"
+      apply_method = "immediate"
+    }
+  ] : []
+
+  all_parameters = concat(
+    local.required_logging_parameters,
+    var.db_parameter
+  )
+
   # Tags
   default_tags = {
     # Mandatory
@@ -259,6 +282,8 @@ resource "aws_db_instance" "rds" {
       EOF
     }
   }
+
+  depends_on = [aws_cloudwatch_log_subscription_filter.rds_logs_to_firehose]
 }
 
 ##########################
@@ -269,7 +294,7 @@ resource "aws_db_parameter_group" "custom_parameters" {
   family = var.rds_family
 
   dynamic "parameter" {
-    for_each = var.db_parameter
+    for_each = local.all_parameters
     content {
       apply_method = lookup(parameter.value, "apply_method", null)
       name         = parameter.value.name
@@ -358,5 +383,26 @@ resource "aws_iam_policy" "irsa" {
   tags   = local.default_tags
 }
 
+data "aws_iam_roles" "cloudwatch_to_firehose" {
+  name_regex = ".*cloudwatch-to-firehose.*00001$"
+}
 
+resource "aws_cloudwatch_log_group" "rds_cloudwatch_logs" {
+  for_each = toset(local.log_exports)
 
+  name              = "/aws/rds/instance/${var.rds_name != "" ? var.rds_name : local.identifier}/${each.key}"
+  retention_in_days = 14
+  tags              = local.default_tags
+}
+
+resource "aws_cloudwatch_log_subscription_filter" "rds_logs_to_firehose" {
+  for_each = aws_cloudwatch_log_group.rds_cloudwatch_logs
+
+  name            = "${var.rds_name != "" ? var.rds_name : local.identifier}-${each.key}-firehose"
+  log_group_name  = "/aws/rds/instance/${var.rds_name != "" ? var.rds_name : local.identifier}/${each.key}"
+  filter_pattern  = ""
+  destination_arn = "arn:aws:firehose:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:deliverystream/cloudwatch-export-180af1363ef3510a"
+  role_arn        = length(data.aws_iam_roles.cloudwatch_to_firehose.arns) > 0 ? tolist(data.aws_iam_roles.cloudwatch_to_firehose.arns)[0] : null
+
+  depends_on = [aws_cloudwatch_log_group.rds_cloudwatch_logs]
+}
