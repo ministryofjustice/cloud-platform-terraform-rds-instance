@@ -239,7 +239,11 @@ resource "aws_db_instance" "rds" {
   maintenance_window           = var.maintenance_window
   license_model                = var.license_model
   character_set_name           = can(regex("sqlserver", var.db_engine)) ? var.character_set_name : null
-  option_group_name            = var.option_group_name
+  option_group_name = (
+    contains(["mysql", "mariadb"], var.db_engine)
+    ? aws_db_option_group.audit[0].name
+    : var.option_group_name
+  )
 
   timeouts {
     create = "2h"
@@ -283,7 +287,30 @@ resource "aws_db_instance" "rds" {
     }
   }
 
-  depends_on = [aws_cloudwatch_log_subscription_filter.rds_logs_to_firehose]
+  depends_on = [
+    aws_cloudwatch_log_subscription_filter.rds_logs_to_firehose,
+    aws_db_option_group.audit
+  ]
+}
+
+#####################################################
+# Create option group if engine is mariadb or mysql #
+#####################################################
+resource "aws_db_option_group" "audit" {
+  count                = contains(["mysql", "mariadb"], var.db_engine) ? 1 : 0
+  name                 = "${local.identifier}-audit"
+  engine_name          = var.db_engine
+  major_engine_version = join(".", slice(split(".", var.db_engine_version), 0, 2))
+
+  option {
+    option_name = "MARIADB_AUDIT_PLUGIN"
+    option_settings {
+      name  = "SERVER_AUDIT_EVENTS"
+      value = "CONNECT,QUERY"
+    }
+  }
+
+  tags = local.default_tags
 }
 
 ##########################
