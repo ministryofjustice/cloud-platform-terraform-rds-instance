@@ -284,6 +284,7 @@ data "aws_iam_policy_document" "irsa" {
     sid    = "AllowRDSAccessFor${random_id.id.hex}"
     effect = "Allow"
     actions = [
+      "rds:AddTagsToResource",
       "rds:CopyDBSnapshot",
       "rds:CreateDBSnapshot",
       "rds:DeleteDBSnapshot",
