@@ -181,7 +181,7 @@ variable "character_set_name" {
 
 variable "option_group_name" {
   type        = string
-  description = "(Optional) The name of an 'aws_db_option_group' to associate to the DB instance"
+  description = "(Optional) The name of an 'aws_db_option_group' to associate to the DB instance. This must be provided with the audit plugin set, if you enable opt_in_xsiam_logging for MySQL or MariaDB engines."
   default     = null
 }
 
@@ -210,6 +210,15 @@ variable "enable_irsa" {
   type        = bool
   default     = false
   description = "Enable creation of IRSA resources for database snapshot creation (for service pod maintenance etc). Defaults to false"
+}
+
+###########
+# Logging #
+###########
+variable "opt_in_xsiam_logging" {
+  description = "If set to true, it will create Cloudwatch log groups for the RDS instance and send them to Cortex XSIAM. NOTE: for MySQL and MariaDB engines, you must pass in an option group with AUDIT PLUGIN set as an option"
+  type        = bool
+  default     = false
 }
 
 ########

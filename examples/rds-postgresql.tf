@@ -91,6 +91,9 @@ module "read_replica" {
   # uncomment below:
 
   # enable_irsa = true
+
+  # If you want to enable Cloudwatch logging for this postgres RDS instance, uncomment the code below:
+  # opt_in_xsiam_logging = true
 }
 
 resource "kubernetes_secret" "rds" {

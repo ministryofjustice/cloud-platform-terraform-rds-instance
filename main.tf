@@ -22,9 +22,9 @@ locals {
   }
 
   # Retrieve logs from user-selected engine
-  log_exports = lookup(local.db_log_export_mappings, var.db_engine, [])
+  log_exports = var.opt_in_xsiam_logging ? lookup(local.db_log_export_mappings, var.db_engine, []) : []
 
-  required_logging_parameters = contains(["mysql", "mariadb"], var.db_engine) ? [
+  required_logging_parameters = var.opt_in_xsiam_logging && contains(["mysql", "mariadb"], var.db_engine) ? [
     {
       name         = "general_log"
       value        = "1"
@@ -42,7 +42,7 @@ locals {
     }
   ] : []
 
-  all_parameters = concat(
+  all_db_parameters = concat(
     local.required_logging_parameters,
     var.db_parameter
   )
@@ -239,11 +239,7 @@ resource "aws_db_instance" "rds" {
   maintenance_window           = var.maintenance_window
   license_model                = var.license_model
   character_set_name           = can(regex("sqlserver", var.db_engine)) ? var.character_set_name : null
-  option_group_name = (
-    contains(["mysql", "mariadb"], var.db_engine)
-    ? aws_db_option_group.audit[0].name
-    : var.option_group_name
-  )
+  option_group_name            = var.option_group_name
 
   timeouts {
     create = "2h"
@@ -254,6 +250,15 @@ resource "aws_db_instance" "rds" {
   tags = merge(local.default_tags, local.tag_for_auto_shutdown)
 
   lifecycle {
+    precondition {
+      condition = !(
+        contains(["mysql", "mariadb"], var.db_engine) &&
+        var.opt_in_xsiam_logging &&
+        (var.option_group_name == null || var.option_group_name == "")
+      )
+      error_message = "For MySQL or MariaDB with opt_in_xsiam_logging enabled, you must provide a non-empty option_group_name (with the audit plugin option set)."
+    }
+
     precondition {
       condition = var.storage_type != "io2" || (
         contains(["sqlserver-ee", "sqlserver-se", "sqlserver-ex", "sqlserver-web"], var.db_engine) ? var.db_allocated_storage >= 20 : var.db_allocated_storage >= 100
@@ -287,30 +292,7 @@ resource "aws_db_instance" "rds" {
     }
   }
 
-  depends_on = [
-    aws_cloudwatch_log_subscription_filter.rds_logs_to_firehose,
-    aws_db_option_group.audit
-  ]
-}
-
-#####################################################
-# Create option group if engine is mariadb or mysql #
-#####################################################
-resource "aws_db_option_group" "audit" {
-  count                = contains(["mysql", "mariadb"], var.db_engine) ? 1 : 0
-  name                 = "${local.identifier}-audit"
-  engine_name          = var.db_engine
-  major_engine_version = join(".", slice(split(".", var.db_engine_version), 0, 2))
-
-  option {
-    option_name = "MARIADB_AUDIT_PLUGIN"
-    option_settings {
-      name  = "SERVER_AUDIT_EVENTS"
-      value = "CONNECT,QUERY"
-    }
-  }
-
-  tags = local.default_tags
+  depends_on = [aws_cloudwatch_log_subscription_filter.rds_logs_to_firehose]
 }
 
 ##########################
@@ -321,7 +303,7 @@ resource "aws_db_parameter_group" "custom_parameters" {
   family = var.rds_family
 
   dynamic "parameter" {
-    for_each = local.all_parameters
+    for_each = local.all_db_parameters
     content {
       apply_method = lookup(parameter.value, "apply_method", null)
       name         = parameter.value.name
@@ -415,21 +397,18 @@ data "aws_iam_roles" "cloudwatch_to_firehose" {
 }
 
 resource "aws_cloudwatch_log_group" "rds_cloudwatch_logs" {
-  for_each = toset(local.log_exports)
-
+  for_each          = var.opt_in_xsiam_logging ? toset(local.log_exports) : toset([])
   name              = "/aws/rds/instance/${var.rds_name != "" ? var.rds_name : local.identifier}/${each.key}"
   retention_in_days = 14
   tags              = local.default_tags
 }
 
 resource "aws_cloudwatch_log_subscription_filter" "rds_logs_to_firehose" {
-  for_each = aws_cloudwatch_log_group.rds_cloudwatch_logs
-
+  for_each        = var.opt_in_xsiam_logging ? aws_cloudwatch_log_group.rds_cloudwatch_logs : {}
   name            = "${var.rds_name != "" ? var.rds_name : local.identifier}-${each.key}-firehose"
   log_group_name  = "/aws/rds/instance/${var.rds_name != "" ? var.rds_name : local.identifier}/${each.key}"
   filter_pattern  = ""
   destination_arn = "arn:aws:firehose:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:deliverystream/cloudwatch-export-180af1363ef3510a"
   role_arn        = length(data.aws_iam_roles.cloudwatch_to_firehose.arns) > 0 ? tolist(data.aws_iam_roles.cloudwatch_to_firehose.arns)[0] : null
-
-  depends_on = [aws_cloudwatch_log_group.rds_cloudwatch_logs]
+  depends_on      = [aws_cloudwatch_log_group.rds_cloudwatch_logs]
 }
