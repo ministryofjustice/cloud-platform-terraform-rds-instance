@@ -109,7 +109,7 @@ Instructions on how to do this are available [here](https://user-guide.cloud-pla
 
 ## Enabling Logging to XSIAM Cortex
 
-If you are required to stream logs to XSIAM Cortex for security auditing, you can do so by setting `opt_in_xsiam_logging` variable to true. In the case of mysql and mariadb engines, you will need to create an option group, set the MARIADB_AUDIT_PLUGIN option, and pass it into the module call. Please see the /examples folder.
+If you are required to stream logs to XSIAM Cortex for security auditing, you can do so by setting `opt_in_xsiam_logging` variable to true. In the case of mysql and mariadb engines, you will need to create an option group, set the MARIADB_AUDIT_PLUGIN option, and pass it into the module call. Please see the '/examples' folder.
 
 ## IMPORTANT - Release 9.0.0 changes:
 
@@ -193,6 +193,7 @@ No modules.
 | [aws_subnets.private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnets) | data source |
 | [aws_vpc.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/vpc) | data source |
 | [aws_iam_roles.cloudwatch_to_firehose](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_roles) | data source |
+| [aws_kinesis_firehose_delivery_stream.rds_log_stream](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/kinesis_firehose_delivery_stream) | data source |
 
 ## Inputs
 

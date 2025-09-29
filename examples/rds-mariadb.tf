@@ -60,7 +60,7 @@ resource "kubernetes_secret" "rds_mariadb" {
 }
 
 # resource "aws_db_option_group" "rds_mariadb_og" {
-#   name                     = "mariadb-option-group"
+#   name                     = "test-mariadb-option-group"
 #   option_group_description = "MariaDB option group for logging"
 #   engine_name              = "mariadb"
 #   major_engine_version     = "10.6"

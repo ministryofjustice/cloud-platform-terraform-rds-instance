@@ -72,7 +72,7 @@ resource "kubernetes_config_map" "rds_mysql" {
 }
 
 # resource "aws_db_option_group" "rds_mysql_og" {
-#   name                     = "mysql-option-group"
+#   name                     = "test-mysql-option-group"
 #   option_group_description = "MySQL option group for logging"
 #   engine_name              = "mysql"
 #   major_engine_version     = "8.0"

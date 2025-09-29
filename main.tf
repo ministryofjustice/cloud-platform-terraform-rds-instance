@@ -393,7 +393,11 @@ resource "aws_iam_policy" "irsa" {
 }
 
 data "aws_iam_roles" "cloudwatch_to_firehose" {
-  name_regex = ".*cloudwatch-to-firehose.*00001$"
+  name_regex = "cloud-platform-cloudwatch-to-firehose20250912120805499500000001"
+}
+
+data "aws_kinesis_firehose_delivery_stream" "rds_log_stream" {
+  name = "cloudwatch-export-180af1363ef3510a"
 }
 
 resource "aws_cloudwatch_log_group" "rds_cloudwatch_logs" {
@@ -408,7 +412,7 @@ resource "aws_cloudwatch_log_subscription_filter" "rds_logs_to_firehose" {
   name            = "${var.rds_name != "" ? var.rds_name : local.identifier}-${each.key}-firehose"
   log_group_name  = "/aws/rds/instance/${var.rds_name != "" ? var.rds_name : local.identifier}/${each.key}"
   filter_pattern  = ""
-  destination_arn = "arn:aws:firehose:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:deliverystream/cloudwatch-export-180af1363ef3510a"
+  destination_arn = data.aws_kinesis_firehose_delivery_stream.rds_log_stream.arn
   role_arn        = length(data.aws_iam_roles.cloudwatch_to_firehose.arns) > 0 ? tolist(data.aws_iam_roles.cloudwatch_to_firehose.arns)[0] : null
   depends_on      = [aws_cloudwatch_log_group.rds_cloudwatch_logs]
 }
