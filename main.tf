@@ -9,6 +9,44 @@ locals {
   db_password_rotation_seed = var.db_password_rotated_date == "" ? {} : { "db-password-rotated-date" = var.db_password_rotated_date }
   vpc_name                  = (var.vpc_name == "live") ? "live-1" : var.vpc_name
 
+  # engine-to-export log configuration mappings
+  db_log_export_mappings = {
+    postgres      = ["postgresql", "upgrade"]
+    mysql         = ["audit", "error", "general", "slowquery"]
+    mariadb       = ["audit", "error", "general", "slowquery"]
+    sqlserver-ee  = ["agent", "error"]
+    sqlserver-se  = ["agent", "error"]
+    sqlserver-ex  = ["agent", "error"]
+    sqlserver-web = ["agent", "error"]
+    oracle-se2    = ["alert", "audit", "listener", "trace", "oemagent"]
+  }
+
+  # Retrieve logs from user-selected engine
+  log_exports = var.opt_in_xsiam_logging ? lookup(local.db_log_export_mappings, var.db_engine, []) : []
+
+  required_logging_parameters = var.opt_in_xsiam_logging && contains(["mysql", "mariadb"], var.db_engine) ? [
+    {
+      name         = "general_log"
+      value        = "1"
+      apply_method = "immediate"
+    },
+    {
+      name         = var.db_engine == "mysql" ? "slow_query_log" : "log_slow_query"
+      value        = "1"
+      apply_method = "immediate"
+    },
+    {
+      name         = "log_output"
+      value        = "FILE"
+      apply_method = "immediate"
+    }
+  ] : []
+
+  all_db_parameters = concat(
+    local.required_logging_parameters,
+    var.db_parameter
+  )
+
   # Tags
   default_tags = {
     # Mandatory
@@ -164,30 +202,31 @@ resource "aws_security_group" "rds-sg" {
 # Create database #
 ###################
 resource "aws_db_instance" "rds" {
-  identifier                   = var.rds_name != "" ? var.rds_name : local.identifier
-  final_snapshot_identifier    = var.replicate_source_db != null ? null : "${local.identifier}-finalsnapshot"
-  allocated_storage            = var.db_allocated_storage
-  max_allocated_storage        = var.db_max_allocated_storage
-  apply_immediately            = true
-  engine                       = var.replicate_source_db == null ? var.db_engine : null
-  engine_version               = var.db_engine_version
-  instance_class               = var.db_instance_class
-  db_name                      = var.replicate_source_db != null || can(regex("sqlserver", var.db_engine)) ? null : local.db_name
-  username                     = var.is_migration || var.replicate_source_db != null ? null : sensitive("cp${random_string.username.result}")
-  password                     = var.replicate_source_db != null ? null : random_password.password.result
-  backup_retention_period      = var.db_backup_retention_period
-  storage_type                 = var.storage_type
-  iops                         = var.db_iops
-  storage_encrypted            = can(regex("sqlserver-ex", var.db_engine)) ? false : true
-  db_subnet_group_name         = var.replicate_source_db != null ? null : aws_db_subnet_group.db_subnet[0].name
-  vpc_security_group_ids       = local.vpc_security_group_ids
-  kms_key_id                   = (var.replicate_source_db != null) || (can(regex("sqlserver-ex", var.db_engine))) ? null : aws_kms_key.kms[0].arn
-  multi_az                     = can(regex("sqlserver-web|sqlserver-ex", var.db_engine)) ? false : true
-  copy_tags_to_snapshot        = true
+  identifier                      = var.rds_name != "" ? var.rds_name : local.identifier
+  final_snapshot_identifier       = var.replicate_source_db != null ? null : "${local.identifier}-finalsnapshot"
+  allocated_storage               = var.db_allocated_storage
+  max_allocated_storage           = var.db_max_allocated_storage
+  apply_immediately               = true
+  engine                          = var.replicate_source_db == null ? var.db_engine : null
+  engine_version                  = var.db_engine_version
+  instance_class                  = var.db_instance_class
+  db_name                         = var.replicate_source_db != null || can(regex("sqlserver", var.db_engine)) ? null : local.db_name
+  username                        = var.is_migration || var.replicate_source_db != null ? null : sensitive("cp${random_string.username.result}")
+  password                        = var.replicate_source_db != null ? null : random_password.password.result
+  backup_retention_period         = var.db_backup_retention_period
+  storage_type                    = var.storage_type
+  iops                            = var.db_iops
+  storage_encrypted               = can(regex("sqlserver-ex", var.db_engine)) ? false : true
+  db_subnet_group_name            = var.replicate_source_db != null ? null : aws_db_subnet_group.db_subnet[0].name
+  vpc_security_group_ids          = local.vpc_security_group_ids
+  kms_key_id                      = (var.replicate_source_db != null) || (can(regex("sqlserver-ex", var.db_engine))) ? null : aws_kms_key.kms[0].arn
+  multi_az                        = can(regex("sqlserver-web|sqlserver-ex", var.db_engine)) ? false : true
+  copy_tags_to_snapshot           = true
+  enabled_cloudwatch_logs_exports = local.log_exports
 
   # if is_migration = true, use the migration_snapshop copy of the snapshot_identifier with the module's kms key
-  snapshot_identifier          = var.is_migration ? aws_db_snapshot_copy.rds_migration_snapshot[0].target_db_snapshot_identifier : var.snapshot_identifier
-  
+  snapshot_identifier = var.is_migration ? aws_db_snapshot_copy.rds_migration_snapshot[0].target_db_snapshot_identifier : var.snapshot_identifier
+
   replicate_source_db          = var.replicate_source_db
   auto_minor_version_upgrade   = var.allow_minor_version_upgrade
   allow_major_version_upgrade  = (var.prepare_for_major_upgrade) ? true : var.allow_major_version_upgrade
@@ -211,6 +250,15 @@ resource "aws_db_instance" "rds" {
   tags = merge(local.default_tags, local.tag_for_auto_shutdown)
 
   lifecycle {
+    precondition {
+      condition = !(
+        contains(["mysql", "mariadb"], var.db_engine) &&
+        var.opt_in_xsiam_logging &&
+        (var.option_group_name == null || var.option_group_name == "")
+      )
+      error_message = "For MySQL or MariaDB with opt_in_xsiam_logging enabled, you must provide a non-empty option_group_name (with the audit plugin option set)."
+    }
+
     precondition {
       condition = var.storage_type != "io2" || (
         contains(["sqlserver-ee", "sqlserver-se", "sqlserver-ex", "sqlserver-web"], var.db_engine) ? var.db_allocated_storage >= 20 : var.db_allocated_storage >= 100
@@ -243,6 +291,8 @@ resource "aws_db_instance" "rds" {
       EOF
     }
   }
+
+  depends_on = [aws_cloudwatch_log_subscription_filter.rds_logs_to_firehose]
 }
 
 ##########################
@@ -253,7 +303,7 @@ resource "aws_db_parameter_group" "custom_parameters" {
   family = var.rds_family
 
   dynamic "parameter" {
-    for_each = var.db_parameter
+    for_each = local.all_db_parameters
     content {
       apply_method = lookup(parameter.value, "apply_method", null)
       name         = parameter.value.name
@@ -268,16 +318,16 @@ resource "aws_db_parameter_group" "custom_parameters" {
 
 # RDS Snapshot - if is_migration = true, create a snapshot of var.snapshot_identifier
 resource "aws_db_snapshot_copy" "rds_migration_snapshot" {
-  count               = var.is_migration ? 1 : 0
+  count                         = var.is_migration ? 1 : 0
   source_db_snapshot_identifier = var.snapshot_identifier
   target_db_snapshot_identifier = "${local.identifier}-migration-snapshot"
-  kms_key_id          = aws_kms_key.kms[0].arn
-  tags                = local.default_tags
+  kms_key_id                    = aws_kms_key.kms[0].arn
+  tags                          = local.default_tags
 }
 
 # Short-lived credentials (IRSA)
 data "aws_iam_policy_document" "irsa" {
-  count = var.enable_irsa ? 1 : 0
+  count   = var.enable_irsa ? 1 : 0
   version = "2012-10-17"
 
   statement {
@@ -336,9 +386,34 @@ data "aws_iam_policy_document" "irsa" {
 }
 
 resource "aws_iam_policy" "irsa" {
-  count = var.enable_irsa ? 1 : 0
+  count  = var.enable_irsa ? 1 : 0
   name   = "cloud-platform-rds-instance-${random_id.id.hex}"
   path   = "/cloud-platform/rds-instance/"
   policy = data.aws_iam_policy_document.irsa[0].json
   tags   = local.default_tags
+}
+
+data "aws_iam_roles" "cloudwatch_to_firehose" {
+  name_regex = "cloud-platform-cloudwatch-to-firehose20250912120805499500000001"
+}
+
+data "aws_kinesis_firehose_delivery_stream" "rds_log_stream" {
+  name = "cloudwatch-export-180af1363ef3510a"
+}
+
+resource "aws_cloudwatch_log_group" "rds_cloudwatch_logs" {
+  for_each          = var.opt_in_xsiam_logging ? toset(local.log_exports) : toset([])
+  name              = "/aws/rds/instance/${var.rds_name != "" ? var.rds_name : local.identifier}/${each.key}"
+  retention_in_days = 14
+  tags              = local.default_tags
+}
+
+resource "aws_cloudwatch_log_subscription_filter" "rds_logs_to_firehose" {
+  for_each        = var.opt_in_xsiam_logging ? aws_cloudwatch_log_group.rds_cloudwatch_logs : {}
+  name            = "${var.rds_name != "" ? var.rds_name : local.identifier}-${each.key}-firehose"
+  log_group_name  = "/aws/rds/instance/${var.rds_name != "" ? var.rds_name : local.identifier}/${each.key}"
+  filter_pattern  = ""
+  destination_arn = data.aws_kinesis_firehose_delivery_stream.rds_log_stream.arn
+  role_arn        = length(data.aws_iam_roles.cloudwatch_to_firehose.arns) > 0 ? tolist(data.aws_iam_roles.cloudwatch_to_firehose.arns)[0] : null
+  depends_on      = [aws_cloudwatch_log_group.rds_cloudwatch_logs]
 }

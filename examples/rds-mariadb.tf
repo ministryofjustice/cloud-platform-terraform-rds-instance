@@ -38,6 +38,11 @@ module "rds_mariadb" {
   # uncomment below:
 
   # enable_irsa = true
+
+  # If you want to enable Cloudwatch logging for this mariadb RDS instance, uncomment below:
+  # opt_in_xsiam_logging = true
+  # option_group_name    = aws_db_option_group.rds_mariadb_og.name
+
 }
 
 resource "kubernetes_secret" "rds_mariadb" {
@@ -53,3 +58,14 @@ resource "kubernetes_secret" "rds_mariadb" {
     rds_instance_address  = module.rds_mariadb.rds_instance_address
   }
 }
+
+# resource "aws_db_option_group" "rds_mariadb_og" {
+#   name                     = "test-mariadb-option-group"
+#   option_group_description = "MariaDB option group for logging"
+#   engine_name              = "mariadb"
+#   major_engine_version     = "10.6"
+
+#   option {
+#     option_name = "MARIADB_AUDIT_PLUGIN"
+#   }
+# }

@@ -48,6 +48,9 @@ module "rds_mssql" {
   # uncomment below:
 
   # enable_irsa = true
+
+  # If you want to enable Cloudwatch logging for this mssql RDS instance, uncomment the code below:
+  # opt_in_xsiam_logging = true
 }
 
 resource "kubernetes_secret" "rds_mssql" {
