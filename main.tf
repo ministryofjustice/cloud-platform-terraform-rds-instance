@@ -42,8 +42,47 @@ locals {
     }
   ] : []
 
+  required_postgres_logging_parameters = var.opt_in_xsiam_logging && var.db_engine == "postgres" ? [
+    {
+      name         = "shared_preload_libraries"
+      value        = "pgaudit"
+      apply_method = "pending-reboot"
+    },
+    {
+      name         = "pgaudit.log"
+      value        = "ddl, role"
+      apply_method = "immediate"
+    },
+    {
+      name         = "log_connections"
+      value        = "1"
+      apply_method = "immediate"
+    },
+      {
+      name         = "log_disconnections"
+      value        = "1"
+      apply_method = "immediate"
+    },
+    {
+      name         = "log_min_error_statement"
+      value        = "panic"
+      apply_method = "immediate"
+    },
+    {
+      name         = "log_error_verbosity"
+      value        = "terse"
+      apply_method = "immediate"
+    },
+    {
+      name         = "log_statement"
+      value        = "none"
+      apply_method = "immediate"
+    }
+  ] : []
+
   all_db_parameters = concat(
     local.required_logging_parameters,
+    local.required_postgres_logging_parameters,
     var.db_parameter
   )
 
