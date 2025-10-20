@@ -12,8 +12,8 @@ locals {
   # engine-to-export log configuration mappings
   db_log_export_mappings = {
     postgres      = ["postgresql", "upgrade"]
-    mysql         = ["audit", "error", "general", "slowquery"]
-    mariadb       = ["audit", "error", "general", "slowquery"]
+    mysql         = ["audit", "error"]
+    mariadb       = ["audit", "error"]
     sqlserver-ee  = ["agent", "error"]
     sqlserver-se  = ["agent", "error"]
     sqlserver-ex  = ["agent", "error"]
@@ -27,12 +27,7 @@ locals {
   required_logging_parameters = var.opt_in_xsiam_logging && contains(["mysql", "mariadb"], var.db_engine) ? [
     {
       name         = "general_log"
-      value        = "1"
-      apply_method = "immediate"
-    },
-    {
-      name         = var.db_engine == "mysql" ? "slow_query_log" : "log_slow_query"
-      value        = "1"
+      value        = "0"
       apply_method = "immediate"
     },
     {
@@ -80,9 +75,18 @@ locals {
     }
   ] : []
 
+  required_oracle_logging_parameters = var.opt_in_xsiam_logging && var.db_engine == "oracle-se2" ? [
+    {
+      name         = "audit_trail"
+      value        = "DB"
+      apply_method = "pending-reboot"
+    }
+  ] : []
+
   all_db_parameters = concat(
     local.required_logging_parameters,
     local.required_postgres_logging_parameters,
+    local.required_oracle_logging_parameters,
     var.db_parameter
   )
 
