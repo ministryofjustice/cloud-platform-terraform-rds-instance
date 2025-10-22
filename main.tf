@@ -18,7 +18,7 @@ locals {
     sqlserver-se  = ["agent", "error"]
     sqlserver-ex  = ["agent", "error"]
     sqlserver-web = ["agent", "error"]
-    oracle-se2    = ["alert", "audit", "listener", "trace", "oemagent"]
+    oracle-se2    = ["alert", "audit", "listener"]
   }
 
   # Retrieve logs from user-selected engine
@@ -53,7 +53,7 @@ locals {
       value        = "1"
       apply_method = "immediate"
     },
-      {
+    {
       name         = "log_disconnections"
       value        = "1"
       apply_method = "immediate"
@@ -78,7 +78,7 @@ locals {
   required_oracle_logging_parameters = var.opt_in_xsiam_logging && var.db_engine == "oracle-se2" ? [
     {
       name         = "audit_trail"
-      value        = "DB"
+      value        = "XML"
       apply_method = "pending-reboot"
     }
   ] : []
@@ -102,6 +102,61 @@ locals {
     # Optional
     environment-name       = var.environment_name
     infrastructure-support = var.infrastructure_support
+  }
+}
+
+resource "null_resource" "validate_mysql_audit_option_group" {
+  count = var.opt_in_xsiam_logging && contains(["mysql", "mariadb"], var.db_engine) && try(length(var.option_group_name) > 0, false) ? 1 : 0
+
+  triggers = {
+    option_group_name = var.option_group_name
+    check_timestamp   = timestamp()
+  }
+
+  provisioner "local-exec" {
+    command = <<-BASH
+      set -euo pipefail
+      OG_NAME="${var.option_group_name}"
+      REGION="${data.aws_region.current.name}"
+
+      echo "Validating Option Group: $OG_NAME"
+
+      # Fetch the OG
+      OG_JSON=$(aws rds describe-option-groups --option-group-name "$OG_NAME" --region "$REGION" --output json)
+
+      # Check MARIADB_AUDIT_PLUGIN exists
+      PLUGIN_PRESENT=$(echo "$OG_JSON" | jq -r '.OptionGroupsList[0].Options // [] | map(.OptionName=="MARIADB_AUDIT_PLUGIN") | any')
+      if [ "$PLUGIN_PRESENT" != "true" ]; then
+        echo "ERROR: Option Group '$OG_NAME' does not include MARIADB_AUDIT_PLUGIN."
+        exit 1
+      fi
+
+      # Extract SERVER_AUDIT_EVENTS
+      EVENTS_VALUE=$(echo "$OG_JSON" | jq -r '
+        .OptionGroupsList[0].Options[]? 
+        | select(.OptionName=="MARIADB_AUDIT_PLUGIN").OptionSettings[]? 
+        | select(.Name=="SERVER_AUDIT_EVENTS").Value // ""
+      ')
+
+      if [ -z "$EVENTS_VALUE" ]; then
+        echo "ERROR: MARIADB_AUDIT_PLUGIN is missing SERVER_AUDIT_EVENTS setting."
+        exit 1
+      fi
+
+      # Normalize (lowercase, no spaces, sort) and compare
+      EVENTS_NORM=$(echo "$EVENTS_VALUE" | tr '[:upper:]' '[:lower:]' | tr -d ' ' | tr ',' '\n' | sort | paste -s -d ',')
+      EXPECTED="connect,query_dcl,query_ddl"
+
+      if [ "$EVENTS_NORM" != "$EXPECTED" ]; then
+        echo "ERROR: SERVER_AUDIT_EVENTS must be exactly CONNECT,QUERY_DDL,QUERY_DCL (no extras)."
+        echo "  Found: $EVENTS_VALUE"
+        echo "  Normalized: $EVENTS_NORM"
+        echo "  Expected: $EXPECTED"
+        exit 1
+      fi
+
+      echo "✓ Option Group '$OG_NAME' is correctly configured."
+    BASH
   }
 }
 

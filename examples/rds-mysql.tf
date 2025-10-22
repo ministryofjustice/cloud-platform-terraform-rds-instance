@@ -79,5 +79,10 @@ resource "kubernetes_config_map" "rds_mysql" {
 
 #   option {
 #     option_name = "MARIADB_AUDIT_PLUGIN"
+
+#     option_settings {
+#       name  = "SERVER_AUDIT_EVENTS"
+#       value = "CONNECT,QUERY_DDL,QUERY_DCL" // DO NOT CHANGE THESE 'MARIADB_AUDIT_PLUGIN' SETTING VALUES WITHOUT CONSULTING MOJ CLOUD PLATFORM TEAM
+#     }
 #   }
 # }
