@@ -103,6 +103,8 @@ locals {
     environment-name       = var.environment_name
     infrastructure-support = var.infrastructure_support
   }
+
+  validate_mysql_mariadb_og = var.opt_in_xsiam_logging && contains(["mysql", "mariadb"], var.db_engine) && try(length(var.option_group_name) > 0, false)
 }
 
 ##################
@@ -242,7 +244,7 @@ resource "aws_security_group" "rds-sg" {
 }
 
 data "external" "validate_mysql_audit_exact" {
-  count = (var.opt_in_xsiam_logging && contains(["mysql","mariadb"], var.db_engine) && try(length(var.option_group_name) > 0, false)) ? 1 : 0
+  count = (var.opt_in_xsiam_logging && contains(["mysql", "mariadb"], var.db_engine) && try(length(var.option_group_name) > 0, false)) ? 1 : 0
 
   program = [
     "/bin/bash",
@@ -260,9 +262,9 @@ data "external" "validate_mysql_audit_exact" {
         .OptionGroupsList[0].Options[]?
         | select(.OptionName=="MARIADB_AUDIT_PLUGIN").OptionSettings[]?
         | select(.Name=="SERVER_AUDIT_EVENTS").Value // ""
+        | gsub("^\\s+|\\s+$"; "")
       ')"
 
-      # Return JSON the external provider can parse
       jq -n --arg events "$EVENTS_VALUE" '{events_value: $events}'
     BASH
   ]
@@ -335,10 +337,13 @@ resource "aws_db_instance" "rds" {
     }
 
     precondition {
-      condition     = try(data.external.validate_mysql_audit_exact[0].result.events_value, "") == "CONNECT,QUERY_DDL,QUERY_DCL"
+      condition = (
+        !local.validate_mysql_mariadb_og
+        || trimspace(try(data.external.validate_mysql_audit_exact[0].result.events_value, "")) == "CONNECT,QUERY_DDL,QUERY_DCL"
+      )
       error_message = "Option Group SERVER_AUDIT_EVENTS must equal CONNECT,QUERY_DDL,QUERY_DCL."
     }
-  
+
     precondition {
       condition = var.storage_type != "io2" || (
         contains(["sqlserver-ee", "sqlserver-se", "sqlserver-ex", "sqlserver-web"], var.db_engine) ? var.db_allocated_storage >= 20 : var.db_allocated_storage >= 100
