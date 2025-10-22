@@ -105,58 +105,118 @@ locals {
   }
 }
 
-resource "null_resource" "validate_mysql_audit_option_group" {
+# resource "null_resource" "validate_mysql_audit_option_group" {
+#   count = var.opt_in_xsiam_logging && contains(["mysql", "mariadb"], var.db_engine) && try(length(var.option_group_name) > 0, false) ? 1 : 0
+
+#   triggers = {
+#     option_group_name = var.option_group_name
+#     check_timestamp   = timestamp()
+#   }
+
+#   provisioner "local-exec" {
+#     command = <<-BASH
+#       set -euo pipefail
+#       OG_NAME="${var.option_group_name}"
+#       REGION="${data.aws_region.current.name}"
+
+#       echo "Validating Option Group: $OG_NAME"
+
+#       # Fetch the OG
+#       OG_JSON=$(aws rds describe-option-groups --option-group-name "$OG_NAME" --region "$REGION" --output json)
+
+#       # Check MARIADB_AUDIT_PLUGIN exists
+#       PLUGIN_PRESENT=$(echo "$OG_JSON" | jq -r '.OptionGroupsList[0].Options // [] | map(.OptionName=="MARIADB_AUDIT_PLUGIN") | any')
+#       if [ "$PLUGIN_PRESENT" != "true" ]; then
+#         echo "ERROR: Option Group '$OG_NAME' does not include MARIADB_AUDIT_PLUGIN."
+#         exit 1
+#       fi
+
+#       # Extract SERVER_AUDIT_EVENTS
+#       EVENTS_VALUE=$(echo "$OG_JSON" | jq -r '
+#         .OptionGroupsList[0].Options[]? 
+#         | select(.OptionName=="MARIADB_AUDIT_PLUGIN").OptionSettings[]? 
+#         | select(.Name=="SERVER_AUDIT_EVENTS").Value // ""
+#       ')
+
+#       if [ -z "$EVENTS_VALUE" ]; then
+#         echo "ERROR: MARIADB_AUDIT_PLUGIN is missing SERVER_AUDIT_EVENTS setting."
+#         exit 1
+#       fi
+
+#       # Normalize (lowercase, no spaces, sort) and compare
+#       EVENTS_NORM=$(echo "$EVENTS_VALUE" | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]' | tr ',' '\n' | sort -u | tr '\n' ',' | sed 's/,$//')
+#       EXPECTED="connect,query_dcl,query_ddl"
+
+#       if [ "$EVENTS_NORM" != "$EXPECTED" ]; then
+#         echo "ERROR: SERVER_AUDIT_EVENTS must be exactly CONNECT,QUERY_DDL,QUERY_DCL (no extras)."
+#         echo "  Found: $EVENTS_VALUE"
+#         echo "  Normalized: $EVENTS_NORM"
+#         echo "  Expected: $EXPECTED"
+#         exit 1
+#       fi
+
+#       echo "✓ Option Group '$OG_NAME' is correctly configured."
+#     BASH
+#   }
+# }
+
+data "external" "validate_mysql_audit_option_group" {
   count = var.opt_in_xsiam_logging && contains(["mysql", "mariadb"], var.db_engine) && try(length(var.option_group_name) > 0, false) ? 1 : 0
 
-  triggers = {
+  program = ["bash", "-c", <<-BASH
+    set -euo pipefail
+    
+    # Read query JSON from stdin
+    QUERY_JSON="$(cat)"
+    OG_NAME="$(echo "$QUERY_JSON" | jq -r '.option_group_name')"
+    REGION="$(echo "$QUERY_JSON" | jq -r '.region')"
+
+    echo "Validating Option Group: $OG_NAME" >&2
+
+    # Fetch the OG
+    OG_JSON=$(aws rds describe-option-groups --option-group-name "$OG_NAME" --region "$REGION" --output json)
+
+    # Check MARIADB_AUDIT_PLUGIN exists
+    PLUGIN_PRESENT=$(echo "$OG_JSON" | jq -r '.OptionGroupsList[0].Options // [] | map(.OptionName=="MARIADB_AUDIT_PLUGIN") | any')
+    if [ "$PLUGIN_PRESENT" != "true" ]; then
+      echo "ERROR: Option Group '$OG_NAME' does not include MARIADB_AUDIT_PLUGIN." >&2
+      exit 1
+    fi
+
+    # Extract SERVER_AUDIT_EVENTS
+    EVENTS_VALUE=$(echo "$OG_JSON" | jq -r '
+      .OptionGroupsList[0].Options[]? 
+      | select(.OptionName=="MARIADB_AUDIT_PLUGIN").OptionSettings[]? 
+      | select(.Name=="SERVER_AUDIT_EVENTS").Value // ""
+    ')
+
+    if [ -z "$EVENTS_VALUE" ]; then
+      echo "ERROR: MARIADB_AUDIT_PLUGIN is missing SERVER_AUDIT_EVENTS setting." >&2
+      exit 1
+    fi
+
+    # Normalize (lowercase, no spaces, sort) and compare
+    EVENTS_NORM=$(echo "$EVENTS_VALUE" | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]' | tr ',' '\n' | sort -u | tr '\n' ',' | sed 's/,$//')
+    EXPECTED="connect,query_dcl,query_ddl"
+
+    if [ "$EVENTS_NORM" != "$EXPECTED" ]; then
+      echo "ERROR: SERVER_AUDIT_EVENTS must be exactly CONNECT,QUERY_DDL,QUERY_DCL (no extras)." >&2
+      echo "  Found: $EVENTS_VALUE" >&2
+      echo "  Normalized: $EVENTS_NORM" >&2
+      echo "  Expected: $EXPECTED" >&2
+      exit 1
+    fi
+
+    echo "✓ Option Group '$OG_NAME' is correctly configured." >&2
+    
+    # Return valid JSON (required by external data source)
+    echo '{"validated":"true"}'
+  BASH
+  ]
+
+  query = {
     option_group_name = var.option_group_name
-    check_timestamp   = timestamp()
-  }
-
-  provisioner "local-exec" {
-    command = <<-BASH
-      set -euo pipefail
-      OG_NAME="${var.option_group_name}"
-      REGION="${data.aws_region.current.name}"
-
-      echo "Validating Option Group: $OG_NAME"
-
-      # Fetch the OG
-      OG_JSON=$(aws rds describe-option-groups --option-group-name "$OG_NAME" --region "$REGION" --output json)
-
-      # Check MARIADB_AUDIT_PLUGIN exists
-      PLUGIN_PRESENT=$(echo "$OG_JSON" | jq -r '.OptionGroupsList[0].Options // [] | map(.OptionName=="MARIADB_AUDIT_PLUGIN") | any')
-      if [ "$PLUGIN_PRESENT" != "true" ]; then
-        echo "ERROR: Option Group '$OG_NAME' does not include MARIADB_AUDIT_PLUGIN."
-        exit 1
-      fi
-
-      # Extract SERVER_AUDIT_EVENTS
-      EVENTS_VALUE=$(echo "$OG_JSON" | jq -r '
-        .OptionGroupsList[0].Options[]? 
-        | select(.OptionName=="MARIADB_AUDIT_PLUGIN").OptionSettings[]? 
-        | select(.Name=="SERVER_AUDIT_EVENTS").Value // ""
-      ')
-
-      if [ -z "$EVENTS_VALUE" ]; then
-        echo "ERROR: MARIADB_AUDIT_PLUGIN is missing SERVER_AUDIT_EVENTS setting."
-        exit 1
-      fi
-
-      # Normalize (lowercase, no spaces, sort) and compare
-      EVENTS_NORM=$(echo "$EVENTS_VALUE" | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]' | tr ',' '\n' | sort -u | tr '\n' ',' | sed 's/,$//')
-      EXPECTED="connect,query_dcl,query_ddl"
-
-      if [ "$EVENTS_NORM" != "$EXPECTED" ]; then
-        echo "ERROR: SERVER_AUDIT_EVENTS must be exactly CONNECT,QUERY_DDL,QUERY_DCL (no extras)."
-        echo "  Found: $EVENTS_VALUE"
-        echo "  Normalized: $EVENTS_NORM"
-        echo "  Expected: $EXPECTED"
-        exit 1
-      fi
-
-      echo "✓ Option Group '$OG_NAME' is correctly configured."
-    BASH
+    region            = data.aws_region.current.name
   }
 }
 
