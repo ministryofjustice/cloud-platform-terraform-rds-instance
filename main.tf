@@ -144,7 +144,7 @@ resource "null_resource" "validate_mysql_audit_option_group" {
       fi
 
       # Normalize (lowercase, no spaces, sort) and compare
-      EVENTS_NORM=$(echo "$EVENTS_VALUE" | tr '[:upper:]' '[:lower:]' | tr -d ' ' | tr ',' '\n' | sort | tr '\n' ',' | sed 's/,$//')
+      EVENTS_NORM=$(echo "$EVENTS_VALUE" | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]' | tr ',' '\n' | sort -u | tr '\n' ',' | sed 's/,$//')
       EXPECTED="connect,query_dcl,query_ddl"
 
       if [ "$EVENTS_NORM" != "$EXPECTED" ]; then
