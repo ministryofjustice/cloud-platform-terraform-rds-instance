@@ -195,8 +195,8 @@ data "external" "validate_mysql_audit_option_group" {
       exit 1
     fi
 
-    # Normalize (lowercase, no spaces, sort) and compare
-    EVENTS_NORM=$(echo "$EVENTS_VALUE" | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]' | tr ',' '\n' | sort -u | tr '\n' ',' | sed 's/,$//')
+    # Normalize (lowercase, no spaces, sort) and compare - do NOT dedupe with -u
+    EVENTS_NORM=$(echo "$EVENTS_VALUE" | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]' | tr ',' '\n' | sort | tr '\n' ',' | sed 's/,$//')
     EXPECTED="connect,query_dcl,query_ddl"
 
     if [ "$EVENTS_NORM" != "$EXPECTED" ]; then
