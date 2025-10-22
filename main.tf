@@ -105,121 +105,6 @@ locals {
   }
 }
 
-# resource "null_resource" "validate_mysql_audit_option_group" {
-#   count = var.opt_in_xsiam_logging && contains(["mysql", "mariadb"], var.db_engine) && try(length(var.option_group_name) > 0, false) ? 1 : 0
-
-#   triggers = {
-#     option_group_name = var.option_group_name
-#     check_timestamp   = timestamp()
-#   }
-
-#   provisioner "local-exec" {
-#     command = <<-BASH
-#       set -euo pipefail
-#       OG_NAME="${var.option_group_name}"
-#       REGION="${data.aws_region.current.name}"
-
-#       echo "Validating Option Group: $OG_NAME"
-
-#       # Fetch the OG
-#       OG_JSON=$(aws rds describe-option-groups --option-group-name "$OG_NAME" --region "$REGION" --output json)
-
-#       # Check MARIADB_AUDIT_PLUGIN exists
-#       PLUGIN_PRESENT=$(echo "$OG_JSON" | jq -r '.OptionGroupsList[0].Options // [] | map(.OptionName=="MARIADB_AUDIT_PLUGIN") | any')
-#       if [ "$PLUGIN_PRESENT" != "true" ]; then
-#         echo "ERROR: Option Group '$OG_NAME' does not include MARIADB_AUDIT_PLUGIN."
-#         exit 1
-#       fi
-
-#       # Extract SERVER_AUDIT_EVENTS
-#       EVENTS_VALUE=$(echo "$OG_JSON" | jq -r '
-#         .OptionGroupsList[0].Options[]? 
-#         | select(.OptionName=="MARIADB_AUDIT_PLUGIN").OptionSettings[]? 
-#         | select(.Name=="SERVER_AUDIT_EVENTS").Value // ""
-#       ')
-
-#       if [ -z "$EVENTS_VALUE" ]; then
-#         echo "ERROR: MARIADB_AUDIT_PLUGIN is missing SERVER_AUDIT_EVENTS setting."
-#         exit 1
-#       fi
-
-#       # Normalize (lowercase, no spaces, sort) and compare
-#       EVENTS_NORM=$(echo "$EVENTS_VALUE" | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]' | tr ',' '\n' | sort -u | tr '\n' ',' | sed 's/,$//')
-#       EXPECTED="connect,query_dcl,query_ddl"
-
-#       if [ "$EVENTS_NORM" != "$EXPECTED" ]; then
-#         echo "ERROR: SERVER_AUDIT_EVENTS must be exactly CONNECT,QUERY_DDL,QUERY_DCL (no extras)."
-#         echo "  Found: $EVENTS_VALUE"
-#         echo "  Normalized: $EVENTS_NORM"
-#         echo "  Expected: $EXPECTED"
-#         exit 1
-#       fi
-
-#       echo "✓ Option Group '$OG_NAME' is correctly configured."
-#     BASH
-#   }
-# }
-
-data "external" "validate_mysql_audit_option_group" {
-  count = var.opt_in_xsiam_logging && contains(["mysql", "mariadb"], var.db_engine) && try(length(var.option_group_name) > 0, false) ? 1 : 0
-
-  program = ["bash", "-c", <<-BASH
-    set -euo pipefail
-    
-    # Read query JSON from stdin
-    QUERY_JSON="$(cat)"
-    OG_NAME="$(echo "$QUERY_JSON" | jq -r '.option_group_name')"
-    REGION="$(echo "$QUERY_JSON" | jq -r '.region')"
-
-    echo "Validating Option Group: $OG_NAME" >&2
-
-    # Fetch the OG
-    OG_JSON=$(aws rds describe-option-groups --option-group-name "$OG_NAME" --region "$REGION" --output json)
-
-    # Check MARIADB_AUDIT_PLUGIN exists
-    PLUGIN_PRESENT=$(echo "$OG_JSON" | jq -r '.OptionGroupsList[0].Options // [] | map(.OptionName=="MARIADB_AUDIT_PLUGIN") | any')
-    if [ "$PLUGIN_PRESENT" != "true" ]; then
-      echo "ERROR: Option Group '$OG_NAME' does not include MARIADB_AUDIT_PLUGIN." >&2
-      exit 1
-    fi
-
-    # Extract SERVER_AUDIT_EVENTS
-    EVENTS_VALUE=$(echo "$OG_JSON" | jq -r '
-      .OptionGroupsList[0].Options[]? 
-      | select(.OptionName=="MARIADB_AUDIT_PLUGIN").OptionSettings[]? 
-      | select(.Name=="SERVER_AUDIT_EVENTS").Value // ""
-    ')
-
-    if [ -z "$EVENTS_VALUE" ]; then
-      echo "ERROR: MARIADB_AUDIT_PLUGIN is missing SERVER_AUDIT_EVENTS setting." >&2
-      exit 1
-    fi
-
-    # Normalize (lowercase, no spaces, sort) and compare - do NOT dedupe with -u
-    EVENTS_NORM=$(echo "$EVENTS_VALUE" | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]' | tr ',' '\n' | sort | tr '\n' ',' | sed 's/,$//')
-    EXPECTED="connect,query_dcl,query_ddl"
-
-    if [ "$EVENTS_NORM" != "$EXPECTED" ]; then
-      echo "ERROR: SERVER_AUDIT_EVENTS must be exactly CONNECT,QUERY_DDL,QUERY_DCL (no extras)." >&2
-      echo "  Found: $EVENTS_VALUE" >&2
-      echo "  Normalized: $EVENTS_NORM" >&2
-      echo "  Expected: $EXPECTED" >&2
-      exit 1
-    fi
-
-    echo "✓ Option Group '$OG_NAME' is correctly configured." >&2
-    
-    # Return valid JSON (required by external data source)
-    echo '{"validated":"true"}'
-  BASH
-  ]
-
-  query = {
-    option_group_name = var.option_group_name
-    region            = data.aws_region.current.name
-  }
-}
-
 ##################
 # Get AWS region #
 ##################
@@ -356,6 +241,38 @@ resource "aws_security_group" "rds-sg" {
   }
 }
 
+data "external" "validate_mysql_audit_exact" {
+  count = (var.opt_in_xsiam_logging && contains(["mysql","mariadb"], var.db_engine) && try(length(var.option_group_name) > 0, false)) ? 1 : 0
+
+  program = [
+    "/bin/bash",
+    "-lc",
+    <<-BASH
+      set -euo pipefail
+
+      QUERY_JSON="$(cat)"
+      OG_NAME="$(echo "$QUERY_JSON" | jq -r '.option_group_name')"
+      REGION="$(echo "$QUERY_JSON" | jq -r '.region')"
+
+      OG_JSON="$(aws rds describe-option-groups --option-group-name "$OG_NAME" --region "$REGION" --output json)"
+
+      EVENTS_VALUE="$(echo "$OG_JSON" | jq -r '
+        .OptionGroupsList[0].Options[]?
+        | select(.OptionName=="MARIADB_AUDIT_PLUGIN").OptionSettings[]?
+        | select(.Name=="SERVER_AUDIT_EVENTS").Value // ""
+      ')"
+
+      # Return JSON the external provider can parse
+      jq -n --arg events "$EVENTS_VALUE" '{events_value: $events}'
+    BASH
+  ]
+
+  query = {
+    option_group_name = var.option_group_name
+    region            = data.aws_region.current.name
+  }
+}
+
 ###################
 # Create database #
 ###################
@@ -417,6 +334,11 @@ resource "aws_db_instance" "rds" {
       error_message = "For MySQL or MariaDB with opt_in_xsiam_logging enabled, you must provide a non-empty option_group_name (with the audit plugin option set)."
     }
 
+    precondition {
+      condition     = try(data.external.validate_mysql_audit_exact[0].result.events_value, "") == "CONNECT,QUERY_DDL,QUERY_DCL"
+      error_message = "Option Group SERVER_AUDIT_EVENTS must equal CONNECT,QUERY_DDL,QUERY_DCL."
+    }
+  
     precondition {
       condition = var.storage_type != "io2" || (
         contains(["sqlserver-ee", "sqlserver-se", "sqlserver-ex", "sqlserver-web"], var.db_engine) ? var.db_allocated_storage >= 20 : var.db_allocated_storage >= 100
