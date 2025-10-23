@@ -12,8 +12,8 @@ locals {
   # engine-to-export log configuration mappings
   db_log_export_mappings = {
     postgres      = ["postgresql", "upgrade"]
-    mysql         = ["audit", "error"]
-    mariadb       = ["audit", "error"]
+    # mysql         = ["audit", "error"]
+    # mariadb       = ["audit", "error"]
     sqlserver-ee  = ["agent", "error"]
     sqlserver-se  = ["agent", "error"]
     sqlserver-ex  = ["agent", "error"]
@@ -24,18 +24,18 @@ locals {
   # Retrieve logs from user-selected engine
   log_exports = var.opt_in_xsiam_logging ? lookup(local.db_log_export_mappings, var.db_engine, []) : []
 
-  required_logging_parameters = var.opt_in_xsiam_logging && contains(["mysql", "mariadb"], var.db_engine) ? [
-    {
-      name         = "general_log"
-      value        = "0"
-      apply_method = "immediate"
-    },
-    {
-      name         = "log_output"
-      value        = "FILE"
-      apply_method = "immediate"
-    }
-  ] : []
+  # required_logging_parameters = var.opt_in_xsiam_logging && contains(["mysql", "mariadb"], var.db_engine) ? [
+  #   {
+  #     name         = "general_log"
+  #     value        = "0"
+  #     apply_method = "immediate"
+  #   },
+  #   {
+  #     name         = "log_output"
+  #     value        = "FILE"
+  #     apply_method = "immediate"
+  #   }
+  # ] : []
 
   required_postgres_logging_parameters = var.opt_in_xsiam_logging && var.db_engine == "postgres" ? [
     {
@@ -84,7 +84,7 @@ locals {
   ] : []
 
   all_db_parameters = concat(
-    local.required_logging_parameters,
+    # local.required_logging_parameters,
     local.required_postgres_logging_parameters,
     local.required_oracle_logging_parameters,
     var.db_parameter
@@ -103,8 +103,6 @@ locals {
     environment-name       = var.environment_name
     infrastructure-support = var.infrastructure_support
   }
-
-  validate_mysql_mariadb_og = var.opt_in_xsiam_logging && contains(["mysql", "mariadb"], var.db_engine) && try(length(var.option_group_name) > 0, false)
 }
 
 ##################
@@ -243,38 +241,6 @@ resource "aws_security_group" "rds-sg" {
   }
 }
 
-data "external" "validate_mysql_audit_exact" {
-  count = (var.opt_in_xsiam_logging && contains(["mysql", "mariadb"], var.db_engine) && try(length(var.option_group_name) > 0, false)) ? 1 : 0
-
-  program = [
-    "/bin/bash",
-    "-lc",
-    <<-BASH
-      set -euo pipefail
-
-      QUERY_JSON="$(cat)"
-      OG_NAME="$(echo "$QUERY_JSON" | jq -r '.option_group_name')"
-      REGION="$(echo "$QUERY_JSON" | jq -r '.region')"
-
-      OG_JSON="$(aws rds describe-option-groups --option-group-name "$OG_NAME" --region "$REGION" --output json)"
-
-      EVENTS_VALUE="$(echo "$OG_JSON" | jq -r '
-        .OptionGroupsList[0].Options[]?
-        | select(.OptionName=="MARIADB_AUDIT_PLUGIN").OptionSettings[]?
-        | select(.Name=="SERVER_AUDIT_EVENTS").Value // ""
-        | gsub("^\\s+|\\s+$"; "")
-      ')"
-
-      jq -n --arg events "$EVENTS_VALUE" '{events_value: $events}'
-    BASH
-  ]
-
-  query = {
-    option_group_name = var.option_group_name
-    region            = data.aws_region.current.name
-  }
-}
-
 ###################
 # Create database #
 ###################
@@ -327,22 +293,14 @@ resource "aws_db_instance" "rds" {
   tags = merge(local.default_tags, local.tag_for_auto_shutdown)
 
   lifecycle {
-    precondition {
-      condition = !(
-        contains(["mysql", "mariadb"], var.db_engine) &&
-        var.opt_in_xsiam_logging &&
-        (var.option_group_name == null || var.option_group_name == "")
-      )
-      error_message = "For MySQL or MariaDB with opt_in_xsiam_logging enabled, you must provide a non-empty option_group_name (with the audit plugin option set)."
-    }
-
-    precondition {
-      condition = (
-        !local.validate_mysql_mariadb_og
-        || trimspace(try(data.external.validate_mysql_audit_exact[0].result.events_value, "")) == "CONNECT,QUERY_DDL,QUERY_DCL"
-      )
-      error_message = "Option Group SERVER_AUDIT_EVENTS must equal CONNECT,QUERY_DDL,QUERY_DCL."
-    }
+    # precondition {
+    #   condition = !(
+    #     contains(["mysql", "mariadb"], var.db_engine) &&
+    #     var.opt_in_xsiam_logging &&
+    #     (var.option_group_name == null || var.option_group_name == "")
+    #   )
+    #   error_message = "For MySQL or MariaDB with opt_in_xsiam_logging enabled, you must provide a non-empty option_group_name (with the audit plugin option set)."
+    # }
 
     precondition {
       condition = var.storage_type != "io2" || (

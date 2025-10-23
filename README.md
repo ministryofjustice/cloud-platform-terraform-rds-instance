@@ -109,7 +109,7 @@ Instructions on how to do this are available [here](https://user-guide.cloud-pla
 
 ## Enabling Logging to XSIAM Cortex
 
-If you are required to stream logs to XSIAM Cortex for security auditing, you can do so by setting `opt_in_xsiam_logging` variable to true. In the case of mysql and mariadb engines, you will need to create an option group, set the MARIADB_AUDIT_PLUGIN option, and pass it into the module call. Please see the '/examples' folder.
+If you are required to stream logs to XSIAM Cortex for security auditing, you can do so by setting `opt_in_xsiam_logging` variable to true. NOTE: IN THE CASE OF MYSQL AND MARIADB ENGINES, THIS FUNCTIONALITY IS TEMPORARILY DISABLED AND WILL BE ENABLED AGAIN SOON.
 
 ## IMPORTANT - Release 9.0.0 changes:
 
@@ -226,8 +226,8 @@ No modules.
 | <a name="input_license_model"></a> [license\_model](#input\_license\_model) | License model information for this DB instance, options for MS-SQL are: license-included \| bring-your-own-license \| general-public-license | `string` | `null` | no |
 | <a name="input_maintenance_window"></a> [maintenance\_window](#input\_maintenance\_window) | The window to perform maintenance in. Syntax: 'ddd:hh24:mi-ddd:hh24:mi'. Eg: 'Mon:00:00-Mon:03:00' | `string` | `null` | no |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | Namespace name | `string` | n/a | yes |
-| <a name="input_opt_in_xsiam_logging"></a> [opt\_in\_xsiam\_logging](#input\_opt\_in\_xsiam\_logging) | If set to true, it will create Cloudwatch log groups for the RDS instance and send them to Cortex XSIAM. NOTE: for MySQL and MariaDB engines, you must pass in an option group with MARIADB\_AUDIT\_PLUGIN set as an option | `bool` | `false` | no |
-| <a name="input_option_group_name"></a> [option\_group\_name](#input\_option\_group\_name) | (Optional) The name of an 'aws\_db\_option\_group' to associate to the DB instance. This must be provided with the MARIADB\_AUDIT\_PLUGIN option set, if you enable opt\_in\_xsiam\_logging for MySQL or MariaDB engines. | `string` | `null` | no |
+| <a name="input_opt_in_xsiam_logging"></a> [opt\_in\_xsiam\_logging](#input\_opt\_in\_xsiam\_logging) | If set to true, it will create Cloudwatch log groups for the RDS instance and send them to Cortex XSIAM. | `bool` | `false` | no |
+| <a name="input_option_group_name"></a> [option\_group\_name](#input\_option\_group\_name) | (Optional) The name of an 'aws\_db\_option\_group' to associate to the DB instance. | `string` | `null` | no |
 | <a name="input_performance_insights_enabled"></a> [performance\_insights\_enabled](#input\_performance\_insights\_enabled) | Enable performance insights for RDS? Note: the user should ensure insights are disabled once the desired outcome is achieved. | `bool` | `false` | no |
 | <a name="input_prepare_for_major_upgrade"></a> [prepare\_for\_major\_upgrade](#input\_prepare\_for\_major\_upgrade) | Set this to true to change your parameter group to the default version, and to turn on the ability to upgrade major versions | `bool` | `false` | no |
 | <a name="input_rds_family"></a> [rds\_family](#input\_rds\_family) | Maps the engine version with the parameter group family, a family often covers several versions | `string` | `"postgres10"` | no |
