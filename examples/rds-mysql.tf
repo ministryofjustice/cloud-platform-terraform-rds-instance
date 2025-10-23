@@ -38,10 +38,6 @@ module "rds_mysql" {
   # uncomment below:
 
   # enable_irsa = true
-
-  # If you want to enable Cloudwatch logging for this mysql RDS instance, uncomment this and the option group below:
-  # opt_in_xsiam_logging = true
-  # option_group_name    = aws_db_option_group.rds_mysql_og.name
 }
 
 resource "kubernetes_secret" "rds_mysql" {
@@ -70,19 +66,3 @@ resource "kubernetes_config_map" "rds_mysql" {
     db_identifier = module.rds_mysql.db_identifier
   }
 }
-
-# resource "aws_db_option_group" "rds_mysql_og" {
-#   name                     = "test-mysql-option-group"
-#   option_group_description = "MySQL option group for logging"
-#   engine_name              = "mysql"
-#   major_engine_version     = "8.0"
-
-#   option {
-#     option_name = "MARIADB_AUDIT_PLUGIN"
-
-#     option_settings {
-#       name  = "SERVER_AUDIT_EVENTS"
-#       value = "CONNECT,QUERY_DDL,QUERY_DCL" // DO NOT CHANGE THESE 'MARIADB_AUDIT_PLUGIN' SETTING VALUES WITHOUT CONSULTING MOJ CLOUD PLATFORM TEAM
-#     }
-#   }
-# }
