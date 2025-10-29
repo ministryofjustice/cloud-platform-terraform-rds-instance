@@ -45,7 +45,7 @@ locals {
     },
     {
       name         = "pgaudit.log"
-      value        = "ddl, role"
+      value        = "read, write, function, role, ddl"
       apply_method = "immediate"
     },
     {
