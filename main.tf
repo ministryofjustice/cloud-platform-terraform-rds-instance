@@ -436,21 +436,21 @@ resource "aws_iam_policy" "irsa" {
   tags   = local.default_tags
 }
 
-# data "aws_iam_roles" "cloudwatch_to_firehose" {
-#   name_regex = "cloud-platform-cloudwatch-to-firehose20250912120805499500000001"
-# }
-
-# data "aws_kinesis_firehose_delivery_stream" "rds_log_stream" {
-#   name = "cloudwatch-export-180af1363ef3510a"
-# }
-
 data "aws_iam_roles" "cloudwatch_to_firehose" {
-  name_regex = "cloud-platform-cloudwatch-to-firehose20251024152904682100000002"
+  name_regex = "cloud-platform-cloudwatch-to-firehose20250912120805499500000001"
 }
 
 data "aws_kinesis_firehose_delivery_stream" "rds_log_stream" {
-  name = "cloudwatch-export-b13d30578912db1a"
+  name = "cloudwatch-export-180af1363ef3510a"
 }
+
+# data "aws_iam_roles" "cloudwatch_to_firehose" {
+#   name_regex = "cloud-platform-cloudwatch-to-firehose20251024152904682100000002"
+# }
+
+# data "aws_kinesis_firehose_delivery_stream" "rds_log_stream" {
+#   name = "cloudwatch-export-b13d30578912db1a"
+# }
 
 resource "aws_cloudwatch_log_group" "rds_cloudwatch_logs" {
   for_each          = var.opt_in_xsiam_logging ? toset(local.log_exports) : toset([])
