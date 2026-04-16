@@ -253,7 +253,7 @@ resource "aws_db_instance" "rds" {
   engine                          = var.replicate_source_db == null ? var.db_engine : null
   engine_version                  = var.db_engine_version
   instance_class                  = var.db_instance_class
-  db_name                         = var.replicate_source_db != null || can(regex("sqlserver", var.db_engine)) ? null : local.db_name
+  db_name                         = var.is_migration || var.replicate_source_db != null || can(regex("sqlserver", var.db_engine)) ? null : local.db_name
   username                        = var.is_migration || var.replicate_source_db != null ? null : sensitive("cp${random_string.username.result}")
   password                        = var.replicate_source_db != null ? null : random_password.password.result
   backup_retention_period         = var.db_backup_retention_period
@@ -293,6 +293,8 @@ resource "aws_db_instance" "rds" {
   tags = merge(local.default_tags, local.tag_for_auto_shutdown)
 
   lifecycle {
+    ignore_changes = [snapshot_identifier, db_name, username]
+
     # precondition {
     #   condition = !(
     #     contains(["mysql", "mariadb"], var.db_engine) &&
