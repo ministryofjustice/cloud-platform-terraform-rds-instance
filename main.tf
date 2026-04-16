@@ -293,6 +293,8 @@ resource "aws_db_instance" "rds" {
   tags = merge(local.default_tags, local.tag_for_auto_shutdown)
 
   lifecycle {
+    ignore_changes = [snapshot_identifier]
+
     # precondition {
     #   condition = !(
     #     contains(["mysql", "mariadb"], var.db_engine) &&
