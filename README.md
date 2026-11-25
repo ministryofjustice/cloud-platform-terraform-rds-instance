@@ -15,8 +15,8 @@ module "rds_instance" {
 
   # Database configuration
   db_engine                = "postgres"
-  db_engine_version        = "15"
-  rds_family               = "postgres15"
+  db_engine_version        = "18"
+  rds_family               = "postgres18"
   db_instance_class        = "db.t4g.micro"
   db_max_allocated_storage = "500"
 
@@ -209,7 +209,7 @@ No modules.
 | <a name="input_db_allocated_storage"></a> [db\_allocated\_storage](#input\_db\_allocated\_storage) | The allocated storage in gibibytes | `number` | `"20"` | no |
 | <a name="input_db_backup_retention_period"></a> [db\_backup\_retention\_period](#input\_db\_backup\_retention\_period) | The days to retain backups. Must be 1 or greater to be a source for a Read Replica | `string` | `"7"` | no |
 | <a name="input_db_engine"></a> [db\_engine](#input\_db\_engine) | Database engine used e.g. postgres, mysql, sqlserver-ex | `string` | `"postgres"` | no |
-| <a name="input_db_engine_version"></a> [db\_engine\_version](#input\_db\_engine\_version) | The engine version to use e.g. 13.2 for Postgresql, 8.0 for MySQL, 15.00.4073.23.v1 for MS-SQL. Omitting the minor release part allows for automatic updates. | `string` | `"10"` | no |
+| <a name="input_db_engine_version"></a> [db\_engine\_version](#input\_db\_engine\_version) | The engine version to use e.g. 18.6 for Postgresql, <br />8.0 for MySQL, <br />15.00.4073.23.v1 for MS-SQL. Omitting the minor release part allows for automatic updates. | `string` | `"10"` | no |
 | <a name="input_db_instance_class"></a> [db\_instance\_class](#input\_db\_instance\_class) | The instance type of the RDS instance | `string` | `"db.t2.small"` | no |
 | <a name="input_db_iops"></a> [db\_iops](#input\_db\_iops) | The amount of provisioned IOPS. | `number` | `null` | no |
 | <a name="input_db_max_allocated_storage"></a> [db\_max\_allocated\_storage](#input\_db\_max\_allocated\_storage) | Maximum storage limit for storage autoscaling | `string` | `"10000"` | no |
